@@ -1,15 +1,18 @@
+# -*- coding: utf-8 -*-
+
+import logging
+import os
+import sys
+from math import pi
+
 import networkx as nx
 import numpy as np
-import logging
 import scipy as sp
-from math import pi
-import sys
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 logging.debug("test")
 
-import os
 dir_path = os.path.dirname(os.path.realpath('__file__'))
 
 
@@ -28,25 +31,27 @@ def get_laplacian(G, normalized=False):
 def set_diagonal_matrix(M, d):
     for j, row in enumerate(M):
         for i, x in enumerate(row):
-            if i==j:
+            if i == j:
                 M[j][i] = d[i]
             else:
                 M[j][i] = x
     return M
 
 
-def commute_time_kernel(G, normalized = False):
+def commute_time_kernel(G, normalized=False):
     """Computes the conmute-time kernel, which is the expected time of going back and forth between a couple of nodes. If the network is connected, then the commute time kernel will be totally dense, therefore reflecting global properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the unnormalised and normalised graph Laplacian.."""
     # Apply pseudo-inverse (moore-penrose) of laplacian matrix
     return np.linalg.pinv(get_laplacian(G, normalized))
 
-def diffusion_kernel(G, sigma2 = 1, normalized = True):
-    EL = -sigma2/2*get_laplacian(G, normalized)
+
+def diffusion_kernel(G, sigma2=1, normalized=True):
+    EL = -sigma2 / 2 * get_laplacian(G, normalized)
     return sp.linalg.expm(EL)
+
 
 def inverse_cosine_kernel(G):
     # Decompose matrix (Singular Value Decomposition)
-    U, S, _ = np.linalg.svd(get_laplacian(G, normalized = True)*(pi/4))
+    U, S, _ = np.linalg.svd(get_laplacian(G, normalized=True) * (pi / 4))
 
     return np.matmul(np.matmul(U, np.diag(np.cos(S))), np.transpose(U))
 
