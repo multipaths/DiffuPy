@@ -1,1 +1,1 @@
-# pydiffu
+# diffupy
