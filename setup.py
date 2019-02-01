@@ -26,6 +26,8 @@ CLASSIFIERS = [
 ]
 INSTALL_REQUIRES = [
     'networkx',
+    'numpy',
+    'scipy'
     # TODO: Add requirements
 ]
 ENTRY_POINTS = {
