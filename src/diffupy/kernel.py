@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import logging
-import os
+"""Implementation of the diffupy Kernel."""
+
 import sys
 from math import pi
 
+import logging
 import networkx as nx
 import numpy as np
 import scipy as sp
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-logging.debug("test")
-
-dir_path = os.path.dirname(os.path.realpath('__file__'))
 
 
 def get_laplacian(G, normalized=False):
+    """"""
     if nx.is_directed(G):
-        sys.exit('Graph must be undirected')
+        raise ValueError('Graph must be undirected')
 
     if not normalized:
         L = nx.laplacian_matrix(G).toarray()
@@ -29,6 +27,7 @@ def get_laplacian(G, normalized=False):
 
 
 def set_diagonal_matrix(M, d):
+    """"""
     for j, row in enumerate(M):
         for i, x in enumerate(row):
             if i == j:
@@ -39,17 +38,23 @@ def set_diagonal_matrix(M, d):
 
 
 def commute_time_kernel(G, normalized=False):
-    """Computes the conmute-time kernel, which is the expected time of going back and forth between a couple of nodes. If the network is connected, then the commute time kernel will be totally dense, therefore reflecting global properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the unnormalised and normalised graph Laplacian.."""
+    """Computes the conmute-time kernel, which is the expected time of going back and forth between a couple of nodes.
+    If the network is connected, then the commute time kernel will be totally dense, therefore reflecting global
+    properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the
+    unnormalised and normalised graph Laplacian."""
+
     # Apply pseudo-inverse (moore-penrose) of laplacian matrix
     return np.linalg.pinv(get_laplacian(G, normalized))
 
 
 def diffusion_kernel(G, sigma2=1, normalized=True):
+    """"""
     EL = -sigma2 / 2 * get_laplacian(G, normalized)
     return sp.linalg.expm(EL)
 
 
 def inverse_cosine_kernel(G):
+    """"""
     # Decompose matrix (Singular Value Decomposition)
     U, S, _ = np.linalg.svd(get_laplacian(G, normalized=True) * (pi / 4))
 
@@ -57,6 +62,7 @@ def inverse_cosine_kernel(G):
 
 
 def p_step_kernel(G, a=2, p=5):
+    """"""
     minusL = -get_laplacian(G, normalized=True)
 
     # Not optimal but kept for clarity
@@ -75,6 +81,7 @@ def p_step_kernel(G, a=2, p=5):
 
 
 def regularised_laplacian_kernel(G, sigma2=1, add_diag=1, normalized=False):
+    """"""
     L = get_laplacian(G, normalized)
     RL = sigma2 * L
 
