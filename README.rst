@@ -1,4 +1,4 @@
-diffupy
+diffuPy
 =======
 
 Description
