@@ -2,26 +2,13 @@
 
 """Tests checking kernel functions py implementation based on R package computations."""
 
-
-import os
-import numpy as np
 import logging
 import networkx as nx
-from diffupy.src.diffupy.kernels import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel
+import numpy as np
+import unittest
 
-TEST_FOLDER = os.path.dirname(os.path.realpath(__file__))
-resources_path = os.path.join(TEST_FOLDER, 'resources')
-
-# Kernel tests: 04_unit_testing
-# Graphs
-G1 = os.path.join(TEST_FOLDER, '_graph.gml')
-
-# Validation matrix
-commtK_path = os.path.join(TEST_FOLDER, 'commuteTimeKernel.csv')
-pstepK_path = os.path.join(TEST_FOLDER, 'pStepKernel.csv')
-invcosK_path = os.path.join(TEST_FOLDER, 'inverseCosineKernel.csv')
-diffuK_path = os.path.join(TEST_FOLDER, 'diffusionKernel.csv')
-
+from diffupy.kernel import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel
+from .constants import *
 
 log = logging.getLogger(__name__)
 
@@ -32,9 +19,8 @@ def csv_labeled_matrix_to_nparray(path):
     return np.array([[x for x in a if ~np.isnan(x)] for a in m[1:]])
 
 
-class KernelsTest():
-
-    G = nx.read_gml(G1, label='id')
+class KernelsTest(unittest.TestCase):
+    G = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
     def run_kernel_test(self, kernel_func, G, validate_matrix_path):
         M = kernel_func(G)
@@ -46,7 +32,7 @@ class KernelsTest():
         assert np.allclose(M, V)
         logging.info(' Test ' + kernel_func.__name__ + ' passed')
 
-    run_kernel_test(commute_time_kernel, G, commtK_path)
-    run_kernel_test(p_step_kernel, G, pstepK_path)
-    run_kernel_test(inverse_cosine_kernel, G, invcosK_path)
-    run_kernel_test(diffusion_kernel, G, diffuK_path)
+    run_kernel_test(commute_time_kernel, G, COMMUTE_TIME_KERNEL)
+    run_kernel_test(p_step_kernel, G, P_STEP_KERNEL)
+    run_kernel_test(inverse_cosine_kernel, G, INVERSE_COSINE_KERNEL)
+    run_kernel_test(diffusion_kernel, G, DIFFUSION_KERNEL)
