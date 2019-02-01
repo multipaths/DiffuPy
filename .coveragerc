@@ -1,0 +1,19 @@
+[run]
+branch = True
+source = diffupy
+omit =
+    src/diffupy/__main__.py
+    src/diffupy/cli.py
+    tests/*
+    docs/*
+
+[paths]
+source =
+    src/diffupy
+    .tox/*/lib/python*/site-packages/diffupy
+
+[report]
+show_missing = True
+exclude_lines =
+    def __str__
+    def __repr__
