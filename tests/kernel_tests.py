@@ -22,7 +22,7 @@ def csv_labeled_matrix_to_nparray(path):
 class KernelsTest(unittest.TestCase):
     G = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
-    def run_kernel_test(self, kernel_func, G, validate_matrix_path):
+    def run_kernel_test(kernel_func, G, validate_matrix_path):
         M = kernel_func(G)
         V = csv_labeled_matrix_to_nparray(validate_matrix_path)
 
