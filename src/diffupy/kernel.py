@@ -54,7 +54,9 @@ def diffusion_kernel(graph, sigma2=1, normalized=True):
 
 
 def inverse_cosine_kernel(graph):
-    """"""
+    """Computes the inverse cosine kernel, which is based on a cosine transform on the spectrum of the normalized Laplacian
+    matrix. Quoting [Smola, 2003]: the inverse cosine kernel treats lower complexity functions almost equally, with a
+    significant reduction in the upper end of the spectrum. This kernel is computed using the normalised graph Laplacian."""
     # Decompose matrix (Singular Value Decomposition)
     U, S, _ = np.linalg.svd(get_laplacian(graph, normalized=True) * (pi / 4))
 
@@ -62,7 +64,13 @@ def inverse_cosine_kernel(graph):
 
 
 def p_step_kernel(graph, a=2, p=5):
-    """"""
+    """Computes the p-step random walk kernel. This kernel is more focused on local properties of the nodes, because
+    random walks are limited in terms of length. Therefore, if p is small, only a fraction of the values K(x1,x2) will
+    be non-null if the network is sparse [Smola, 2003].
+    The parameter a is a regularising term that is summed to the spectrum of the normalised Laplacian matrix, and has
+    to be 2 or greater. The p-step kernels can be cheaper to compute and have been successful in biological tasks,
+    see the benchmark in [Valentini, 2014].
+    """
     minusL = -get_laplacian(graph, normalized=True)
 
     # Not optimal but kept for clarity
@@ -80,18 +88,18 @@ def p_step_kernel(graph, a=2, p=5):
     return np.linalg.matrix_power(M, p)
 
 
-def regularised_laplacian_kernel(graph, sigma2=1, add_diag=1, normalized=False):
-    """"""
-    L = get_laplacian(graph, normalized)
-    RL = sigma2 * L
+def regularised_laplacian_kernel(G, sigma2=1, add_diag=1, normalized=False):
+    """Computes the regularised Laplacian kernel, which is a standard in biological networks.
+    The regularised Laplacian kernel arises in numerous situations, such as the finite difference formulation of the
+    diffusion equation and in Gaussian process estimation. Sticking to the heat diffusion model, this function allows
+    to control the constant terms summed to the diagonal through add_diag, i.e. the strength of the leaking in each node.
+    If a node has diagonal term of 0, it is not allowed to disperse heat. The larger the diagonal term of a node, the
+    stronger the first order heat dispersion in it, provided that it is positive. Every connected component in the graph
+    should be able to disperse heat, i.e. have at least a node i with add_diag[i] > 0. If this is not the case, the result
+    diverges. More details on the parameters can be found in [Smola, 2003].
+    This kernel can be computed using both the unnormalised and normalised graph Laplacian.
+    """
+    L = get_laplacian(G, normalized)
+    RL = set_diagonal_matrix(sigma2 * L, [x + add_diag for x in np.diag(L)])
 
-    RL = set_diagonal_matrix(RL, [x + add_diag for x in np.diag(L)])
-
-    print(RL)
-    A = np.array(RL[:, :-1])
-    b = np.array(RL[:, -1])
-
-    print(A)
-    print(b)
-
-    return np.linalg.solve(A, b)
+    return np.linalg.inv(RL)

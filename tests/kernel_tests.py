@@ -7,7 +7,7 @@ import networkx as nx
 import numpy as np
 import unittest
 
-from diffupy.kernel import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel
+from diffupy.kernel import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel, regularised_laplacian_kernel
 from .constants import *
 
 log = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ class KernelsTest(unittest.TestCase):
         logging.info(' Test ' + kernel_func.__name__ + ' passed')
 
     run_kernel_test(commute_time_kernel, G, COMMUTE_TIME_KERNEL)
+    run_kernel_test(diffusion_kernel, G, DIFFUSION_KERNEL)
     run_kernel_test(p_step_kernel, G, P_STEP_KERNEL)
     run_kernel_test(inverse_cosine_kernel, G, INVERSE_COSINE_KERNEL)
-    run_kernel_test(diffusion_kernel, G, DIFFUSION_KERNEL)
+    run_kernel_test(regularised_laplacian_kernel, G, REGULARISED_LAPLACIAN_KERNEL)
