@@ -9,9 +9,9 @@ import click
 log = logging.getLogger(__name__)
 
 
-@click.group(help='PathMe')
+@click.group(help='DiffuPy')
 def main():
-    """Run PathMe."""
+    """Run DiffuPy."""
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
 
 
