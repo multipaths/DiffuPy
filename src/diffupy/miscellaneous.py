@@ -1,33 +1,40 @@
+# -*- coding: utf-8 -*-
+
+"""Miscellaneous utils of the package."""
+
 import networkx as nx
 import numpy as np
-import sys
 
-# General functions
-# Labels mapping
-def get_laplacian(G, normalized=False):
-    if nx.is_directed(G):
-        sys.exit('Graph must be undirected')
+from .kernel import get_laplacian
 
-    if not normalized:
-        L = nx.laplacian_matrix(G).toarray()
-    else:
-        L = nx.normalized_laplacian_matrix(G).toarray()
-
-    return L
 
 def get_label_list_graph(graph):
-    return [v for k, v in nx.get_node_attributes(graph, 'name')]
+    """Return graph labels."""
+    return [
+        v
+        for k, v in nx.get_node_attributes(graph, 'name')
+    ]
 
 
-def get_label_id_mapping(labels_row, labels_col = None):
+def get_label_id_mapping(labels_row, labels_col=None):
+    """Get label id mappings."""
     if not labels_col:
-        return {label: i for i, label in enumerate(labels_row)}
-    else:
-        return {label_row:{label_col: (j, i) for j, label_col in enumerate(labels_col)} for i, label_row in enumerate(labels_row)}
+        return {
+            label: i
+            for i, label in enumerate(labels_row)
+        }
+
+    return {
+        label_row: {
+            label_col: (j, i)
+            for j, label_col in enumerate(labels_col)}
+        for i, label_row in enumerate(labels_row)
+    }
 
 
-# Matrix class
 class Matrix:
+    """Matrix class."""
+
     def __init__(self, mat, name='', rows_labels=[], cols_labels=[], dupl=False, graph=None, **kw):
         self._name = name
         self._mat = np.array(mat)
@@ -40,7 +47,11 @@ class Matrix:
         if dupl:
             self._cols_labels = self._rows_labels
 
-        label_id_mapping = get_label_id_mapping(mat, rows_labels, cols_labels)
+        self.label_id_mapping = get_label_id_mapping(mat, rows_labels, cols_labels)
+
+    def __str__(self):
+        return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
+               f"\n column labels: \n {self.cols_labels} \n : "
 
     # Getters - setters
     # Raw matrix (numpy array)
@@ -112,10 +123,6 @@ class Matrix:
 
     def match_matrix(self):
         return self.rows_labels
-
-    def __str__(self):
-        return "matrix %s \n %s \n row_labels \n : %s \n column_labels \n : %s" % (
-        self.name, self.mat, self.rows_labels, self.cols_labels)
 
 
 class LaplacianMatrix(Matrix):
