@@ -3,8 +3,10 @@
 """Miscellaneous utils of the package."""
 
 import numpy as np
+import os
 
 from .miscellaneous import get_label_id_mapping, get_label_list_graph, get_laplacian
+
 
 class Matrix:
     """Matrix class."""
@@ -24,7 +26,7 @@ class Matrix:
 
     def __str__(self):
         return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
-               f"\n column labels: \n {self.cols_labels} \n : "
+            f"\n column labels: \n {self.cols_labels} \n : "
 
     # Getters - setters
     # Raw matrix (numpy array)
@@ -109,3 +111,12 @@ class LaplacianMatrix(Matrix):
     def __init__(self, graph, normalized=False, name=''):
         l_mat = get_laplacian(graph, normalized)
         Matrix.__init__(self, l_mat, name=name, dupl=True, graph=graph)
+
+
+def csv_to_matrix(path):
+    # Import matrix from csv file and headers as a Matrix class
+    m = np.genfromtxt(path, dtype=None, delimiter=',')
+    return Matrix(mat=np.array([[float(x) for x in a[1:]] for a in m[1:]]),
+                  name=str(os.path.basename(path).split('.csv')),
+                  rows_labels=m[1:, 0],
+                  cols_labels=m[0, 1:])
