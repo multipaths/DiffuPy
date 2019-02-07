@@ -6,36 +6,11 @@ import sys
 from math import pi
 
 import logging
-import networkx as nx
 import numpy as np
 import scipy as sp
-from diffupy.miscellaneous import LaplacianMatrix
-
+from .matrix import LaplacianMatrix
+from .miscellaneous import set_diagonal_matrix
 logger = logging.getLogger()
-
-
-def get_laplacian(graph, normalized=False):
-    """"""
-    if nx.is_directed(graph):
-        raise ValueError('Graph must be undirected')
-
-    if not normalized:
-        L = nx.laplacian_matrix(graph).toarray()
-    else:
-        L = nx.normalized_laplacian_matrix(graph).toarray()
-
-    return L
-
-
-def set_diagonal_matrix(matrix, d):
-    """"""
-    for j, row in enumerate(matrix):
-        for i, x in enumerate(row):
-            if i == j:
-                matrix[j][i] = d[i]
-            else:
-                matrix[j][i] = x
-    return matrix
 
 
 def commute_time_kernel(graph, normalized=False):

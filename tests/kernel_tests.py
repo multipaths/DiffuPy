@@ -8,7 +8,7 @@ import numpy as np
 import unittest
 
 from diffupy.kernel import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel, regularised_laplacian_kernel
-from diffupy.miscellaneous import Matrix
+from diffupy.matrix import Matrix
 
 from .constants import *
 

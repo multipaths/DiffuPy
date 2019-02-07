@@ -4,28 +4,23 @@
 
 import numpy as np
 
-from .miscellaneous import get_label_id_mapping, get_label_list_graph
-
+from .miscellaneous import get_label_id_mapping, get_label_list_graph, get_laplacian
 
 class Matrix:
     """Matrix class."""
 
-    def __init__(self, mat, name='', rows_labels=[], cols_labels=[], dupl=False, graph=None, **kw):
+    def __init__(self, mat, name='', rows_labels=[], cols_labels=[], graph=None, dupl=False, **kw):
         """Initialize matrix."""
         self._name = name
         self._mat = np.array(mat)
         self._rows_labels = rows_labels
         self._cols_labels = cols_labels
+        self._dupl = dupl
 
-        # TODO: si no hay graph es dupl? porque te puedes ahorrar una variable
         if graph:
             self._rows_labels = get_label_list_graph(graph)
 
-        if dupl:
-            self._cols_labels = self._rows_labels
-
-        # TODO: check cols_labels argument
-        self.label_id_mapping = get_label_id_mapping(mat, rows_labels, cols_labels)
+        self.label_id_mapping = get_label_id_mapping(self.rows_labels, self.cols_labels)
 
     def __str__(self):
         return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
@@ -62,11 +57,17 @@ class Matrix:
     # Columns labels
     @property
     def cols_labels(self):
-        return self._cols_labels
+        if self._dupl:
+            return self._rows_labels
+        else:
+            return self._cols_labels
 
     @cols_labels.setter
     def cols_labels(self, cols_labels):
-        self._cols_labels = list(cols_labels)
+        if self._dupl:
+            self._rows_labels = list(cols_labels)
+        else:
+            self._cols_labels = list(cols_labels)
 
     # From labels
     def set_row_from_label(self, label, x):
@@ -102,3 +103,9 @@ class Matrix:
     # tODO: este nombre es un poco confuso no?
     def match_matrix(self):
         return self.rows_labels
+
+
+class LaplacianMatrix(Matrix):
+    def __init__(self, graph, normalized=False, name=''):
+        l_mat = get_laplacian(graph, normalized)
+        Matrix.__init__(self, l_mat, name=name, dupl=True, graph=graph)

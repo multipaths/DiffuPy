@@ -4,20 +4,41 @@
 
 import networkx as nx
 
-from .kernel import get_laplacian
 
+def get_laplacian(graph, normalized=False):
+    """"""
+    if nx.is_directed(graph):
+        raise ValueError('Graph must be undirected')
+
+    if not normalized:
+        L = nx.laplacian_matrix(graph).toarray()
+    else:
+        L = nx.normalized_laplacian_matrix(graph).toarray()
+
+    return L
+
+
+def set_diagonal_matrix(matrix, d):
+    """"""
+    for j, row in enumerate(matrix):
+        for i, x in enumerate(row):
+            if i == j:
+                matrix[j][i] = d[i]
+            else:
+                matrix[j][i] = x
+    return matrix
 
 def get_label_list_graph(graph):
     """Return graph labels."""
     return [
         v
-        for k, v in nx.get_node_attributes(graph, 'name')
+        for k, v in nx.get_node_attributes(graph, 'name').items()
     ]
 
 
 def get_label_id_mapping(labels_row, labels_col=None):
     """Get label id mappings."""
-    if not labels_col:
+    if labels_col is not []:
         return {
             label: i
             for i, label in enumerate(labels_row)
@@ -29,10 +50,3 @@ def get_label_id_mapping(labels_row, labels_col=None):
             for j, label_col in enumerate(labels_col)}
         for i, label_row in enumerate(labels_row)
     }
-
-
-# TODO: borrar de aqui
-class LaplacianMatrix(Matrix):
-    def __init__(self, graph, normalized=False, name=''):
-        l_mat = get_laplacian(graph, normalized)
-        Matrix.__init__(self, l_mat, name=name, dupl=True, graph=graph)
