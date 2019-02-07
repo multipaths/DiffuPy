@@ -9,6 +9,7 @@ import logging
 import networkx as nx
 import numpy as np
 import scipy as sp
+from diffupy.miscellaneous import LaplacianMatrix
 
 logger = logging.getLogger()
 
@@ -44,13 +45,15 @@ def commute_time_kernel(graph, normalized=False):
     unnormalised and normalised graph Laplacian."""
 
     # Apply pseudo-inverse (moore-penrose) of laplacian matrix
-    return np.linalg.pinv(get_laplacian(graph, normalized))
-
+    L = LaplacianMatrix(graph, normalized)
+    L.mat = np.linalg.pinv(L.mat)
+    return L
 
 def diffusion_kernel(graph, sigma2=1, normalized=True):
     """"""
-    EL = -sigma2 / 2 * get_laplacian(graph, normalized)
-    return sp.linalg.expm(EL)
+    L = LaplacianMatrix(graph, normalized)
+    L.mat = sp.linalg.expm(-sigma2 / 2 * L.mat)
+    return L
 
 
 def inverse_cosine_kernel(graph):
@@ -58,9 +61,11 @@ def inverse_cosine_kernel(graph):
     matrix. Quoting [Smola, 2003]: the inverse cosine kernel treats lower complexity functions almost equally, with a
     significant reduction in the upper end of the spectrum. This kernel is computed using the normalised graph Laplacian."""
     # Decompose matrix (Singular Value Decomposition)
-    U, S, _ = np.linalg.svd(get_laplacian(graph, normalized=True) * (pi / 4))
-
-    return np.matmul(np.matmul(U, np.diag(np.cos(S))), np.transpose(U))
+    L = LaplacianMatrix(graph, normalized=True)
+    # Decompose matrix (Singular Value Decomposition)
+    U, S, _ = np.linalg.svd(L.mat * (pi / 4))
+    L.mat = np.matmul(np.matmul(U, np.diag(np.cos(S))), np.transpose(U))
+    return L
 
 
 def p_step_kernel(graph, a=2, p=5):
@@ -71,7 +76,8 @@ def p_step_kernel(graph, a=2, p=5):
     to be 2 or greater. The p-step kernels can be cheaper to compute and have been successful in biological tasks,
     see the benchmark in [Valentini, 2014].
     """
-    minusL = -get_laplacian(graph, normalized=True)
+    M = LaplacianMatrix(graph, normalized=True)
+    M.mat = -M.mat
 
     # Not optimal but kept for clarity
     # here we restrict to the normalised version, as the eigenvalues are
@@ -81,11 +87,13 @@ def p_step_kernel(graph, a=2, p=5):
     if p < 0:
         sys.exit('p must be greater than 0')
 
-    M = set_diagonal_matrix(minusL, [x + a for x in np.diag(minusL)])
+    M.mat = set_diagonal_matrix(M.mat, [x + a for x in np.diag(M.mat)])
 
     if p == 1: return M
 
-    return np.linalg.matrix_power(M, p)
+    M.mat = np.linalg.matrix_power(M.mat, p)
+
+    return M
 
 
 def regularised_laplacian_kernel(G, sigma2=1, add_diag=1, normalized=False):
@@ -99,7 +107,7 @@ def regularised_laplacian_kernel(G, sigma2=1, add_diag=1, normalized=False):
     diverges. More details on the parameters can be found in [Smola, 2003].
     This kernel can be computed using both the unnormalised and normalised graph Laplacian.
     """
-    L = get_laplacian(G, normalized)
-    RL = set_diagonal_matrix(sigma2 * L, [x + add_diag for x in np.diag(L)])
+    RL = LaplacianMatrix(G, normalized)
+    RL.mat = np.linalg.inv(set_diagonal_matrix(sigma2 * RL.mat, [x + add_diag for x in np.diag(RL.mat)]))
 
-    return np.linalg.inv(RL)
+    return RL
