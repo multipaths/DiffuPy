@@ -8,7 +8,7 @@ import numpy as np
 import unittest
 
 from diffupy.kernel import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel, regularised_laplacian_kernel
-from diffupy.matrix import csv_to_matrix
+from diffupy.matrix import Matrix
 
 from .constants import *
 
@@ -20,7 +20,7 @@ class KernelsTest(unittest.TestCase):
 
     def run_kernel_test(kernel_func, G, validate_matrix_path):
         M = kernel_func(G)
-        V = csv_to_matrix(validate_matrix_path)
+        V = Matrix.from_csv(validate_matrix_path)
 
         logging.info(' %s  \n %s\n', 'Computed matrix', M)
         logging.info(' %s  \n %s\n', 'Test matrix', V)
