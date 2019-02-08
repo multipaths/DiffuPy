@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Miscellaneous utils of the package."""
+"""Main Matrix Class."""
 
 import numpy as np
 import os
@@ -11,12 +11,21 @@ from .miscellaneous import get_label_id_mapping, get_label_list_graph, get_lapla
 class Matrix:
     """Matrix class."""
 
-    def __init__(self, mat, name='', rows_labels=[], cols_labels=[], graph=None, dupl=False, **kw):
+    def __init__(self, mat, name='', rows_labels=None, cols_labels=None, graph=None, dupl=False, **kw):
         """Initialize matrix."""
+
+        if rows_labels is None:
+            self._rows_labels = []
+        else:
+            self._rows_labels = rows_labels
+
+        if cols_labels is None:
+            self.cols_labels = []
+        else:
+            self._cols_labels = cols_labels
+
         self._name = name
         self._mat = np.array(mat)
-        self._rows_labels = rows_labels
-        self._cols_labels = cols_labels
         self._dupl = dupl
 
         if graph:
