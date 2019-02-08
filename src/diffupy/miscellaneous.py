@@ -28,6 +28,7 @@ def set_diagonal_matrix(matrix, d):
                 matrix[j][i] = x
     return matrix
 
+
 def get_label_list_graph(graph):
     """Return graph labels."""
     return [
