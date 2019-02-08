@@ -134,7 +134,7 @@ class Matrix:
             cols_labels=m[0, 1:])
 
 
-# TODO: whats this?
+# TODO: Poner que es matriz simetrica
 class LaplacianMatrix(Matrix):
     def __init__(self, graph, normalized=False, name=''):
         l_mat = get_laplacian(graph, normalized)
