@@ -31,7 +31,7 @@ class Matrix:
         self._dupl = dupl
 
         if graph:
-            self._rows_labels = get_label_list_graph(graph)
+            self._rows_labels = get_label_list_graph(graph, 'name')
 
         self.label_id_mapping = get_label_id_mapping(self.rows_labels, self.cols_labels)
 

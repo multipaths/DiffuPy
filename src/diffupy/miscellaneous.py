@@ -2,20 +2,22 @@
 
 """Miscellaneous utils of the package."""
 
+from typing import List
+
 import networkx as nx
+import numpy as np
 
 
-def get_laplacian(graph, normalized=False):
-    """"""
+def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
+    """Return Laplacian matrix."""
     if nx.is_directed(graph):
         raise ValueError('Graph must be undirected')
 
-    if not normalized:
-        L = nx.laplacian_matrix(graph).toarray()
-    else:
-        L = nx.normalized_laplacian_matrix(graph).toarray()
+    # Normalize matrix
+    if normalized:
+        return nx.normalized_laplacian_matrix(graph).toarray()
 
-    return L
+    return nx.laplacian_matrix(graph).toarray()
 
 
 def set_diagonal_matrix(matrix, d):
@@ -29,11 +31,11 @@ def set_diagonal_matrix(matrix, d):
     return matrix
 
 
-def get_label_list_graph(graph):
+def get_label_list_graph(graph: nx.Graph, label: str) -> List:
     """Return graph labels."""
     return [
-        v
-        for k, v in nx.get_node_attributes(graph, 'name').items()
+        value
+        for value in nx.get_node_attributes(graph, label).values()
     ]
 
 
