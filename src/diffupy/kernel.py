@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Implementation of the diffupy Kernel."""
+"""Compute graph kernels."""
 
 import sys
 from math import pi

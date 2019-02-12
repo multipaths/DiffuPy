@@ -12,3 +12,8 @@ DIFFUSION_KERNEL = os.path.join(RESOURCES_FOLDER, 'diffusionKernel.csv')
 INVERSE_COSINE_KERNEL = os.path.join(RESOURCES_FOLDER, 'inverseCosineKernel.csv')
 P_STEP_KERNEL = os.path.join(RESOURCES_FOLDER, 'pStepKernel.csv')
 REGULARISED_LAPLACIAN_KERNEL = os.path.join(RESOURCES_FOLDER, 'regularisedLaplacianKernel.csv')
+
+
+INPUT_SCORES = os.path.join(RESOURCES_FOLDER, 'input_scores.csv')
+OUTPUT_SCORES = os.path.join(RESOURCES_FOLDER, 'output_scores.csv')
+OUTPUT_Z_SCORES = os.path.join(RESOURCES_FOLDER, 'output_z_scores.csv')

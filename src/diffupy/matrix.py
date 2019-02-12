@@ -129,10 +129,10 @@ class Matrix:
         return self.mat[:, self.cols_labels_ix_mapping[label]]
 
     def set_from_labels(self, col_label, row_label, x):
-        self.mat[self.rows_labels_ix_mapping[row_label]][self.cols_labels_ix_mapping[col_label]] = x
+        self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]] = x
 
     def get_from_labels(self, col_label, row_label):
-        return self.mat[self.rows_labels_ix_mapping[row_label]][self.cols_labels_ix_mapping[col_label]]
+        return self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]]
 
     # TODO: este nombre es un poco confuso no?
 
@@ -141,9 +141,6 @@ class Matrix:
     """Match matrices"""
 
     def match_rows(self, matrix_to_match):
-        if matrix_to_match.rows_labels == matrix_to_match.rows_labels:
-            return self
-
         if self.dupl:
             Warning('Changing rows of a symetric Matrix.')
             return self.match_mat(matrix_to_match, True)
@@ -152,7 +149,7 @@ class Matrix:
         mat_match.rows_labels = matrix_to_match.rows_labels
 
         for row_label in mat_match.rows_labels:
-            mat_match.set_col_from_label(row_label, self.get_row_from_label(row_label))
+            mat_match.set_row_from_label(row_label, self.get_row_from_label(row_label))
 
         return mat_match
 
@@ -208,7 +205,7 @@ class Matrix:
                 ]),
             rows_labels=m[1:, 0],
             cols_labels=m[0, 1:],
-            name=str(os.path.basename(path).split('.csv'))
+            name=str(os.path.basename(path).replace('.csv', ''))
         )
 
 
