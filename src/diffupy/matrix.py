@@ -6,14 +6,14 @@ import os
 
 import numpy as np
 
-from .miscellaneous import get_label_id_mapping, get_label_list_graph, get_laplacian
+from .miscellaneous import get_label_ix_mapping, get_label_list_graph, get_laplacian
 
 
 class Matrix:
     """Matrix class."""
 
     # TODO: why kw?
-    def __init__(self, mat, rows_labels=None, cols_labels=None, name='', graph=None, dupl=False, **kw):
+    def __init__(self, mat, rows_labels=None, cols_labels=None, dupl=False, name='', graph=None, **kw):
         """Initialize matrix."""
 
         self._rows_labels = rows_labels
@@ -27,7 +27,8 @@ class Matrix:
         if graph:
             self._rows_labels = get_label_list_graph(graph, 'name')
 
-        self.label_id_mapping = get_label_id_mapping(self.rows_labels, self.cols_labels)
+        self.rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
+        self.cols_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
 
     def __str__(self):
         return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
@@ -35,6 +36,7 @@ class Matrix:
 
 
     """Iterator"""
+
     def __iter__(self):
         self.i = -1
         self.j = 0
@@ -53,6 +55,13 @@ class Matrix:
         if len(self.rows_labels) == 1: return self.mat[self.i], self.cols_labels[self.i], self.rows_labels[self.j]
         return self.mat[self.j][self.i], self.cols_labels[self.i], self.rows_labels[self.j]
 
+    """Copy"""
+
+    def __copy__(self):
+        if self._dupl:
+            return Matrix(self.mat, rows_labels = self.rows_labels, dupl = True, name = self.name)
+        else:
+            return Matrix(self.mat, rows_labels = self.rows_labels, cols_labels = self.cols_labels, name = self.name)
 
     """Getters and Setters"""
 
@@ -73,6 +82,14 @@ class Matrix:
     @name.setter
     def name(self, name):
         self._name = name
+
+    @property
+    def dupl(self):
+        return self._dupl
+
+    @dupl.setter
+    def dupl(self, dupl):
+        self._dupl = dupl
 
     # Rows labels
     @property
@@ -100,40 +117,84 @@ class Matrix:
 
     # From labels
     def set_row_from_label(self, label, x):
-        i_row = self.label_id_mapping[label]
-        if isinstance(i_row, dict):
-            i_row = i_row[label].values()[0][0]
-        self.mat[i_row] = x
+        self.mat[self.rows_labels_ix_mapping[label]] = x
 
     def get_row_from_label(self, label):
-        i_row = self.label_id_mapping[label]
-        if isinstance(i_row, dict):
-            i_row = i_row[label].values()[0][0]
-        return self.mat[i_row]
+        return self.mat[self.rows_labels_ix_mapping[label]]
 
     def set_col_from_label(self, label, x):
-        i_col = self.label_id_mapping[label]
-        if isinstance(i_col, dict):
-            i_col = i_col[label].values()[0][0]
-        self.mat[:, i_col] = x
+        self.mat[:, self.cols_labels_ix_mapping[label]] = x
 
-    def get_col_from_label(self, label, x):
-        i_col = self.label_id_mapping[label]
-        if isinstance(i_col, dict):
-            i_col = i_col[label].values()[0][0]
-        return self.mat[:, i_col]
+    def get_col_from_label(self, label):
+        return self.mat[:, self.cols_labels_ix_mapping[label]]
 
-    def set_from_labels(self, row_label, col_label, x):
-        self.mat[self.label_id_mapping[row_label][col_label]] = x
+    def set_from_labels(self, col_label, row_label, x):
+        self.mat[self.rows_labels_ix_mapping[row_label]][self.cols_labels_ix_mapping[col_label]] = x
 
-    def get_from_labels(self, row_label, col_label):
-        return self.mat[self.label_id_mapping[row_label][col_label]]
+    def get_from_labels(self, col_label, row_label):
+        return self.mat[self.rows_labels_ix_mapping[row_label]][self.cols_labels_ix_mapping[col_label]]
 
     # TODO: este nombre es un poco confuso no?
-    def match_matrix(self):
-        return self.rows_labels
 
     """Methods"""
+
+    """Match matrices"""
+
+    def match_rows(self, matrix_to_match):
+        if matrix_to_match.rows_labels == matrix_to_match.rows_labels:
+            return self
+
+        if self.dupl:
+            Warning('Changing rows of a symetric Matrix.')
+            return self.match_mat(matrix_to_match, True)
+
+        mat_match = self.__copy__()
+        mat_match.rows_labels = matrix_to_match.rows_labels
+
+        for row_label in mat_match.rows_labels:
+            mat_match.set_col_from_label(row_label, self.get_row_from_label(row_label))
+
+        return mat_match
+
+    def match_cols(self, matrix_to_match):
+        if matrix_to_match.cols_labels == matrix_to_match.cols_labels:
+            return self
+
+        if self.dupl:
+            Warning('Changing columns of a symetric Matrix.')
+            return self.match_mat(matrix_to_match, True)
+
+        mat_match = self.__copy__()
+        mat_match.cols_labels = matrix_to_match.cols_labels
+
+        for row_label in mat_match.rows_labels:
+            mat_match.set_col_from_label(row_label, self.get_row_from_label(row_label))
+
+        return mat_match
+
+
+    def match_mat(self, matrix_to_match, match_dupl = None):
+        if matrix_to_match.cols_labels == matrix_to_match.cols_labels and matrix_to_match.rows_labels == matrix_to_match.rows_labels:
+            return self
+
+        mat_match = self.__copy__()
+        mat_match.rows_labels = matrix_to_match.rows_labels
+
+        if match_dupl is None:
+            match_dupl = matrix_to_match.dupl
+            Warning('Matrix to match symetric.')
+
+        if not match_dupl:
+            mat_match.cols_labels = matrix_to_match.cols_labels
+        else:
+            mat_match.dupl = True
+
+        for score, col_label, row_label in iter(self):
+            mat_match.set_from_labels(col_label, row_label, self.get_from_labels(col_label, row_label))
+
+        return mat_match
+
+    """Import"""
 
     def from_csv(path):
         """Import matrix from csv file using the headers as a Matrix class."""
@@ -155,4 +216,4 @@ class Matrix:
 class LaplacianMatrix(Matrix):
     def __init__(self, graph, normalized=False, name=''):
         l_mat = get_laplacian(graph, normalized)
-        Matrix.__init__(self, l_mat, name=name, dupl=True, graph=graph)
+        Matrix.__init__(self, l_mat, dupl=True, name=name, graph=graph)
