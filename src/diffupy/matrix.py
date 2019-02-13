@@ -2,20 +2,19 @@
 
 """Main Matrix Class."""
 
-import os
-
-import numpy as np
 import logging
+import numpy as np
+import os
 
 from .miscellaneous import get_label_ix_mapping, get_label_list_graph, get_laplacian
 
 log = logging.getLogger(__name__)
 
+
 class Matrix:
     """Matrix class."""
 
-    # TODO: why kw?
-    def __init__(self, mat, rows_labels=None, cols_labels=None, dupl=False, name='', graph=None, **kw):
+    def __init__(self, mat, rows_labels=None, cols_labels=None, dupl=False, name='', graph=None, **kwargs):
         """Initialize matrix."""
 
         self._rows_labels = rows_labels
@@ -35,7 +34,7 @@ class Matrix:
 
     def __str__(self):
         return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
-            f"\n column labels: \n {self.cols_labels} \n : "
+               f"\n column labels: \n {self.cols_labels} \n : "
 
     """Iterator"""
 
