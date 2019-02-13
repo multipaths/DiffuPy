@@ -5,9 +5,11 @@
 import os
 
 import numpy as np
+import logging
 
 from .miscellaneous import get_label_ix_mapping, get_label_list_graph, get_laplacian
 
+log = logging.getLogger(__name__)
 
 class Matrix:
     """Matrix class."""
@@ -28,16 +30,16 @@ class Matrix:
             self._rows_labels = get_label_list_graph(graph, 'name')
 
         self.rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
+        print(self.rows_labels_ix_mapping)
         self.cols_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
 
     def __str__(self):
         return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
-               f"\n column labels: \n {self.cols_labels} \n : "
-
+            f"\n column labels: \n {self.cols_labels} \n : "
 
     """Iterator"""
 
-    def __iter__(self, get_labels = True, get_indices = False):
+    def __iter__(self, get_labels=True, get_indices=False):
         self.i = -1
         self.j = 0
         self.get_indices = get_indices
@@ -46,34 +48,35 @@ class Matrix:
         return self
 
     def __next__(self):
-        if self.j >= len(self.rows_labels)-1 and self.i >= len(self.cols_labels)-1:
+        if self.j >= len(self.rows_labels) - 1 and self.i >= len(self.cols_labels) - 1:
             raise StopIteration
 
-        if self.i >= len(self.cols_labels)-1:
+        if self.i >= len(self.cols_labels) - 1:
             self.i = 0
             self.j += 1
         else:
             self.i += 1
 
         nxt = tuple()
-        if len(self.rows_labels) == 1: nxt += (self.mat[self.i], )
-        else: nxt += (self.mat[self.j][self.i], )
+        if len(self.rows_labels) == 1:
+            nxt += (self.mat[self.i],)
+        else:
+            nxt += (self.mat[self.j][self.i],)
 
         if self.get_indices:
-            nxt += (self.i, self.j, )
+            nxt += (self.i, self.j,)
 
         if self.get_labels:
-            nxt += (self.cols_labels[self.i], self.rows_labels[self.j], )
+            nxt += (self.cols_labels[self.i], self.rows_labels[self.j],)
 
         return nxt
 
     """Copy"""
 
     def __copy__(self):
-        if self._dupl:
-            return Matrix(self.mat, rows_labels = self.rows_labels, dupl = True, name = self.name)
-        else:
-            return Matrix(self.mat, rows_labels = self.rows_labels, cols_labels = self.cols_labels, name = self.name)
+        """Return a copy of Matrix Object."""
+        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, dupl=self._dupl,
+                      name=self.name)
 
     """Getters and Setters"""
 
@@ -117,8 +120,8 @@ class Matrix:
     def cols_labels(self):
         if self._dupl:
             return self._rows_labels
-        else:
-            return self._cols_labels
+
+        return self._cols_labels
 
     @cols_labels.setter
     def cols_labels(self, cols_labels):
@@ -151,16 +154,20 @@ class Matrix:
     """Methods"""
 
     """Binds"""
-    def row_bind(self, rows = None, rows_labels = None, mat = None):
-        if mat:
-            rows = mat.mat
+
+    def row_bind(self, rows=None, rows_labels=None, matrix=None):
+        """Return a copy of Matrix Object."""
+        if matrix:
+            rows = matrix.mat
             rows_labels = rows_labels.rows_labels
         self.mat += rows
         self.rows_labels += rows_labels
 
-    def col_bind(self, cols = None, cols_labels = None, mat = None):
-        if mat:
-            cols = mat.mat
+    def col_bind(self, cols=None, cols_labels=None, matrix=None):
+        """Return a copy of Matrix Object."""
+
+        if matrix:
+            cols = matrix.mat
             cols_labels = cols_labels.cols_labels
         self.mat[:, :-1] += cols
         self.cols_labels += cols_labels
@@ -168,8 +175,9 @@ class Matrix:
     """Match matrices"""
 
     def match_rows(self, matrix_to_match):
+        """Return a copy of Matrix Object."""
         if self.dupl:
-            Warning('Changing rows of a symmetric Matrix.')
+            log.warning('Changing rows of a symmetric Matrix implies changing also columns.')
             return self.match_mat(matrix_to_match, True)
 
         mat_match = self.__copy__()
@@ -185,7 +193,7 @@ class Matrix:
             return self
 
         if self.dupl:
-            Warning('Changing columns of a symmetric Matrix.')
+            log.warning('Changing columns of a symmetric Matrix implies changing also rows.')
             return self.match_mat(matrix_to_match, True)
 
         mat_match = self.__copy__()
@@ -196,8 +204,7 @@ class Matrix:
 
         return mat_match
 
-
-    def match_mat(self, matrix_to_match, match_dupl = None):
+    def match_mat(self, matrix_to_match, match_dupl=None):
         if matrix_to_match.cols_labels == matrix_to_match.cols_labels and matrix_to_match.rows_labels == matrix_to_match.rows_labels:
             return self
 

@@ -41,8 +41,11 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
 
 def get_label_ix_mapping(labels):
     """Get label to mat index mappings."""
-    return {
-        # label.decode('utf-8'): i
-        str(label).replace('b', '').replace("'", '').replace('"', ''): i
-        for i, label in enumerate(labels)
-    }
+    mapping = {}
+    for i, label in enumerate(labels):
+        if not isinstance(label, str):
+            label = label.decode('utf-8')
+
+        mapping[label] = i
+
+    return mapping

@@ -14,25 +14,34 @@ from .matrix import Matrix
 from .miscellaneous import get_label_list_graph
 
 
-def check_scores(scores):
-    """Ensures that scores are suitable for diffusion."""
+def _validate_scores(scores: Matrix) -> None:
+    """Check scores sanity: Ensures that scores are suitable for diffusion."""
 
-    # if np.equal(scores.cols_labels, any(([], None, 'Nan')):
-    if scores.cols_labels == []:
+    #  Check labels list
+    if not scores.cols_labels:
+        raise ValueError("Scores must be a named list but supplied list contains no names.")
+    if not scores.rows_labels:
         raise ValueError("Scores must be a named list but supplied list contains no names.")
 
+    #  Check numpy array values type
     if not 'float' and 'int' in str(scores.mat.dtype):
         raise ValueError("The scores in background are not numeric.")
 
+    #  Check each matrix element
     for score, col_label, row_label in iter(scores):
-        if not isinstance(score, float) and not isinstance(score, int):
-            raise ValueError("The scores in background are not numeric")
-        if score in ['Nan', None]:
-            raise ValueError("Scores input cannot contain NA. But background .")
+        #  Validate scores
+        if score is None:
+            raise ValueError("Scores input cannot contain None.")
+        elif score is ['NA', 'Nan', 'nan']:
+            raise ValueError("Scores input cannot contain NA values.")
+        elif not isinstance(score, float) and not isinstance(score, int):
+            raise ValueError("The scores in background are not numeric.")
+
+        #  Validate labels
         if col_label in ['Nan', None]:
-            raise ValueError("The scores in background must have rownames according to the scored nodes.")
+            raise ValueError("The scores in background must have row names according to the scored nodes.")
         if row_label in ['Nan', None]:
-            raise ValueError("The scores in background must have colnames to differentiate score sets.")
+            raise ValueError("The scores in background must have col names to differentiate score sets.")
 
     std_mat = Matrix(np.std(scores.mat, axis=0), ['sd'], scores.cols_labels)
 
@@ -43,9 +52,8 @@ def check_scores(scores):
             raise ValueError("Standard deviation in background is 0 in column:" + str(col_label))
 
 
-# Check graph sanity
-def check_graph(graph):
-    """Ensures that 'graph' is a valid NetworkX Graph object."""
+def _check_graph(graph: nx.Graph) -> None:
+    """Check graph sanity: Ensures that 'graph' is a valid NetworkX Graph object."""
 
     if graph in [None, 'NA', 'Nan']:
         raise ValueError("'graph' missing")
@@ -74,9 +82,8 @@ def check_graph(graph):
             raise Warning("'graph' should not contain negative edge weights.")
 
 
-# Check graph sanity
-def check_K(K):
-    """Ensures that 'K' is a formally valid kernel. Does not check for spd"""
+def _check_K(K: Matrix) -> None:
+    """Check kernel sanity: Ensures that 'K' is a formally valid kernel. Does not check for spd"""
 
     if not isinstance(K, Matrix):
         raise ValueError("'K' must be a matrix")

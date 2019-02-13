@@ -6,14 +6,17 @@ import sys
 from math import pi
 
 import logging
+
+import networkx as nx
 import numpy as np
 import scipy as sp
-from .matrix import LaplacianMatrix
+from .matrix import LaplacianMatrix, Matrix
 from .miscellaneous import set_diagonal_matrix
-logger = logging.getLogger()
+
+log = logging.getLogger(__name__)
 
 
-def commute_time_kernel(graph, normalized=False):
+def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
     """Computes the conmute-time kernel, which is the expected time of going back and forth between a couple of nodes.
     If the network is connected, then the commute time kernel will be totally dense, therefore reflecting global
     properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the
@@ -24,14 +27,15 @@ def commute_time_kernel(graph, normalized=False):
     L.mat = np.linalg.pinv(L.mat)
     return L
 
-def diffusion_kernel(graph, sigma2=1, normalized=True):
+
+def diffusion_kernel(graph: nx.Graph, sigma2: float = 1, normalized: bool = True) -> Matrix:
     """"""
     L = LaplacianMatrix(graph, normalized)
     L.mat = sp.linalg.expm(-sigma2 / 2 * L.mat)
     return L
 
 
-def inverse_cosine_kernel(graph):
+def inverse_cosine_kernel(graph: nx.Graph) -> Matrix:
     """Computes the inverse cosine kernel, which is based on a cosine transform on the spectrum of the normalized Laplacian
     matrix. Quoting [Smola, 2003]: the inverse cosine kernel treats lower complexity functions almost equally, with a
     significant reduction in the upper end of the spectrum. This kernel is computed using the normalised graph Laplacian."""
@@ -43,7 +47,7 @@ def inverse_cosine_kernel(graph):
     return L
 
 
-def p_step_kernel(graph, a=2, p=5):
+def p_step_kernel(graph: nx.Graph, a: float = 2, p: float = 5) -> Matrix:
     """Computes the p-step random walk kernel. This kernel is more focused on local properties of the nodes, because
     random walks are limited in terms of length. Therefore, if p is small, only a fraction of the values K(x1,x2) will
     be non-null if the network is sparse [Smola, 2003].
@@ -71,7 +75,8 @@ def p_step_kernel(graph, a=2, p=5):
     return M
 
 
-def regularised_laplacian_kernel(G, sigma2=1, add_diag=1, normalized=False):
+def regularised_laplacian_kernel(graph: nx.Graph, sigma2: float = 1, add_diag: int = 1,
+                                 normalized: bool = False) -> Matrix:
     """Computes the regularised Laplacian kernel, which is a standard in biological networks.
     The regularised Laplacian kernel arises in numerous situations, such as the finite difference formulation of the
     diffusion equation and in Gaussian process estimation. Sticking to the heat diffusion model, this function allows
@@ -82,7 +87,7 @@ def regularised_laplacian_kernel(G, sigma2=1, add_diag=1, normalized=False):
     diverges. More details on the parameters can be found in [Smola, 2003].
     This kernel can be computed using both the unnormalised and normalised graph Laplacian.
     """
-    RL = LaplacianMatrix(G, normalized)
+    RL = LaplacianMatrix(graph, normalized)
     RL.mat = np.linalg.inv(set_diagonal_matrix(sigma2 * RL.mat, [x + add_diag for x in np.diag(RL.mat)]))
 
     return RL
