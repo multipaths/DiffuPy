@@ -37,9 +37,12 @@ class Matrix:
 
     """Iterator"""
 
-    def __iter__(self):
+    def __iter__(self, get_labels = True, get_indices = False):
         self.i = -1
         self.j = 0
+        self.get_indices = get_indices
+        self.get_labels = get_labels
+
         return self
 
     def __next__(self):
@@ -52,8 +55,17 @@ class Matrix:
         else:
             self.i += 1
 
-        if len(self.rows_labels) == 1: return self.mat[self.i], self.cols_labels[self.i], self.rows_labels[self.j]
-        return self.mat[self.j][self.i], self.cols_labels[self.i], self.rows_labels[self.j]
+        nxt = tuple()
+        if len(self.rows_labels) == 1: nxt += (self.mat[self.i], )
+        else: nxt += (self.mat[self.j][self.i], )
+
+        if self.get_indices:
+            nxt += (self.i, self.j, )
+
+        if self.get_labels:
+            nxt += (self.cols_labels[self.i], self.rows_labels[self.j], )
+
+        return nxt
 
     """Copy"""
 
@@ -138,11 +150,26 @@ class Matrix:
 
     """Methods"""
 
+    """Binds"""
+    def row_bind(self, rows = None, rows_labels = None, mat = None):
+        if mat:
+            rows = mat.mat
+            rows_labels = rows_labels.rows_labels
+        self.mat += rows
+        self.rows_labels += rows_labels
+
+    def col_bind(self, cols = None, cols_labels = None, mat = None):
+        if mat:
+            cols = mat.mat
+            cols_labels = cols_labels.cols_labels
+        self.mat[:, :-1] += cols
+        self.cols_labels += cols_labels
+
     """Match matrices"""
 
     def match_rows(self, matrix_to_match):
         if self.dupl:
-            Warning('Changing rows of a symetric Matrix.')
+            Warning('Changing rows of a symmetric Matrix.')
             return self.match_mat(matrix_to_match, True)
 
         mat_match = self.__copy__()
@@ -158,7 +185,7 @@ class Matrix:
             return self
 
         if self.dupl:
-            Warning('Changing columns of a symetric Matrix.')
+            Warning('Changing columns of a symmetric Matrix.')
             return self.match_mat(matrix_to_match, True)
 
         mat_match = self.__copy__()

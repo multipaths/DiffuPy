@@ -14,7 +14,7 @@ logger = logging.getLogger()
 
 
 def calculate_scores(col_ind, scores, diff, const_mean, const_var):
-    """Helper function for diffuse_raw, which operates the z-score for each cell of the score matrix."""
+    """Helper function for diffuse_raw, which operates the atomic z-score for each cell of the score matrix."""
 
     col_in = scores[:, col_ind]
     col_raw = diff[:, col_ind]
