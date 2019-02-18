@@ -4,7 +4,7 @@
 import networkx as nx
 import numpy as np
 
-from .validate_inputs import _validate_scores, _check_graph, _check_K
+from .validate_inputs import _validate_scores, _validate_graph, _validate_K
 from .kernels import regularised_laplacian_kernel
 from .matrix import Matrix
 
@@ -67,12 +67,12 @@ def diffuse_raw(graph: nx.Graph,
 
     # Kernel matrix
     if K is None:
-        _check_graph(graph)
+        _validate_graph(graph)
         logging.info('Kernel not supplied. Computing regularised Laplacian kernel ...')
         K = regularised_laplacian_kernel(graph, normalized=False)
         logging.info('Done')
     else:
-        _check_K(K)
+        _validate_K(K)
         logging.info('Using supplied kernel matrix...')
 
     # Compute scores

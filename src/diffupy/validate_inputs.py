@@ -53,7 +53,7 @@ def _validate_scores(scores: Matrix) -> None:
             raise ValueError("Standard deviation in background is 0 in column:" + str(col_label))
 
 
-def _check_graph(graph: nx.Graph) -> None:
+def _validate_graph(graph: nx.Graph) -> None:
     """Check graph sanity: Ensures that 'graph' is a valid NetworkX Graph object."""
 
     if graph in [None, 'NA', 'Nan']:
@@ -83,7 +83,7 @@ def _check_graph(graph: nx.Graph) -> None:
             raise Warning("'graph' should not contain negative edge weights.")
 
 
-def _check_K(k: Matrix) -> None:
+def _validate_K(k: Matrix) -> None:
     """Check kernel sanity: Ensures that 'k' is a formally valid kernel. Does not check for spd"""
 
     if not isinstance(k, Matrix):
