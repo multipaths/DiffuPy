@@ -4,7 +4,7 @@
 import networkx as nx
 import numpy as np
 
-from .validate import _validate_scores, _check_graph, _check_K
+from .validate_inputs import _validate_scores, _check_graph, _check_K
 from .kernels import regularised_laplacian_kernel
 from .matrix import Matrix
 
@@ -107,6 +107,7 @@ def diffuse_raw(graph: nx.Graph,
     const_mean = row_sums / n
     const_var = np.subtract(n * row_sums_2, row_sums ** 2) / ((n - 1) * (n ** 2))
 
+
     # Calculate z-scores iterating the score matrix columns, performing the operation with the whole column.
     return Matrix(
         np.transpose(
@@ -119,7 +120,7 @@ def diffuse_raw(graph: nx.Graph,
                     const_var
                 )
             )
-                for i in range(diff.shape[0])
+                for i in range(diff.shape[1])
             ]),
         scores.rows_labels,
         scores.cols_labels

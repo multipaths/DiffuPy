@@ -19,18 +19,17 @@ class Matrix:
 
         self._rows_labels = rows_labels
 
-        self._cols_labels = cols_labels
+        if not dupl:
+            self._cols_labels = cols_labels
 
         self._name = name
         self._dupl = dupl
         self._mat = np.array(mat)
 
         if graph:
-            self._rows_labels = get_label_list_graph(graph, 'name')
+            self._rows_labels= list(get_label_list_graph(graph, 'name'))
 
-        self.rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
-        print(self.rows_labels_ix_mapping)
-        self.cols_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
+        self.set_mappings_validate_labels()
 
     def __str__(self):
         return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
@@ -78,6 +77,22 @@ class Matrix:
                       name=self.name)
 
     """Getters and Setters"""
+    def set_mappings_validate_labels(self):
+
+        if list(self.rows_labels):
+            self._rows_labels_ix_mapping, self._rows_labels = get_label_ix_mapping(self.rows_labels)
+        elif self.dupl and not list(self.cols_labels):
+            log.warning(
+                'Rows labels empty, also columns (neither cols labels given) will be empty since duplicate labels is true.')
+        elif not self.dupl:
+            log.warning('Rows labels empty.')
+
+        if list(self.cols_labels):
+            self.cols_labels_ix_mapping, self.cols_labels = get_label_ix_mapping(self.cols_labels)
+            if self.dupl:
+                log.warning('Columns labels are assigned to rows since duplicate labels is true.')
+        elif not self.dupl:
+            log.warning('Cols labels empty.')
 
     # Raw matrix (numpy array)
     @property
@@ -128,6 +143,30 @@ class Matrix:
             self._rows_labels = list(cols_labels)
         else:
             self._cols_labels = list(cols_labels)
+
+    # Rows mapping
+    @property
+    def rows_labels_ix_mapping(self):
+        return self._rows_labels_ix_mapping
+
+    @rows_labels_ix_mapping.setter
+    def rows_labels_ix_mapping(self, rows_labels_ix_mapping):
+        self._rows_labels_ix_mapping = rows_labels_ix_mapping
+
+    # Columns mapping
+    @property
+    def cols_labels_ix_mapping(self):
+        if self._dupl:
+            return self._rows_labels_ix_mapping
+
+        return self._cols_labels_ix_mapping
+
+    @cols_labels_ix_mapping.setter
+    def cols_labels_ix_mapping(self, cols_labels_ix_mapping):
+        if self._dupl:
+            self._rows_labels_ix_mapping = cols_labels_ix_mapping
+        else:
+            self._cols_labels_ix_mapping = cols_labels_ix_mapping
 
     # From labels
     def set_row_from_label(self, label, x):

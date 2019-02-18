@@ -17,6 +17,7 @@ from diffupy.miscellaneous import get_label_list_graph
 def _validate_scores(scores: Matrix) -> None:
     """Check scores sanity: Ensures that scores are suitable for diffusion."""
 
+
     #  Check labels list
     if not scores.cols_labels:
         raise ValueError("Scores must be a named list but supplied list contains no names.")

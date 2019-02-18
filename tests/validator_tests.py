@@ -6,7 +6,7 @@ import logging
 import unittest
 
 from diffupy.matrix import Matrix
-from diffupy.validate import _validate_scores
+from diffupy.validate_inputs import _validate_scores
 
 log = logging.getLogger(__name__)
 
