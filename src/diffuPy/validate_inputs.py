@@ -10,8 +10,8 @@
 import networkx as nx
 import numpy as np
 
-from diffupy.matrix import Matrix
-from diffupy.miscellaneous import get_label_list_graph
+from diffuPy.matrix import Matrix
+from diffuPy.miscellaneous import get_label_list_graph
 
 
 def _validate_scores(scores: Matrix) -> None:

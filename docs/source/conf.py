@@ -17,7 +17,7 @@ extensions = [
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
-project = 'diffupy'
+project = 'diffuPy'
 copyright = '2019,  Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 author = ' Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 
@@ -43,14 +43,14 @@ html_static_path = []
 htmlhelp_basename = 'diffupydoc'
 latex_elements = {}
 latex_documents = [
-    (master_doc, 'diffupy.tex', 'DiffuPy Documentation',
+    (master_doc, 'diffuPy.tex', 'DiffuPy Documentation',
      ' Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández', 'manual'),
 ]
 man_pages = [
-    (master_doc, 'diffupy', 'diffupy Documentation', [author], 1)
+    (master_doc, 'diffuPy', 'diffuPy Documentation', [author], 1)
 ]
 texinfo_documents = [
-    (master_doc, 'diffupy', 'diffupy Documentation', author, 'diffupy'),
+    (master_doc, 'diffuPy', 'diffuPy Documentation', author, 'diffuPy'),
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.

@@ -8,9 +8,9 @@ import unittest
 import networkx as nx
 import numpy as np
 
-from diffupy.kernels import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel, \
+from diffuPy.kernels import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel, \
     regularised_laplacian_kernel
-from diffupy.matrix import Matrix
+from diffuPy.matrix import Matrix
 from .constants import *
 
 log = logging.getLogger(__name__)

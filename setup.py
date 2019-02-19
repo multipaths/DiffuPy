@@ -8,7 +8,7 @@ import re
 
 import setuptools
 
-MODULE = 'diffupy'
+MODULE = 'diffuPy'
 PACKAGES = setuptools.find_packages(where='src')
 META_PATH = os.path.join('src', MODULE, '__init__.py')
 KEYWORDS = ['Diffusion algorithms','Pathways', 'Systems Biology', 'Networks']
@@ -32,7 +32,7 @@ INSTALL_REQUIRES = [
 ]
 ENTRY_POINTS = {
     'console_scripts': [
-        'diffupy = diffupy.cli:main',
+        'diffuPy = diffuPy.cli:main',
     ]
 }
 EXTRAS_REQUIRE = {

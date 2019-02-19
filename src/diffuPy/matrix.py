@@ -26,6 +26,9 @@ class Matrix:
         self._dupl = dupl
         self._mat = np.array(mat)
 
+        self.get_labels = True
+        self.get_indices = False
+
         if graph:
             self._rows_labels= list(get_label_list_graph(graph, 'name'))
 
@@ -37,16 +40,21 @@ class Matrix:
 
     """Iterator"""
 
-    def __iter__(self, get_labels=True, get_indices=False):
+    def __iter__(self, **kargs):
         self.i = -1
         self.j = 0
-        self.get_indices = get_indices
-        self.get_labels = get_labels
+
+        if 'get_indices' in kargs:
+            self.get_indices = kargs['get_indices']
+        if 'get_labels' in kargs:
+            self.get_labels = kargs['get_labels']
 
         return self
 
     def __next__(self):
         if self.j >= len(self.rows_labels) - 1 and self.i >= len(self.cols_labels) - 1:
+            self.get_labels = True
+            self.get_indices = False
             raise StopIteration
 
         if self.i >= len(self.cols_labels) - 1:

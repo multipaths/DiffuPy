@@ -6,7 +6,7 @@ TODO: Add me
 
 Installation
 ------------
-1. ``diffupy`` can be installed with the following commmands:
+1. ``diffuPy`` can be installed with the following commmands:
 
 .. code-block:: sh
 
@@ -20,7 +20,7 @@ Installation
 
 .. code-block:: sh
 
-    cd diffupy
+    cd diffuPy
 
 .. code-block:: sh
 
@@ -37,11 +37,11 @@ log = logging.getLogger(__name__)
 
 __version__ = '0.0.1-dev'
 
-__title__ = 'diffupy'
+__title__ = 'diffuPy'
 __description__ = "The diffuStats package consists of functions to compute graph kernels, the function diffuse to " \
                   "compute the diffusion scores and the function perf_eval and its wrapper perf to compute performance " \
                   "measures."
-__url__ = 'https://github.com/jmarinllao/diffupy'
+__url__ = 'https://github.com/jmarinllao/diffuPy'
 
 __author__ = 'Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 __email__ = 'josepmarinllao@gmail.com'
