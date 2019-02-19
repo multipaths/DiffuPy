@@ -206,8 +206,10 @@ class Matrix:
         if matrix:
             rows = matrix.mat
             rows_labels = rows_labels.rows_labels
-        self.mat += rows
-        self.rows_labels += rows_labels
+
+        if rows:
+            self.mat += rows
+            self.rows_labels += rows_labels
 
     def col_bind(self, cols=None, cols_labels=None, matrix=None):
         """Return a copy of Matrix Object."""
@@ -215,8 +217,10 @@ class Matrix:
         if matrix:
             cols = matrix.mat
             cols_labels = cols_labels.cols_labels
-        self.mat[:, :-1] += cols
-        self.cols_labels += cols_labels
+
+        if cols:
+            self.mat[:, :-1] += cols
+            self.cols_labels += cols_labels
 
     """Match matrices"""
 
