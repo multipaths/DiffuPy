@@ -15,5 +15,9 @@ REGULARISED_LAPLACIAN_KERNEL = os.path.join(RESOURCES_FOLDER, 'regularisedLaplac
 
 
 INPUT_SCORES = os.path.join(RESOURCES_FOLDER, 'input_scores.csv')
-OUTPUT_SCORES = os.path.join(RESOURCES_FOLDER, 'output_scores.csv')
+INPUT_UNLABELED_SCORES = os.path.join(RESOURCES_FOLDER, 'input_unlabeled_scores.csv')
+
+OUTPUT_RAW_SCORES = os.path.join(RESOURCES_FOLDER, 'output_raw_scores.csv')
 OUTPUT_Z_SCORES = os.path.join(RESOURCES_FOLDER, 'output_z_scores.csv')
+OUTPUT_ML_SCORES = os.path.join(RESOURCES_FOLDER, 'output_ml_scores.csv')
+OUTPUT_GM_SCORES = os.path.join(RESOURCES_FOLDER, 'output_gm_scores.csv')
