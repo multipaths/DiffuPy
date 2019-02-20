@@ -3,8 +3,9 @@
 """Main Matrix Class."""
 
 import logging
-import numpy as np
 import os
+
+import numpy as np
 
 from .miscellaneous import get_label_ix_mapping, get_label_list_graph, get_laplacian
 
@@ -30,13 +31,13 @@ class Matrix:
         self.get_indices = False
 
         if graph:
-            self._rows_labels= list(get_label_list_graph(graph, 'name'))
+            self._rows_labels = list(get_label_list_graph(graph, 'name'))
 
         self.set_mappings_validate_labels()
 
     def __str__(self):
-        return f"matrix {self.name} \n {self.mat} \n row labels: {self.rows_labels} " \
-               f"\n column labels: \n {self.cols_labels} \n : "
+        return f"\nmatrix {self.name} \n  {self.mat} \n row labels: \n  {self.rows_labels} " \
+            f"\n column labels: \n  {self.cols_labels} \n "
 
     """Iterator"""
 
@@ -85,6 +86,7 @@ class Matrix:
                       name=self.name)
 
     """Getters and Setters"""
+
     def set_mappings_validate_labels(self):
 
         if list(self.rows_labels):
@@ -203,13 +205,17 @@ class Matrix:
 
     def row_bind(self, rows=None, rows_labels=None, matrix=None):
         """Return a copy of Matrix Object."""
+
         if matrix:
             rows = matrix.mat
             rows_labels = rows_labels.rows_labels
 
-        if rows:
-            self.mat += rows
+        if list(rows):
+            self.mat = np.concatenate((self.mat, np.array(rows)), axis=0)
             self.rows_labels += rows_labels
+            self.set_mappings_validate_labels()
+        else:
+            log.warning('No column given to concatenate to matrix.')
 
     def col_bind(self, cols=None, cols_labels=None, matrix=None):
         """Return a copy of Matrix Object."""
@@ -218,14 +224,18 @@ class Matrix:
             cols = matrix.mat
             cols_labels = cols_labels.cols_labels
 
-        if cols:
-            self.mat[:, :-1] += cols
+        if list(cols):
+            self.mat = np.concatenate(self.mat, cols, axis=1)
             self.cols_labels += cols_labels
+            self.set_mappings_validate_labels()
+        else:
+            log.warning('No column given to concatenate to matrix.')
 
     """Match matrices"""
 
     def match_rows(self, matrix_to_match):
         """Return a copy of Matrix Object."""
+
         if self.dupl:
             log.warning('Changing rows of a symmetric Matrix implies changing also columns.')
             return self.match_mat(matrix_to_match, True)
@@ -279,6 +289,7 @@ class Matrix:
 
     def from_csv(path):
         """Import matrix from csv file using the headers as a Matrix class."""
+
         m = np.genfromtxt(path, dtype=None, delimiter=',')
         return Matrix(
             mat=np.array(

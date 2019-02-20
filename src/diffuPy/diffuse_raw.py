@@ -75,13 +75,12 @@ def diffuse_raw(graph: nx.Graph,
         _validate_K(K)
         logging.info('Using supplied kernel matrix...')
 
-    # Compute scores
-
     # Match indices
     scores = scores.match_rows(K)
-
     # TODO: Sparse
     # scores.mat <- methods::as(scores[[scores.name]], "sparseMatrix")
+
+    # Compute scores
 
     n = len(scores.mat)
     K = K.mat
