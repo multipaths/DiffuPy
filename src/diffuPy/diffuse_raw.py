@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
 
 """Diffuse scores on a network."""
+
+import logging
+
 import networkx as nx
 import numpy as np
 
-from .validate_inputs import _validate_scores, _validate_graph, _validate_K
 from .kernels import regularised_laplacian_kernel
 from .matrix import Matrix
-
-import logging
+from .validate_inputs import _validate_scores, _validate_graph, _validate_K
 
 logger = logging.getLogger()
 
 
-def calculate_scores(col_ind: int,
-                     scores: np.array,
-                     diff: np.array,
-                     const_mean: np.array,
-                     const_var: np.array) -> float:
+def calculate_scores(
+        col_ind: int,
+        scores: np.array,
+        diff: np.array,
+        const_mean: np.array,
+        const_var: np.array) -> float:
     """Helper function for diffuse_raw, which operate the z-scores calculation given a whole column of the score matrix.
 
-        :param col_ind: background object for the diffusion
-        :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column
-        :param diff: bool to indicate if z-scores be computed instead of raw scores
-        :param const_mean: K optional matrix precomputed diffusion kernel
-        :param const_var: K optional matrix precomputed diffusion kernel
-
-        :return:  Calculated column z-score
+    :param col_ind: background object for the diffusion
+    :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column
+    :param diff: bool to indicate if z-scores be computed instead of raw scores
+    :param const_mean: K optional matrix precomputed diffusion kernel
+    :param const_var: K optional matrix precomputed diffusion kernel
+    :return:  Calculated column z-score
     """
-
     col_in = scores[:, col_ind]
     col_raw = diff[:, col_ind]
 
@@ -44,25 +44,24 @@ def calculate_scores(col_ind: int,
     return np.subtract(col_raw, score_means) / np.sqrt(score_vars)
 
 
-def diffuse_raw(graph: nx.Graph,
-                scores: Matrix,
-                z: bool = False,
-                K: Matrix = None,
-                **karg) -> Matrix:
+def diffuse_raw(
+        graph: nx.Graph,
+        scores: Matrix,
+        z: bool = False,
+        K: Matrix = None,
+        **karg) -> Matrix:
     """Computes the conmute-time kernel, which is the expected time of going back and forth between a couple of nodes.
         If the network is connected, then the commute time kernel will be totally dense, therefore reflecting global
         properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the
-        unnormalised and normalised graph Laplacian
+        unnormalised and normalised graph Laplacian.
 
-
-        :param graph: background object for the diffusion
-        :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column
-        :param z-logical: bool to indicate if z-scores be computed instead of raw scores
-        :param  K optional matrix precomputed diffusion kernel
-        :return:  A list of scores, with the same length and dimensions as scores
+    :param graph: background object for the diffusion
+    :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column
+    :param z-logical: bool to indicate if z-scores be computed instead of raw scores
+    :param  K optional matrix precomputed diffusion kernel
+    :return:  A list of scores, with the same length and dimensions as scores
     """
-
-    # sanity checks
+    # Sanity checks
     _validate_scores(scores)
 
     # Kernel matrix
@@ -105,7 +104,6 @@ def diffuse_raw(graph: nx.Graph,
     # Constant terms over columns
     const_mean = row_sums / n
     const_var = np.subtract(n * row_sums_2, row_sums ** 2) / ((n - 1) * (n ** 2))
-
 
     # Calculate z-scores iterating the score matrix columns, performing the operation with the whole column.
     return Matrix(

@@ -9,10 +9,7 @@ from diffuPy.validate_inputs import _validate_scores
 log = logging.getLogger(__name__)
 
 
-def diffuse(scores,
-            method,
-            graph=None,
-            **kargs):
+def diffuse(scores, method, graph=None, **kwargs):
     # sanity checks
     _validate_scores(scores)
 
@@ -20,17 +17,18 @@ def diffuse(scores,
     if graph:
         format_network = "graph"
     else:
-        if not "K" in kargs:
+        if not "K" in kwargs:
             raise ValueError("Neither a graph 'graph' or a kernel 'K' has been provided.")
         format_network = "kernel"
 
+    # TODO: que pasa si es kernel y method == 'raw'? va a entrar aqui y va a petar todo (yo meteria esta parte que trabaja con el graph dentro del if de antes
     # Diffuse raw
     if method == "raw":
-        return diffuse_raw(graph=graph, scores=scores, **kargs)
+        return diffuse_raw(graph=graph, scores=scores, **kwargs)
 
     # z scores
     elif method == "z":
-        return diffuse_raw(graph, scores, z=True, **kargs)
+        return diffuse_raw(graph, scores, z=True, **kwargs)
 
     elif method == "ml":
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
@@ -39,7 +37,7 @@ def diffuse(scores,
             if score == 0:
                 scores.mat[j, i] = -1
 
-        return diffuse_raw(graph, scores, **kargs)
+        return diffuse_raw(graph, scores, **kwargs)
 
     elif method == "gm":
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
@@ -51,7 +49,7 @@ def diffuse(scores,
         if format_network == "graph":
             names_ordered = get_label_list_graph(graph, 'name')
         elif format_network == "kernel":
-            names_ordered = kargs['K'].rows_labels
+            names_ordered = kwargs['K'].rows_labels
 
         # If the graph is defined...
         ids_nobkgd = set(names_ordered) - set(scores.rows_labels)
@@ -78,13 +76,15 @@ def diffuse(scores,
         scores.row_bind(
             np.transpose(np.array(
                 [np.repeat(
-                        score,
-                        n_tot - n_bkgd
-                    )
+                    score,
+                    n_tot - n_bkgd
+                )
                     for score in p
                 ])
             ),
             ids_nobkgd
         )
 
-        return diffuse_raw(graph, scores, **kargs)
+        return diffuse_raw(graph, scores, **kwargs)
+
+    # TODO: aqui que pasa? xD metele un raise error method not valid o algo
