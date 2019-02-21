@@ -43,8 +43,8 @@ class ValidateTest(unittest.TestCase):
         """Test empty matrix."""
         matrix = Matrix(
             None,
-            cols_labels=[None]
-            , rows_labels=[None],
+            cols_labels=[None],
+            rows_labels=[None],
             name='Test Matrix 4'
         )
         with self.assertRaises(ValueError): _validate_scores(matrix)

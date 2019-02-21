@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 class Matrix:
     """Matrix class."""
 
-    def __init__(self, mat, rows_labels=None, cols_labels=None, dupl=False, name='', graph=None, **kwargs):
+    def __init__(self, mat = None, rows_labels=None, cols_labels=None, dupl=False, name='', graph=None, init=None, **kwargs):
         """Initialize matrix."""
 
         self._rows_labels = rows_labels
@@ -25,6 +25,12 @@ class Matrix:
 
         self._name = name
         self._dupl = dupl
+
+        if init and self.rows_labels and self.cols_labels:
+            mat = np.full((len(self.rows_labels), len(self.cols_labels)), init)
+        else:
+            raise ValueError('An input matrix or initialization should be provided.')
+
         self._mat = np.array(mat)
 
         self.get_labels = True

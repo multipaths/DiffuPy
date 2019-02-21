@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 """Helper functions for testing"""
 
 
-def _run_score_method_test(method, G, input_scores, test_output_scores):
+def _run_diffusion_method_test(method, G, input_scores, test_output_scores):
     computed_output_scores = diffuse(input_scores, method, graph=G)
 
     if isinstance(computed_output_scores, Matrix):
@@ -37,7 +37,7 @@ def _run_score_method_test(method, G, input_scores, test_output_scores):
 class DiffuseTest(unittest.TestCase):
     graph = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
-    _run_score_method_test('raw', graph, INPUT_SCORES, OUTPUT_RAW_SCORES)
-    _run_score_method_test('z', graph, INPUT_SCORES, OUTPUT_Z_SCORES)
-    _run_score_method_test('ml', graph, INPUT_SCORES, OUTPUT_ML_SCORES)
-    _run_score_method_test('gm', graph, INPUT_UNLABELED_SCORES, OUTPUT_GM_SCORES)
+    _run_diffusion_method_test('raw', graph, INPUT_SCORES, OUTPUT_RAW_SCORES)
+    _run_diffusion_method_test('z', graph, INPUT_SCORES, OUTPUT_Z_SCORES)
+    _run_diffusion_method_test('ml', graph, INPUT_SCORES, OUTPUT_ML_SCORES)
+    _run_diffusion_method_test('gm', graph, INPUT_UNLABELED_SCORES, OUTPUT_GM_SCORES)

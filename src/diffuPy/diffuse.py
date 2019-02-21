@@ -87,4 +87,5 @@ def diffuse(scores, method, graph=None, **kwargs):
 
         return diffuse_raw(graph, scores, **kwargs)
 
-    # TODO: aqui que pasa? xD metele un raise error method not valid o algo
+    else:
+        raise ValueError("")
