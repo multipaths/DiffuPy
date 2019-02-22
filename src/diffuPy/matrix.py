@@ -20,6 +20,9 @@ class Matrix:
 
         self._rows_labels = rows_labels
 
+        if graph:
+            self._rows_labels = list(get_label_list_graph(graph, 'name'))
+
         if not dupl:
             self._cols_labels = cols_labels
 
@@ -28,16 +31,13 @@ class Matrix:
 
         if init and self.rows_labels and self.cols_labels:
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init)
-        else:
+        elif not list(mat):
             raise ValueError('An input matrix or initialization should be provided.')
 
         self._mat = np.array(mat)
 
         self.get_labels = True
         self.get_indices = False
-
-        if graph:
-            self._rows_labels = list(get_label_list_graph(graph, 'name'))
 
         self.set_mappings_validate_labels()
 
@@ -314,4 +314,4 @@ class Matrix:
 class LaplacianMatrix(Matrix):
     def __init__(self, graph, normalized=False, name=''):
         l_mat = get_laplacian(graph, normalized)
-        Matrix.__init__(self, l_mat, dupl=True, name=name, graph=graph)
+        Matrix.__init__(self, mat = l_mat, dupl=True, name=name, graph=graph)

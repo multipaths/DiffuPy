@@ -33,6 +33,7 @@ def set_diagonal_matrix(matrix, d):
 
 def get_label_list_graph(graph: nx.Graph, label: str) -> List:
     """Return graph labels."""
+
     return [
         value
         for value in nx.get_node_attributes(graph, label).values()
