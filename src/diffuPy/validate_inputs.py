@@ -3,8 +3,8 @@
 """Sanity checks for input."""
 
 # TODO
-# .check_method
 # .check_metric
+
 
 # Check scores sanity
 import networkx as nx
@@ -14,9 +14,28 @@ from diffuPy.matrix import Matrix
 from diffuPy.miscellaneous import get_label_list_graph
 
 
+# ' Available methods for diffusion
+# '
+# ' .available_methods is a character vector with the implemented scores
+# '
+# ' @rdname checks
+available_methods = ["raw", "ml", "gm", "mc", "z", "ber_s", "ber_p"]
+
+def _validate_method(method: str):
+    """Ensures that 'method' is a valid character."""
+    if not isinstance(method, str):
+        raise ValueError("The supplied 'method' must be a character, but the one supplied is a " + type(method))
+
+    if len(method) > 1:
+        raise ValueError("Only one 'method' can be supplied at once,  but you supplied " + len(method.split(' ')))
+
+    if len(method) not in available_methods:
+        raise ValueError("The available methods are " + str(
+            available_methods) + " but you supplied '" + method + "', which is not implemented.")
+
+
 def _validate_scores(scores: Matrix) -> None:
     """Check scores sanity: Ensures that scores are suitable for diffusion."""
-
 
     #  Check labels list
     if not scores.cols_labels:
@@ -31,10 +50,19 @@ def _validate_scores(scores: Matrix) -> None:
     #  Check each matrix element
     for score, col_label, row_label in iter(scores):
         #  Validate scores
+
         if score is None:
             raise ValueError("Scores input cannot contain None.")
         elif score is ['NA', 'Nan', 'nan']:
             raise ValueError("Scores input cannot contain NA values.")
+
+        elif isinstance(score, np.int32) or isinstance(score, np.int64):
+            score = int(score)
+            scores.set_from_labels(col_label, row_label, score)
+        elif isinstance(score, np.float32) or isinstance(score, np.float64):
+            score = float(score)
+            scores.set_from_labels(col_label, row_label, score)
+
         elif not isinstance(score, float) and not isinstance(score, int):
             raise ValueError("The scores in background are not numeric.")
 
@@ -48,10 +76,10 @@ def _validate_scores(scores: Matrix) -> None:
 
     for sd, col_label, row_label in iter(std_mat):
         if sd in ['Nan', None]:
-            raise ValueError("Standard deviation in background is NA in column:" + str(col_label))
-        if sd == 0:
-            raise ValueError("Standard deviation in background is 0 in column:" + str(col_label))
+            raise ValueError("Standard deviation in background is NA in column: " + str(col_label))
 
+        # if sd == 0:
+        #    raise ValueError("Standard deviation in background is 0 in column:" + str(col_label))
 
 def _validate_graph(graph: nx.Graph) -> None:
     """Check graph sanity: Ensures that 'graph' is a valid NetworkX Graph object."""
@@ -109,11 +137,30 @@ def _validate_K(k: Matrix) -> None:
         raise ValueError("'k' rownames and colnames must coincide.")
 
     for score, col_label, row_label in iter(k):
-        if not isinstance(score, float) and not isinstance(score, int):
+        # print(k)
+        # print(np.int64)
+        # print(type(score))
+        # print(type(score) == np.int64)
+        # print(isinstance(score, np.int64))
+        # print(np.issubdtype(score, np.dtype('int64')))
+        # print(np.issubdtype(score, int))
+
+        # if isinstance(score, np.int32) or isinstance(score, np.int64):
+        # if type(score) == np.int32 or type(score) == np.int64:
+
+        if np.issubdtype(score, int):
+            score = int(score)
+            k.set_from_labels(col_label, row_label, score)
+
+        elif np.issubdtype(score, float):
+            score = float(score)
+            k.set_from_labels(col_label, row_label, score)
+
+        elif not isinstance(score, float) and not isinstance(score, int):
             raise ValueError("'k' must be a numeric matrix, but it is not numeric.")
 
         if score in ['Nan', None]:
-            raise ValueError("Scores input cannot contain NA. But background .")
+            raise ValueError("Scores input cannot contain NA, but background does.")
 
         if col_label in ['Nan', None] or row_label in ['Nan', None]:
             raise ValueError("'k' dimnames cannot be NA.")

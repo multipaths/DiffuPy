@@ -64,6 +64,7 @@ def diffuse_raw(
     # Sanity checks
     _validate_scores(scores)
 
+
     # Kernel matrix
     if K is None:
         _validate_graph(graph)

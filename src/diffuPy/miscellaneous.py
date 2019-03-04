@@ -7,11 +7,16 @@ from typing import List
 import networkx as nx
 import numpy as np
 
+import warnings
+
+import pybel
+
 
 def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
     """Return Laplacian matrix."""
     if nx.is_directed(graph):
-        raise ValueError('Graph must be undirected')
+        graph = graph.to_undirected()
+        warnings.warn('Graph must be undirected, so it is converted to undirected.')
 
     # Normalize matrix
     if normalized:
@@ -34,10 +39,24 @@ def set_diagonal_matrix(matrix, d):
 def get_label_list_graph(graph: nx.Graph, label: str) -> List:
     """Return graph labels."""
 
-    return [
-        value
-        for value in nx.get_node_attributes(graph, label).values()
-    ]
+    if isinstance(list(graph.nodes(data=True))[0], tuple):
+        labels = []
+        for node, _ in graph.nodes(data=True):
+            if hasattr(node, 'name') and node.name is not None:
+                labels.append(node.name.lower())
+            elif hasattr(node, 'id') and node.id is not None:
+                labels.append(node.id.lower())
+        return labels
+
+    elif nx.get_node_attributes(graph, label).values():
+        return [
+            value
+            for value in nx.get_node_attributes(graph, label).values()
+        ]
+
+    else:
+        raise Warning('Could not get a label list from graph.')
+
 
 
 def get_label_ix_mapping(labels):
