@@ -4,34 +4,26 @@
 
 # TODO
 # .check_metric
+# TODO: por que no agregas todos los [NaN] en una lista comun en constants?
 
-
-# Check scores sanity
 import networkx as nx
 import numpy as np
 
+from diffuPy.constants import METHODS
 from diffuPy.matrix import Matrix
 from diffuPy.miscellaneous import get_label_list_graph
 
 
-# ' Available methods for diffusion
-# '
-# ' .available_methods is a character vector with the implemented scores
-# '
-# ' @rdname checks
-available_methods = ["raw", "ml", "gm", "mc", "z", "ber_s", "ber_p"]
-
 def _validate_method(method: str):
     """Ensures that 'method' is a valid character."""
     if not isinstance(method, str):
-        raise ValueError("The supplied 'method' must be a character, but the one supplied is a " + type(method))
+        raise ValueError(f"The supplied 'method' must be a character, but the one supplied is a {type(method)}")
 
     if len(method) > 1:
-        raise ValueError("Only one 'method' can be supplied at once,  but you supplied " + len(method.split(' ')))
+        raise ValueError(f"Only one 'method' can be supplied at once, but you supplied {len(method.split(' '))}")
 
-    if len(method) not in available_methods:
-        raise ValueError("The available methods are " + str(
-            available_methods) + " but you supplied '" + method + "', which is not implemented.")
+    if len(method) not in METHODS:
+        raise ValueError(f"The available methods are {METHODS} but you supplied {method}.")
 
 
 def _validate_scores(scores: Matrix) -> None:
@@ -81,6 +73,7 @@ def _validate_scores(scores: Matrix) -> None:
         # if sd == 0:
         #    raise ValueError("Standard deviation in background is 0 in column:" + str(col_label))
 
+
 def _validate_graph(graph: nx.Graph) -> None:
     """Check graph sanity: Ensures that 'graph' is a valid NetworkX Graph object."""
 
@@ -113,9 +106,8 @@ def _validate_graph(graph: nx.Graph) -> None:
 
 def _validate_K(k: Matrix) -> None:
     """Check kernel sanity: Ensures that 'k' is a formally valid kernel. Does not check for spd"""
-
     if not isinstance(k, Matrix):
-        raise ValueError("'k' must be a matrix")
+        raise ValueError("'k' must be a Matrix object")
 
     # Check numeric type.
     if not 'float' and 'int' in str(k.mat.dtype):
@@ -125,16 +117,17 @@ def _validate_K(k: Matrix) -> None:
     n_cols = k.mat.shape[1]
     if n_rows != n_cols:
         raise ValueError(
-            "'k' must be a square matrix, but it has " + str(n_rows) + " rows and " + str(n_cols) + " columns.")
+            f"'k' must be a square matrix, but it has {str(n_rows)} rows and {str(n_cols)} columns."
+        )
 
-    if k.cols_labels == []:
+    if not k.cols_labels:
         raise ValueError("'k' kernel must have row names.")
 
-    if k.rows_labels == []:
+    if not k.rows_labels:
         raise ValueError("'k' kernel must have column names.")
 
     if k.rows_labels != k.cols_labels:
-        raise ValueError("'k' rownames and colnames must coincide.")
+        raise ValueError("'k' rownames and colnames must be identical.")
 
     for score, col_label, row_label in iter(k):
         # print(k)
