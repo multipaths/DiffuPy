@@ -305,14 +305,13 @@ class Matrix:
 
         missing_labels = set(reference_labels) - set(self.rows_labels)
 
-        print(len(missing_labels))
 
         mat_match.rows_labels += list(missing_labels)
 
         missing_values = np.full((len(missing_labels), 1), missing_fill)
 
         mat_match.mat = np.concatenate((mat_match.mat, missing_values), axis=0)
-        print(mat_match.mat)
+
         return mat_match
 
     def match_missing_cols(self, reference_labels, missing_fill):
