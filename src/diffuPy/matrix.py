@@ -15,7 +15,8 @@ log = logging.getLogger(__name__)
 class Matrix:
     """Matrix class."""
 
-    def __init__(self, mat = None, rows_labels=None, cols_labels=None, dupl=False, name='', graph=None, init=None, **kwargs):
+    def __init__(self, mat=None, rows_labels=None, cols_labels=None, symetric=False, name='', graph=None, init=None,
+                 **kwargs):
         """Initialize matrix."""
 
         self._rows_labels = rows_labels
@@ -23,11 +24,11 @@ class Matrix:
         if graph:
             self._rows_labels = get_label_list_graph(graph, 'name')
 
-        if not dupl:
+        if not symetric:
             self._cols_labels = cols_labels
 
         self._name = name
-        self._dupl = dupl
+        self._symetric = symetric
 
         if init and self.rows_labels and self.cols_labels:
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init)
@@ -88,7 +89,7 @@ class Matrix:
 
     def __copy__(self):
         """Return a copy of Matrix Object."""
-        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, dupl=self._dupl,
+        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, symetric=self._symetric,
                       name=self.name)
 
     """Getters and Setters"""
@@ -97,17 +98,17 @@ class Matrix:
 
         if list(self.rows_labels):
             self._rows_labels_ix_mapping, self._rows_labels = get_label_ix_mapping(self.rows_labels)
-        elif self.dupl and not list(self.cols_labels):
+        elif self.symetric and not list(self.cols_labels):
             log.warning(
                 'Rows labels empty, also columns (neither cols labels given) will be empty since duplicate labels is true.')
-        elif not self.dupl:
+        elif not self.symetric:
             log.warning('Rows labels empty.')
 
         if list(self.cols_labels):
             self.cols_labels_ix_mapping, self.cols_labels = get_label_ix_mapping(self.cols_labels)
-            if self.dupl:
+            if self.symetric:
                 log.warning('Columns labels are assigned to rows since duplicate labels is true.')
-        elif not self.dupl:
+        elif not self.symetric:
             log.warning('Cols labels empty.')
 
     # Raw matrix (numpy array)
@@ -129,12 +130,12 @@ class Matrix:
         self._name = name
 
     @property
-    def dupl(self):
-        return self._dupl
+    def symetric(self):
+        return self._symetric
 
-    @dupl.setter
-    def dupl(self, dupl):
-        self._dupl = dupl
+    @symetric.setter
+    def symetric(self, symetric):
+        self._symetric = symetric
 
     # Rows labels
     @property
@@ -148,14 +149,14 @@ class Matrix:
     # Columns labels
     @property
     def cols_labels(self):
-        if self._dupl:
+        if self._symetric:
             return self._rows_labels
 
         return self._cols_labels
 
     @cols_labels.setter
     def cols_labels(self, cols_labels):
-        if self._dupl:
+        if self._symetric:
             self._rows_labels = list(cols_labels)
         else:
             self._cols_labels = list(cols_labels)
@@ -172,14 +173,14 @@ class Matrix:
     # Columns mapping
     @property
     def cols_labels_ix_mapping(self):
-        if self._dupl:
+        if self._symetric:
             return self._rows_labels_ix_mapping
 
         return self._cols_labels_ix_mapping
 
     @cols_labels_ix_mapping.setter
     def cols_labels_ix_mapping(self, cols_labels_ix_mapping):
-        if self._dupl:
+        if self._symetric:
             self._rows_labels_ix_mapping = cols_labels_ix_mapping
         else:
             self._cols_labels_ix_mapping = cols_labels_ix_mapping
@@ -197,10 +198,10 @@ class Matrix:
     def get_col_from_label(self, label):
         return self.mat[:, self.cols_labels_ix_mapping[label]]
 
-    def set_from_labels(self, col_label, row_label, x):
+    def set_from_labels(self, row_label, col_label, x):
         self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]] = x
 
-    def get_from_labels(self, col_label, row_label):
+    def get_from_labels(self, row_label, col_label, ):
         return self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]]
 
     # TODO: este nombre es un poco confuso no?
@@ -239,40 +240,44 @@ class Matrix:
 
     """Match matrices"""
 
-    def match_rows(self, reference_rows):
+    def match_rows(self, reference_matrix):
         """Match method to set rows labels as reference matrix."""
 
-        if self.dupl:
+        if self.symetric:
             log.warning('Changing rows of a symmetric Matrix implies changing also columns.')
-            return self.match_mat(reference_rows, True)
+            return self.match_mat(reference_matrix, True)
 
         mat_match = self.__copy__()
-        mat_match.rows_labels = reference_rows.rows_labels
+        mat_match.rows_labels = reference_matrix.rows_labels
 
-        for row_label in mat_match.rows_labels:
-            mat_match.set_row_from_label(row_label, self.get_row_from_label(row_label))
+        for row_label in reference_matrix.rows_labels:
+            mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label]] = self.get_row_from_label(row_label)
+
+        mat_match.set_mappings_and_validate_labels()
 
         return mat_match
 
-    def match_cols(self, reference_cols):
+    def match_cols(self, reference_matrix):
         """Match method to set cols labels as reference matrix."""
 
-        if reference_cols.cols_labels == reference_cols.cols_labels:
+        if reference_matrix.cols_labels == reference_matrix.cols_labels:
             return self
 
-        if self.dupl:
+        if self.symetric:
             log.warning('Changing columns of a symmetric Matrix implies changing also rows.')
-            return self.match_mat(reference_cols, True)
+            return self.match_mat(reference_matrix, True)
 
         mat_match = self.__copy__()
-        mat_match.cols_labels = reference_cols.cols_labels
+        mat_match.cols_labels = reference_matrix.cols_labels
 
-        for row_label in mat_match.rows_labels:
-            mat_match.set_col_from_label(row_label, self.get_row_from_label(row_label))
+        for col_label in reference_matrix.cols_labels:
+            mat_match.mat[reference_matrix.cols_labels_ix_mapping[col_label]] = self.get_col_from_label(col_label)
+
+        mat_match.set_mappings_and_validate_labels()
 
         return mat_match
 
-    def match_mat(self, reference_matrix, match_dupl=None):
+    def match_mat(self, reference_matrix, match_symetric=None):
         """Match method to set axis labels as reference matrix."""
 
         if reference_matrix.cols_labels == self.cols_labels and reference_matrix.rows_labels == self.rows_labels:
@@ -281,17 +286,20 @@ class Matrix:
         mat_match = self.__copy__()
         mat_match.rows_labels = reference_matrix.rows_labels
 
-        if match_dupl is None:
-            match_dupl = reference_matrix.dupl
+        if match_symetric is None:
+            match_symetric = reference_matrix.symetric
 
-        if not match_dupl:
+        if not match_symetric:
             mat_match.cols_labels = reference_matrix.cols_labels
         else:
-            mat_match.dupl = True
             Warning('Matching symetric matrix.')
 
-        for score, col_label, row_label in iter(self):
-            mat_match.set_from_labels(col_label, row_label, self.get_from_labels(col_label, row_label))
+        for score, col_label, row_label in iter(reference_matrix):
+            mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label], \
+                          reference_matrix.cols_labels_ix_mapping[col_label]] \
+                = self.get_from_labels(row_label, col_label)
+
+        mat_match.set_mappings_and_validate_labels()
 
         return mat_match
 
@@ -305,12 +313,13 @@ class Matrix:
 
         missing_labels = set(reference_labels) - set(self.rows_labels)
 
-
         mat_match.rows_labels += list(missing_labels)
 
         missing_values = np.full((len(missing_labels), 1), missing_fill)
 
         mat_match.mat = np.concatenate((mat_match.mat, missing_values), axis=0)
+
+        mat_match.set_mappings_and_validate_labels()
 
         return mat_match
 
@@ -331,8 +340,9 @@ class Matrix:
 
         mat_match.mat = np.concatenate(mat_match.mat, missing_values, axis=1)
 
-        return mat_match
+        mat_match.set_mappings_and_validate_labels()
 
+        return mat_match
 
     """Import"""
 
@@ -358,4 +368,4 @@ class LaplacianMatrix(Matrix):
     def __init__(self, graph, normalized=False, name=''):
         l_mat = get_laplacian(graph, normalized)
 
-        Matrix.__init__(self, mat = l_mat, dupl=True, name=name, graph=graph)
+        Matrix.__init__(self, mat=l_mat, symetric=True, name=name, graph=graph)

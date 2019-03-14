@@ -50,10 +50,10 @@ def _validate_scores(scores: Matrix) -> None:
 
         elif isinstance(score, np.int32) or isinstance(score, np.int64):
             score = int(score)
-            scores.set_from_labels(col_label, row_label, score)
+            scores.set_from_labels(row_label, col_label, score)
         elif isinstance(score, np.float32) or isinstance(score, np.float64):
             score = float(score)
-            scores.set_from_labels(col_label, row_label, score)
+            scores.set_from_labels(row_label, col_label, score)
 
         elif not isinstance(score, float) and not isinstance(score, int):
             raise ValueError("The scores in background are not numeric.")
@@ -143,11 +143,11 @@ def _validate_K(k: Matrix) -> None:
 
         if np.issubdtype(score, int):
             score = int(score)
-            k.set_from_labels(col_label, row_label, score)
+            k.set_from_labels(row_label, col_label, score)
 
         elif np.issubdtype(score, float):
             score = float(score)
-            k.set_from_labels(col_label, row_label, score)
+            k.set_from_labels(row_label, col_label, score)
 
         elif not isinstance(score, float) and not isinstance(score, int):
             raise ValueError("'k' must be a numeric matrix, but it is not numeric.")
