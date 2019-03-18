@@ -4,6 +4,7 @@
 
 import logging
 import os
+from collections import defaultdict
 
 import numpy as np
 
@@ -16,16 +17,17 @@ class Matrix:
     """Matrix class."""
 
     def __init__(self, mat=None, rows_labels=None, cols_labels=None, symetric=False, name='', graph=None, init=None,
-                 **kwargs):
+                 no_duplicates = True, **kwargs):
         """Initialize matrix."""
 
-        self._rows_labels = rows_labels
+        if rows_labels:
+            self._rows_labels = list(rows_labels)
 
         if graph:
             self._rows_labels = get_label_list_graph(graph, 'name')
 
         if not symetric:
-            self._cols_labels = cols_labels
+            self._cols_labels = list(cols_labels)
 
         self._name = name
         self._symetric = symetric
@@ -39,6 +41,8 @@ class Matrix:
 
         self.get_labels = True
         self.get_indices = False
+
+        self.no_duplicates = no_duplicates
 
         self.set_mappings_and_validate_labels()
 
@@ -60,12 +64,12 @@ class Matrix:
         return self
 
     def __next__(self):
-        if self.j >= len(self.rows_labels) - 1 and self.i >= len(self.cols_labels) - 1:
+        if self.i >= len(self.rows_labels) - 1 and self.j >= len(self.cols_labels) - 1:
             self.get_labels = True
             self.get_indices = False
             raise StopIteration
 
-        if self.i >= len(self.cols_labels) - 1:
+        if self.i >= len(self.rows_labels) - 1:
             self.i = 0
             self.j += 1
         else:
@@ -73,15 +77,15 @@ class Matrix:
 
         nxt = tuple()
         if len(self.rows_labels) == 1:
-            nxt += (self.mat[self.i],)
+            nxt += (self.mat[self.j],)
         else:
-            nxt += (self.mat[self.j][self.i],)
+            nxt += (self.mat[self.i][self.j],)
 
         if self.get_indices:
             nxt += (self.i, self.j,)
 
         if self.get_labels:
-            nxt += (self.cols_labels[self.i], self.rows_labels[self.j],)
+            nxt += (self.rows_labels[self.i], self.cols_labels[self.j])
 
         return nxt
 
@@ -92,11 +96,46 @@ class Matrix:
         return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, symetric=self._symetric,
                       name=self.name)
 
-    """Getters and Setters"""
+    """Validators """
+    def validate_duplicates(self):
+        row_labels = []
+        col_lables = []
+        rep_col = defaultdict(lambda : dict())
+
+        mat = np.empty((len(set(self.rows_labels)),len(set(self.cols_labels))))
+
+        for value, row_index, col_index, row_label, col_label in self.__iter__(get_indices=True, get_labels=True):
+            if row_label in row_labels:
+                mat[row_labels.index(row_label)] = np.sum([self.mat[row_labels.index(row_label)], self.mat[row_index]])
+
+                for col_label, cols in rep_col.items():
+                    for col_index, col in cols.items():
+                        rep_col[col_label][col_index] = np.delete(col, row_index)
+            else:
+                np.append(mat, self.mat[row_index])
+                row_labels.append(row_label)
+
+            if col_label in col_lables:
+                rep_col[col_label][col_index] = self.mat[:,col_index]
+
+            else:
+                col_lables.append(col_label)
+
+        for col_label, cols in rep_col.items():
+            for col_index, col in cols.items():
+                mat[:, col_lables.index(col_label)] = np.sum([mat[:, col_lables.index(col_label)], self.mat[:, col_index]])
+            for col_index, col in cols.items():
+                np.delete(mat, col_index, 1)
+
+        self.mat = mat
+        self.row_labels = row_labels
+        self.col_lables = col_lables
 
     def set_mappings_and_validate_labels(self):
+        if self.no_duplicates and (set(self.row_labels) != self.row_labels or set(self.cols_labels) != self.cols_labels):
+            self.validate_duplicates()
 
-        if list(self.rows_labels):
+        if self.rows_labels:
             self._rows_labels_ix_mapping, self._rows_labels = get_label_ix_mapping(self.rows_labels)
         elif self.symetric and not list(self.cols_labels):
             log.warning(
@@ -110,6 +149,8 @@ class Matrix:
                 log.warning('Columns labels are assigned to rows since duplicate labels is true.')
         elif not self.symetric:
             log.warning('Cols labels empty.')
+
+    """Getters and Setters"""
 
     # Raw matrix (numpy array)
     @property
@@ -294,7 +335,7 @@ class Matrix:
         else:
             Warning('Matching symetric matrix.')
 
-        for score, col_label, row_label in iter(reference_matrix):
+        for score, row_label, col_label in iter(reference_matrix):
             mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label], \
                           reference_matrix.cols_labels_ix_mapping[col_label]] \
                 = self.get_from_labels(row_label, col_label)
@@ -309,13 +350,14 @@ class Matrix:
         if reference_labels == self.rows_labels:
             return self
 
-        mat_match = self.__copy__()
 
         missing_labels = set(reference_labels) - set(self.rows_labels)
 
+        mat_match = self.__copy__()
+
         mat_match.rows_labels += list(missing_labels)
 
-        missing_values = np.full((len(missing_labels), 1), missing_fill)
+        missing_values = np.full((len(missing_labels), len(self.cols_labels)), missing_fill)
 
         mat_match.mat = np.concatenate((mat_match.mat, missing_values), axis=0)
 

@@ -21,7 +21,8 @@ def diffuse(scores, method, graph=None, **kwargs):
             raise ValueError("Neither a graph 'graph' or a kernel 'K' has been provided.")
         format_network = "kernel"
 
-    # TODO: que pasa si es kernel y method == 'raw'? va a entrar aqui y va a petar todo (yo meteria esta parte que trabaja con el graph dentro del if de antes
+    # TODO: que pasa si es kernel y method == 'raw'? va a entrar aqui y va a petar todo (yo meteria esta parte que
+    #  trabaja con el graph dentro del if de antes
     # Diffuse raw
     if method == "raw":
         return diffuse_raw(graph=graph, scores=scores, **kwargs)
@@ -35,7 +36,7 @@ def diffuse(scores, method, graph=None, **kwargs):
             if score not in [0, 1]:
                 raise ValueError("'graph' cannot have NA as node names")
             if score == 0:
-                scores.mat[j, i] = -1
+                scores.mat[i, j] = -1
 
         return diffuse_raw(graph, scores, **kwargs)
 
@@ -70,7 +71,7 @@ def diffuse(scores, method, graph=None, **kwargs):
 
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
             if score == 0:
-                scores.mat[j, i] = -1
+                scores.mat[i, j] = -1
 
         # add biases (each column has its bias)
         scores.row_bind(

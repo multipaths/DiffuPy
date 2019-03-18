@@ -40,7 +40,7 @@ def _validate_scores(scores: Matrix) -> None:
         raise ValueError("The scores in background are not numeric.")
 
     #  Check each matrix element
-    for score, col_label, row_label in iter(scores):
+    for score, row_label, col_label in iter(scores):
         #  Validate scores
 
         if score is None:
@@ -66,7 +66,7 @@ def _validate_scores(scores: Matrix) -> None:
 
     std_mat = Matrix(np.std(scores.mat, axis=0), ['sd'], scores.cols_labels)
 
-    for sd, col_label, row_label in iter(std_mat):
+    for sd, row_label, col_label in iter(std_mat):
         if sd in ['Nan', None]:
             raise ValueError("Standard deviation in background is NA in column: " + str(col_label))
 
@@ -129,7 +129,7 @@ def _validate_K(k: Matrix) -> None:
     if k.rows_labels != k.cols_labels:
         raise ValueError("'k' rownames and colnames must be identical.")
 
-    for score, col_label, row_label in iter(k):
+    for score, row_label, col_label in iter(k):
         # print(k)
         # print(np.int64)
         # print(type(score))
