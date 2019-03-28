@@ -12,7 +12,6 @@ from .miscellaneous import get_label_ix_mapping, get_label_list_graph, get_lapla
 
 log = logging.getLogger(__name__)
 
-
 class Matrix:
     """Matrix class."""
 
@@ -105,21 +104,25 @@ class Matrix:
         mat = np.empty((len(set(self.rows_labels)),len(set(self.cols_labels))))
 
         for value, row_index, col_index, row_label, col_label in self.__iter__(get_indices=True, get_labels=True):
+
             if row_label in row_labels:
                 mat[row_labels.index(row_label)] = np.sum([self.mat[row_labels.index(row_label)], self.mat[row_index]])
 
-                for col_label, cols in rep_col.items():
-                    for col_index, col in cols.items():
-                        rep_col[col_label][col_index] = np.delete(col, row_index)
+                if self.symetric:
+                    for col_label, cols in rep_col.items():
+                        for col_index, col in cols.items():
+                            rep_col[col_label][col_index] = np.delete(col, row_index)
+
+            if self.symetric:
+                if col_label in col_lables:
+                    rep_col[col_label][col_index] = self.mat[:,col_index]
+                else:
+                    col_lables.append(col_label)
+
+
             else:
                 np.append(mat, self.mat[row_index])
                 row_labels.append(row_label)
-
-            if col_label in col_lables:
-                rep_col[col_label][col_index] = self.mat[:,col_index]
-
-            else:
-                col_lables.append(col_label)
 
         for col_label, cols in rep_col.items():
             for col_index, col in cols.items():
@@ -127,13 +130,17 @@ class Matrix:
             for col_index, col in cols.items():
                 np.delete(mat, col_index, 1)
 
+
+
         self.mat = mat
-        self.row_labels = row_labels
-        self.col_lables = col_lables
+        self.rows_labels = row_labels
+
+        if self.symetric:
+            self.col_lables = col_lables
 
     def set_mappings_and_validate_labels(self):
-        if self.no_duplicates and (set(self.row_labels) != self.row_labels or set(self.cols_labels) != self.cols_labels):
-            self.validate_duplicates()
+        # if self.no_duplicates and (set(self.rows_labels) != self.rows_labels or set(self.cols_labels) != self.cols_labels):
+            # self.validate_duplicates()
 
         if self.rows_labels:
             self._rows_labels_ix_mapping, self._rows_labels = get_label_ix_mapping(self.rows_labels)
@@ -362,6 +369,7 @@ class Matrix:
         mat_match.mat = np.concatenate((mat_match.mat, missing_values), axis=0)
 
         mat_match.set_mappings_and_validate_labels()
+
 
         return mat_match
 
