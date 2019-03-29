@@ -62,8 +62,9 @@ def diffuse_raw(
     :return:  A list of scores, with the same length and dimensions as scores
     """
     # Sanity checks
-    _validate_scores(scores)
 
+    _validate_scores(scores)
+    logging.info('Scores validated.')
 
     # Kernel matrix
     if K is None:
@@ -76,7 +77,11 @@ def diffuse_raw(
         logging.info('Using supplied kernel matrix...')
 
     # Match indices
+    logging.info('Kernel validated scores.')
+
     scores = scores.match_rows(K)
+    logging.info('Scores matched.')
+
     # TODO: Sparse
     # scores.mat <- methods::as(scores[[scores.name]], "sparseMatrix")
 
@@ -87,10 +92,19 @@ def diffuse_raw(
 
     # raw scores
     diff = np.matmul(K[:, :n], scores.mat)
+    logging.info('Matrix product for raw scores preformed.')
+
 
     # Return base matrix if it is raw. Continue if we want z-scores
     if not z:
-        return diff
+        return Matrix(
+        diff,
+        scores.rows_labels,
+        scores.cols_labels
+    )
+
+
+    logging.info('Normalization z-scores.')
 
     # If we want z-scores, must compute rowmeans and rowmeans2
     row_sums = np.array(
@@ -101,6 +115,8 @@ def diffuse_raw(
         [np.sum(row)
          for row in K[:, :n] ** 2]
     )
+
+    logging.info('Rowmeans and rowmeans2 computatated.')
 
     # Constant terms over columns
     const_mean = row_sums / n

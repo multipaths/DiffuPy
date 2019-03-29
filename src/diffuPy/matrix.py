@@ -29,7 +29,7 @@ class Matrix:
             self._cols_labels = list(cols_labels)
 
         self._name = name
-        self._symetric = symetric
+        self._quadratic = symetric
 
         if init and self.rows_labels and self.cols_labels:
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init)
@@ -92,7 +92,7 @@ class Matrix:
 
     def __copy__(self):
         """Return a copy of Matrix Object."""
-        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, symetric=self._symetric,
+        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, symetric=self._quadratic,
                       name=self.name)
 
     """Validators """
@@ -108,12 +108,12 @@ class Matrix:
             if row_label in row_labels:
                 mat[row_labels.index(row_label)] = np.sum([self.mat[row_labels.index(row_label)], self.mat[row_index]])
 
-                if self.symetric:
+                if self.quadratic:
                     for col_label, cols in rep_col.items():
                         for col_index, col in cols.items():
                             rep_col[col_label][col_index] = np.delete(col, row_index)
 
-            if self.symetric:
+            if self.quadratic:
                 if col_label in col_lables:
                     rep_col[col_label][col_index] = self.mat[:,col_index]
                 else:
@@ -135,7 +135,7 @@ class Matrix:
         self.mat = mat
         self.rows_labels = row_labels
 
-        if self.symetric:
+        if self.quadratic:
             self.col_lables = col_lables
 
     def set_mappings_and_validate_labels(self):
@@ -144,17 +144,17 @@ class Matrix:
 
         if self.rows_labels:
             self._rows_labels_ix_mapping, self._rows_labels = get_label_ix_mapping(self.rows_labels)
-        elif self.symetric and not list(self.cols_labels):
+        elif self.quadratic and not list(self.cols_labels):
             log.warning(
                 'Rows labels empty, also columns (neither cols labels given) will be empty since duplicate labels is true.')
-        elif not self.symetric:
+        elif not self.quadratic:
             log.warning('Rows labels empty.')
 
         if list(self.cols_labels):
             self.cols_labels_ix_mapping, self.cols_labels = get_label_ix_mapping(self.cols_labels)
-            if self.symetric:
+            if self.quadratic:
                 log.warning('Columns labels are assigned to rows since duplicate labels is true.')
-        elif not self.symetric:
+        elif not self.quadratic:
             log.warning('Cols labels empty.')
 
     """Getters and Setters"""
@@ -178,12 +178,12 @@ class Matrix:
         self._name = name
 
     @property
-    def symetric(self):
-        return self._symetric
+    def quadratic(self):
+        return self._quadratic
 
-    @symetric.setter
-    def symetric(self, symetric):
-        self._symetric = symetric
+    @quadratic.setter
+    def quadratic(self, quadratic):
+        self._quadratic = quadratic
 
     # Rows labels
     @property
@@ -197,14 +197,14 @@ class Matrix:
     # Columns labels
     @property
     def cols_labels(self):
-        if self._symetric:
+        if self._quadratic:
             return self._rows_labels
 
         return self._cols_labels
 
     @cols_labels.setter
     def cols_labels(self, cols_labels):
-        if self._symetric:
+        if self._quadratic:
             self._rows_labels = list(cols_labels)
         else:
             self._cols_labels = list(cols_labels)
@@ -221,14 +221,14 @@ class Matrix:
     # Columns mapping
     @property
     def cols_labels_ix_mapping(self):
-        if self._symetric:
+        if self._quadratic:
             return self._rows_labels_ix_mapping
 
         return self._cols_labels_ix_mapping
 
     @cols_labels_ix_mapping.setter
     def cols_labels_ix_mapping(self, cols_labels_ix_mapping):
-        if self._symetric:
+        if self._quadratic:
             self._rows_labels_ix_mapping = cols_labels_ix_mapping
         else:
             self._cols_labels_ix_mapping = cols_labels_ix_mapping
@@ -291,7 +291,7 @@ class Matrix:
     def match_rows(self, reference_matrix):
         """Match method to set rows labels as reference matrix."""
 
-        if self.symetric:
+        if self.quadratic:
             log.warning('Changing rows of a symmetric Matrix implies changing also columns.')
             return self.match_mat(reference_matrix, True)
 
@@ -311,7 +311,7 @@ class Matrix:
         if reference_matrix.cols_labels == reference_matrix.cols_labels:
             return self
 
-        if self.symetric:
+        if self.quadratic:
             log.warning('Changing columns of a symmetric Matrix implies changing also rows.')
             return self.match_mat(reference_matrix, True)
 
@@ -325,7 +325,7 @@ class Matrix:
 
         return mat_match
 
-    def match_mat(self, reference_matrix, match_symetric=None):
+    def match_mat(self, reference_matrix, match_quadratic=None):
         """Match method to set axis labels as reference matrix."""
 
         if reference_matrix.cols_labels == self.cols_labels and reference_matrix.rows_labels == self.rows_labels:
@@ -334,13 +334,13 @@ class Matrix:
         mat_match = self.__copy__()
         mat_match.rows_labels = reference_matrix.rows_labels
 
-        if match_symetric is None:
-            match_symetric = reference_matrix.symetric
+        if match_quadratic is None:
+            match_quadratic = reference_matrix.quadratic
 
-        if not match_symetric:
+        if not match_quadratic:
             mat_match.cols_labels = reference_matrix.cols_labels
         else:
-            Warning('Matching symetric matrix.')
+            Warning('Matching quadratic matrix: Same columns and row labels.')
 
         for score, row_label, col_label in iter(reference_matrix):
             mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label], \

@@ -129,34 +129,35 @@ def _validate_K(k: Matrix) -> None:
     if k.rows_labels != k.cols_labels:
         raise ValueError("'k' rownames and colnames must be identical.")
 
-    for score, row_label, col_label in iter(k):
-        # print(k)
-        # print(np.int64)
-        # print(type(score))
-        # print(type(score) == np.int64)
-        # print(isinstance(score, np.int64))
-        # print(np.issubdtype(score, np.dtype('int64')))
-        # print(np.issubdtype(score, int))
-
-        # if isinstance(score, np.int32) or isinstance(score, np.int64):
-        # if type(score) == np.int32 or type(score) == np.int64:
-
-        if np.issubdtype(score, int):
-            score = int(score)
-            k.set_from_labels(row_label, col_label, score)
-
-        elif np.issubdtype(score, float):
-            score = float(score)
-            k.set_from_labels(row_label, col_label, score)
-
-        elif not isinstance(score, float) and not isinstance(score, int):
-            raise ValueError("'k' must be a numeric matrix, but it is not numeric.")
-
-        if score in ['Nan', None]:
-            raise ValueError("Scores input cannot contain NA, but background does.")
-
-        if col_label in ['Nan', None] or row_label in ['Nan', None]:
-            raise ValueError("'k' dimnames cannot be NA.")
+    # TODO: Bottleneck
+    # for score, row_label, col_label in iter(k):
+    #     # print(k)
+    #     # print(np.int64)
+    #     # print(type(score))
+    #     # print(type(score) == np.int64)
+    #     # print(isinstance(score, np.int64))
+    #     # print(np.issubdtype(score, np.dtype('int64')))
+    #     # print(np.issubdtype(score, int))
+    #
+    #     # if isinstance(score, np.int32) or isinstance(score, np.int64):
+    #     # if type(score) == np.int32 or type(score) == np.int64:
+    #
+    #     if np.issubdtype(score, int):
+    #         score = int(score)
+    #         k.set_from_labels(row_label, col_label, score)
+    #
+    #     elif np.issubdtype(score, float):
+    #         score = float(score)
+    #         k.set_from_labels(row_label, col_label, score)
+    #
+    #     elif not isinstance(score, float) and not isinstance(score, int):
+    #         raise ValueError("'k' must be a numeric matrix, but it is not numeric.")
+    #
+    #     if score in ['Nan', None]:
+    #         raise ValueError("Scores input cannot contain NA, but background does.")
+    #
+    #     if col_label in ['Nan', None] or row_label in ['Nan', None]:
+    #         raise ValueError("'k' dimnames cannot be NA.")
 
     if len(np.unique(k.rows_labels)) != len(k.rows_labels):
         raise ValueError("'k' cannot contain duplicated row names.")
