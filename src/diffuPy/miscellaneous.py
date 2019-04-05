@@ -9,8 +9,8 @@ import numpy as np
 
 import warnings
 
-import pybel
-
+import logging
+log = logging.getLogger(__name__)
 
 def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
     """Return Laplacian matrix."""
@@ -43,9 +43,29 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
         labels = []
         for node, _ in graph.nodes(data=True):
             if hasattr(node, 'name') and node.name is not None:
-                labels.append(node.name.lower())
+                if node.name.lower() == "":
+                    log.warning('Empty attribute name.' + str(node))
+                    labels.append(str(node))
+
+                else:
+                    labels.append(node.name.lower())
+
             elif hasattr(node, 'id') and node.id is not None:
-                labels.append(node.id.lower())
+                if node.id.lower() == "":
+                    log.warning('Empty attribute id.' + str(node))
+                    labels.append(str(node))
+
+                else:
+                    labels.append(node.id.lower())
+                    log.warning('Node labeled with id.' + node.id.lower())
+
+            else:
+                if str(node) == "":
+                    log.warning('Node with no info.')
+                else:
+                    labels.append(str(node))
+                    log.warning('Node name nor id not labeled. ' + str(node))
+
         return labels
 
     elif nx.get_node_attributes(graph, label).values():

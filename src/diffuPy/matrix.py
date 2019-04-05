@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 class Matrix:
     """Matrix class."""
 
-    def __init__(self, mat=None, rows_labels=None, cols_labels=None, symetric=False, name='', graph=None, init=None,
+    def __init__(self, mat=None, rows_labels=None, cols_labels=None, quadratic=False, name='', graph=None, init=None,
                  no_duplicates = True, **kwargs):
         """Initialize matrix."""
 
@@ -25,11 +25,11 @@ class Matrix:
         if graph:
             self._rows_labels = get_label_list_graph(graph, 'name')
 
-        if not symetric:
+        if not quadratic:
             self._cols_labels = list(cols_labels)
 
         self._name = name
-        self._quadratic = symetric
+        self._quadratic = quadratic
 
         if init and self.rows_labels and self.cols_labels:
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init)
@@ -92,7 +92,7 @@ class Matrix:
 
     def __copy__(self):
         """Return a copy of Matrix Object."""
-        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, symetric=self._quadratic,
+        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, quadratic=self._quadratic,
                       name=self.name)
 
     """Validators """
@@ -418,4 +418,4 @@ class LaplacianMatrix(Matrix):
     def __init__(self, graph, normalized=False, name=''):
         l_mat = get_laplacian(graph, normalized)
 
-        Matrix.__init__(self, mat=l_mat, symetric=True, name=name, graph=graph)
+        Matrix.__init__(self, mat=l_mat, quadratic=True, name=name, graph=graph)
