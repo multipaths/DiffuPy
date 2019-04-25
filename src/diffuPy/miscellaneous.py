@@ -44,7 +44,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
         for node, _ in graph.nodes(data=True):
             if hasattr(node, 'name') and node.name is not None:
                 if node.name.lower() == "":
-                    log.warning(f'Empty attribute name: {node.to_bel()}')
+                    log.warning(f'Empty attribute name: {str(node)}')
                     labels.append(str(node))
 
                 else:
@@ -52,7 +52,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
 
             elif hasattr(node, 'id') and node.id is not None:
                 if node.id.lower() == "":
-                    log.warning(f'Empty attribute id: {node.to_bel()}')
+                    log.warning(f'Empty attribute id: {str(node)}')
                     labels.append(str(node))
 
                 else:
@@ -64,7 +64,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
                     log.warning('Node with no info.')
                 else:
                     labels.append(str(node))
-                    log.warning(f'Node name nor id not labeled: {node.to_bel()}')
+                    log.warning(f'Node name nor id not labeled: {str(node)}')
 
         return labels
 
