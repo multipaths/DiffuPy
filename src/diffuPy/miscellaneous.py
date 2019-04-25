@@ -2,15 +2,15 @@
 
 """Miscellaneous utils of the package."""
 
+import logging
+import warnings
 from typing import List
 
 import networkx as nx
 import numpy as np
 
-import warnings
-
-import logging
 log = logging.getLogger(__name__)
+
 
 def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
     """Return Laplacian matrix."""
@@ -44,7 +44,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
         for node, _ in graph.nodes(data=True):
             if hasattr(node, 'name') and node.name is not None:
                 if node.name.lower() == "":
-                    log.warning('Empty attribute name.' + str(node))
+                    log.warning('Empty attribute name: { node.to_bel()}')
                     labels.append(str(node))
 
                 else:
@@ -52,7 +52,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
 
             elif hasattr(node, 'id') and node.id is not None:
                 if node.id.lower() == "":
-                    log.warning('Empty attribute id.' + str(node))
+                    log.warning(f'Empty attribute id: { node.to_bel()}')
                     labels.append(str(node))
 
                 else:
@@ -64,7 +64,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
                     log.warning('Node with no info.')
                 else:
                     labels.append(str(node))
-                    log.warning('Node name nor id not labeled. ' + str(node))
+                    log.warning(f'Node name nor id not labeled: { node.to_bel()}')
 
         return labels
 
@@ -74,9 +74,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
             for value in nx.get_node_attributes(graph, label).values()
         ]
 
-    else:
-        raise Warning('Could not get a label list from graph.')
-
+    raise Warning('Could not get a label list from graph.')
 
 
 def get_label_ix_mapping(labels):
