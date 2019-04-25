@@ -44,7 +44,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
         for node, _ in graph.nodes(data=True):
             if hasattr(node, 'name') and node.name is not None:
                 if node.name.lower() == "":
-                    log.warning('Empty attribute name: { node.to_bel()}')
+                    log.warning(f'Empty attribute name: {node.to_bel()}')
                     labels.append(str(node))
 
                 else:
