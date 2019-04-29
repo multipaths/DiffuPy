@@ -19,9 +19,14 @@ def print_dict_dimentions(entites_db, title):
 
 def get_labels_set_from_dict(entities):
     if isinstance(list(entities.values())[0], dict):
+        #TODO: Check
         return set(itertools.chain.from_iterable(itertools.chain.from_iterable(entities.values())))
     else:
         return set(itertools.chain.from_iterable(entities.values()))
+
+def reduce_dict_dimention(dict):
+    return {k : set(itertools.chain.from_iterable(entities.values())) for k, entities in dict.items()}
+
 
 def check_substrings(dataset_nodes, db_nodes):
     mapping_substrings = set()
@@ -33,7 +38,7 @@ def check_substrings(dataset_nodes, db_nodes):
                     if isinstance(entity_db, tuple):
                         for subentity_db in entity_db:
                             if subentity_db in subentity or subentity in subentity_db:
-                                mapping_substrings.add(subentity_db)
+                                mapping_substrings.add(entity_db)
                                 break
                         break
                     else:
@@ -44,8 +49,8 @@ def check_substrings(dataset_nodes, db_nodes):
             for entity_db in db_nodes:
                 if isinstance(entity_db, tuple):
                     for subentity_db in entity_db:
-                        if subentity_db in subentity or subentity in subentity_db:
-                            mapping_substrings.add(subentity_db)
+                        if subentity_db in entity or entity in subentity_db:
+                            mapping_substrings.add(entity_db)
                             break
                     break
                 else:

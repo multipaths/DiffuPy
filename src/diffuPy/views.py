@@ -65,6 +65,7 @@ def heatmap(data, row_labels, col_labels, ax=None,
 
 def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
                      textcolors=["black", "white"],
+                     entity_count=None,
                      threshold=None, **textkw):
     """
     A function to annotate a heatmap.
@@ -111,18 +112,18 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
             kw.update(color=textcolors[im.norm(data[i, j]) > threshold])
-            text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
+            text = im.axes.text(j, i, valfmt(entity_count[i, j], None), **kw)
             texts.append(text)
 
     return texts
 
 
-def show_heatmap(entity_number, databases, entity_types):
+def show_heatmap(entity_number, entity_count, databases, entity_types):
     fig, ax = plt.subplots(figsize=(15,7))
 
     im, cbar = heatmap(entity_number, databases, entity_types, ax=ax,
                        cmap="YlGn", cbarlabel="percentage [0-1]")
-    texts = annotate_heatmap(im, valfmt="{x:.1f} t")
+    texts = annotate_heatmap(im, entity_count=entity_count, valfmt="{x:1} ")
 
     fig.tight_layout()
     ax.set_title("Dataset 1 DiffuPath Mapping")

@@ -20,13 +20,13 @@ class Matrix:
         """Initialize matrix."""
 
         if rows_labels:
-            self._rows_labels = list(rows_labels)
+            self.rows_labels = list(set(rows_labels))
 
         if graph:
-            self._rows_labels = get_label_list_graph(graph, 'name')
+            self.rows_labels = list(set(get_label_list_graph(graph, 'name')))
 
         if not quadratic:
-            self._cols_labels = list(cols_labels)
+            self._cols_labels = list(set(cols_labels))
 
         self._name = name
         self._quadratic = quadratic
@@ -143,7 +143,7 @@ class Matrix:
             # self.validate_duplicates()
 
         if self.rows_labels:
-            self._rows_labels_ix_mapping, self._rows_labels = get_label_ix_mapping(self.rows_labels)
+            self._rows_labels_ix_mapping, self.rows_labels = get_label_ix_mapping(self.rows_labels)
         elif self.quadratic and not list(self.cols_labels):
             log.warning(
                 'Rows labels empty, also columns (neither cols labels given) will be empty since duplicate labels is true.')
@@ -185,29 +185,20 @@ class Matrix:
     def quadratic(self, quadratic):
         self._quadratic = quadratic
 
-    # Rows labels
-    @property
-    def rows_labels(self):
-        return self._rows_labels
-
-    @rows_labels.setter
-    def rows_labels(self, rows_labels):
-        self._rows_labels = list(rows_labels)
-
     # Columns labels
     @property
     def cols_labels(self):
         if self._quadratic:
-            return self._rows_labels
+            return self.rows_labels
 
         return self._cols_labels
 
     @cols_labels.setter
     def cols_labels(self, cols_labels):
         if self._quadratic:
-            self._rows_labels = list(cols_labels)
+            self.rows_labels = list(set(cols_labels))
         else:
-            self._cols_labels = list(cols_labels)
+            self._cols_labels = list(set(cols_labels))
 
     # Rows mapping
     @property
