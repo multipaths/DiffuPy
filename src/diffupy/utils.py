@@ -15,8 +15,8 @@ log = logging.getLogger(__name__)
 def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
     """Return Laplacian matrix."""
     if nx.is_directed(graph):
+        warnings.warn('Since graph is directed, it will be converted to an undirected graph.')
         graph = graph.to_undirected()
-        warnings.warn('Graph must be undirected, so it is converted to undirected.')
 
     # Normalize matrix
     if normalized:
@@ -44,7 +44,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
         for node, _ in graph.nodes(data=True):
             if hasattr(node, 'name') and node.name is not None:
                 if node.name.lower() == "":
-                    log.warning(f'Empty attribute name: {node.as_bel()}')
+                    log.debug(f'Empty attribute name: {node.as_bel()}')
                     labels.append(node.as_bel())
 
                 else:
@@ -52,19 +52,19 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
 
             elif hasattr(node, 'id') and node.id is not None:
                 if node.id.lower() == "":
-                    log.warning(f'Empty attribute id: {node.as_bel()}')
+                    log.debug(f'Empty attribute id: {node.as_bel()}')
                     labels.append(node.as_bel())
 
                 else:
                     labels.append(node.id.lower())
-                    log.warning('Node labeled with id.' + node.id.lower())
+                    log.debug('Node labeled with id.' + node.id.lower())
 
             else:
                 if node.as_bel() == "":
-                    log.warning('Node with no info.')
+                    log.debug('Node with no info.')
                 else:
                     labels.append(node.as_bel())
-                    log.warning(f'Node name nor id not labeled: {node.as_bel()}')
+                    log.debug(f'Node name nor id not labeled: {node.as_bel()}')
 
         return labels
 
