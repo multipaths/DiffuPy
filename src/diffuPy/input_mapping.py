@@ -1,7 +1,7 @@
 import itertools
 
 from diffuPy.matrix import Matrix
-from diffuPy.utils import check_substrings, get_labels_set_from_dict
+from diffuPy.miscellaneous import get_labels_set_from_dict, check_substrings
 
 
 def generate_categoric_input_from_labels(rows_labels, cols_labels, background_mat):
