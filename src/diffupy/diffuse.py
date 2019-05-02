@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+"""Diffusion methods."""
+
 import logging
 
 import numpy as np
