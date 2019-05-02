@@ -12,11 +12,12 @@ from diffupy.utils import get_label_ix_mapping, get_label_list_graph, get_laplac
 
 log = logging.getLogger(__name__)
 
+
 class Matrix:
     """Matrix class."""
 
     def __init__(self, mat=None, rows_labels=None, cols_labels=None, quadratic=False, name='', graph=None, init=None,
-                 no_duplicates = True, **kwargs):
+                 no_duplicates=True, **kwargs):
         """Initialize matrix."""
 
         if rows_labels:
@@ -47,7 +48,7 @@ class Matrix:
 
     def __str__(self):
         return f"\nmatrix {self.name} \n  {self.mat} \n row labels: \n  {self.rows_labels} " \
-            f"\n column labels: \n  {self.cols_labels} \n "
+               f"\n column labels: \n  {self.cols_labels} \n "
 
     """Iterator"""
 
@@ -96,12 +97,13 @@ class Matrix:
                       name=self.name)
 
     """Validators """
+
     def validate_duplicates(self):
         row_labels = []
         col_lables = []
-        rep_col = defaultdict(lambda : dict())
+        rep_col = defaultdict(lambda: dict())
 
-        mat = np.empty((len(set(self.rows_labels)),len(set(self.cols_labels))))
+        mat = np.empty((len(set(self.rows_labels)), len(set(self.cols_labels))))
 
         for value, row_index, col_index, row_label, col_label in self.__iter__(get_indices=True, get_labels=True):
 
@@ -115,7 +117,7 @@ class Matrix:
 
             if self.quadratic:
                 if col_label in col_lables:
-                    rep_col[col_label][col_index] = self.mat[:,col_index]
+                    rep_col[col_label][col_index] = self.mat[:, col_index]
                 else:
                     col_lables.append(col_label)
 
@@ -126,11 +128,10 @@ class Matrix:
 
         for col_label, cols in rep_col.items():
             for col_index, col in cols.items():
-                mat[:, col_lables.index(col_label)] = np.sum([mat[:, col_lables.index(col_label)], self.mat[:, col_index]])
+                mat[:, col_lables.index(col_label)] = np.sum(
+                    [mat[:, col_lables.index(col_label)], self.mat[:, col_index]])
             for col_index, col in cols.items():
                 np.delete(mat, col_index, 1)
-
-
 
         self.mat = mat
         self.rows_labels = row_labels
@@ -140,7 +141,7 @@ class Matrix:
 
     def set_mappings_and_validate_labels(self):
         # if self.no_duplicates and (set(self.rows_labels) != self.rows_labels or set(self.cols_labels) != self.cols_labels):
-            # self.validate_duplicates()
+        # self.validate_duplicates()
 
         if self.rows_labels:
             self._rows_labels_ix_mapping, self.rows_labels = get_label_ix_mapping(self.rows_labels)
@@ -348,7 +349,6 @@ class Matrix:
         if reference_labels == self.rows_labels:
             return self
 
-
         missing_labels = set(reference_labels) - set(self.rows_labels)
 
         mat_match = self.__copy__()
@@ -360,7 +360,6 @@ class Matrix:
         mat_match.mat = np.concatenate((mat_match.mat, missing_values), axis=0)
 
         mat_match.set_mappings_and_validate_labels()
-
 
         return mat_match
 

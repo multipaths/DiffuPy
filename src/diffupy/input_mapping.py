@@ -11,13 +11,15 @@ def generate_categoric_input_from_labels(rows_labels, cols_labels, background_ma
     return input_mat.match_missing_rows(background_mat.rows_labels, 0).match_rows(background_mat)
 
 
-def get_mapping(to_map,
-                background_map,
-                mirnas=None,
-                mirnas_mapping=None,
-                submapping=None,
-                title='',
-                print_percentage=False):
+def get_mapping(
+        to_map,
+        background_map,
+        mirnas=None,
+        mirnas_mapping=None,
+        submapping=None,
+        title='',
+        print_percentage=False
+):
     intersection = to_map.intersection(background_map)
 
     if mirnas:
