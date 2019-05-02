@@ -1,10 +1,15 @@
-import numpy as np
+# -*- coding: utf-8 -*-
+
+"""Visualization methods."""
+
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
 
-def heatmap(data, row_labels, col_labels, ax=None,
-            cbar_kw={}, cbarlabel="", title = "", **kwargs):
+def heatmap(
+        data, row_labels, col_labels, ax=None, cbar_kw={}, cbarlabel="", title="", **kwargs
+):
     """
     Create a heatmap from a numpy array and two lists of labels.
 
@@ -53,8 +58,8 @@ def heatmap(data, row_labels, col_labels, ax=None,
     for edge, spine in ax.spines.items():
         spine.set_visible(False)
 
-    ax.set_xticks(np.arange(data.shape[1]+1)-.5, minor=True)
-    ax.set_yticks(np.arange(data.shape[0]+1)-.5, minor=True)
+    ax.set_xticks(np.arange(data.shape[1] + 1) - .5, minor=True)
+    ax.set_yticks(np.arange(data.shape[0] + 1) - .5, minor=True)
     ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
     ax.tick_params(which="minor", bottom=False, left=False)
 
@@ -94,7 +99,7 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
     if threshold is not None:
         threshold = im.norm(threshold)
     else:
-        threshold = im.norm(data.max())/2.
+        threshold = im.norm(data.max()) / 2.
 
     # Set default alignment to center, but allow it to be
     # overwritten by textkw.
@@ -119,7 +124,7 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 
 
 def show_heatmap(entity_number, entity_count, databases, entity_types):
-    fig, ax = plt.subplots(figsize=(15,7))
+    fig, ax = plt.subplots(figsize=(15, 7))
 
     im, cbar = heatmap(entity_number, databases, entity_types, ax=ax,
                        cmap="YlGn", cbarlabel="percentage [0-1]")

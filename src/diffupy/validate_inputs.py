@@ -9,9 +9,9 @@
 import networkx as nx
 import numpy as np
 
-from diffuPy.constants import METHODS
-from diffuPy.matrix import Matrix
-from diffuPy.miscellaneous import get_label_list_graph
+from diffupy.constants import METHODS
+from diffupy.matrix import Matrix
+from diffupy.utils import get_label_list_graph
 
 
 def _validate_method(method: str):

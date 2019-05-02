@@ -7,9 +7,9 @@ import networkx as nx
 import numpy as np
 import unittest
 
-from diffuPy.diffuse import diffuse
+from diffupy.diffuse import diffuse
 
-from diffuPy.matrix import Matrix
+from diffupy.matrix import Matrix
 from .constants import *
 
 log = logging.getLogger(__name__)

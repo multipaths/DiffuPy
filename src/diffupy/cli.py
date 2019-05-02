@@ -13,7 +13,7 @@ import pickle
 
 import networkx as nx
 
-from diffuPy.kernels import regularised_laplacian_kernel
+from diffupy.kernels import regularised_laplacian_kernel
 
 log = logging.getLogger(__name__)
 

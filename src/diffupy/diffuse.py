@@ -2,9 +2,9 @@ import logging
 
 import numpy as np
 
-from diffuPy.diffuse_raw import diffuse_raw
-from diffuPy.miscellaneous import get_label_list_graph
-from diffuPy.validate_inputs import _validate_scores
+from diffupy.diffuse_raw import diffuse_raw
+from diffupy.utils import get_label_list_graph
+from diffupy.validate_inputs import _validate_scores
 
 log = logging.getLogger(__name__)
 

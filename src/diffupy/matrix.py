@@ -8,7 +8,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from .miscellaneous import get_label_ix_mapping, get_label_list_graph, get_laplacian
+from diffupy.utils import get_label_ix_mapping, get_label_list_graph, get_laplacian
 
 log = logging.getLogger(__name__)
 
