@@ -9,6 +9,7 @@ import time
 import click
 import pybel
 from pathme.constants import PATHME_DIR
+import pickle
 
 import networkx as nx
 
@@ -52,7 +53,11 @@ def regularized_kernel_from_bel_graph(bel_graph_path, output_path, isolates):
     now = time.time()
     click.echo("It took: ", now - then, " seconds")
 
-    to_pickle(background_mat, os.path.join(output_path))
+    output_path = os.path.join(output_path, 'regularised_laplacian_kernel.pickle')
+
+    with open(output_path, 'wb') as file:
+        pickle.dump(background_mat, file)
+
 
 if __name__ == '__main__':
     main()
