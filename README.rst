@@ -2,7 +2,37 @@ diffuPy |build| |coverage|
 ==========================
 
 diffuPy is a generalizable Python implementation of the null diffusion algorithm for metabolomics data described by [1].
-The package enables running the algorithm in heterogenous networks by abstracting `NetworkX <http://networkx.github.io/>`_ classes.
+The package enables running the algorithm in heterogenous networks by abstracting
+`NetworkX <http://networkx.github.io/>`_ classes.
+
+
+Installation
+------------
+1. ``diffupy`` can be installed with the following commands:
+
+.. code-block:: sh
+
+    $ python3 -m pip install git+https://github.com/jmarinllao/diffuPy.git@master
+
+2. or in editable mode with:
+
+.. code-block:: sh
+
+    $ git clone https://github.com/jmarinllao/diffuPy.git
+    $ cd pathme
+    $ python3 -m pip install -e .
+
+How to Use
+----------
+
+1. **Generate Kernel**
+
+Generates the kernel of a given graph.
+
+.. code-block:: sh
+
+    $ python3 -m diffupy kernel
+
 
 Citation
 --------

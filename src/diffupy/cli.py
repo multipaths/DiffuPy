@@ -4,14 +4,13 @@
 
 import logging
 import os
+import pickle
 import time
 
 import click
-import pybel
-from pathme.constants import PATHME_DIR
-import pickle
-
 import networkx as nx
+import pybel
+from pathme.constants import DATA_DIR
 
 from diffupy.kernels import regularised_laplacian_kernel
 
@@ -28,17 +27,26 @@ def main():
 
 
 @main.command()
-@click.option('-g', '--graph_path', help='Input graph path.',
-              default=os.path.join(PATHME_DIR, 'universe', 'pathme_universe_bel_graph_no_flatten.bel.pickle'),
-              show_default=True)
-@click.option('-o', '--output', help='Output kernel pickle.',
-              default=os.path.join(PATHME_DIR, 'kernels', 'regularized_kernel_pathme_universe.pickle'),
-              show_default=True)
+@click.option(
+    '-g', '--graph',
+    help='Path to the BEL graph',
+    default=os.path.join(DATA_DIR, 'pickles', 'pathme_universe_bel_graph_no_flatten.bel.pickle'),
+    show_default=True
+)
+@click.option(
+    '-o', '--output',
+    help='Output kernel pickle',
+    default=os.path.join(DATA_DIR, 'kernels'),
+    show_default=True
+)
 @click.option('--isolates', is_flag=False, help='Include isolates')
-def regularized_kernel_from_bel_graph(bel_graph_path, output_path, isolates):
+def kernel(bel_graph_path, output_path, isolates):
+    """Generates kernel for a given BEL graph."""
     bel_graph = pybel.from_pickle(bel_graph_path)
+    print(isolates)
 
     if not isolates:
+        print(isolates)
         click.echo(f'Number of isolates after getting graph: {nx.number_of_isolates(bel_graph_path)}')
 
         bel_graph.remove_nodes_from({
@@ -53,7 +61,7 @@ def regularized_kernel_from_bel_graph(bel_graph_path, output_path, isolates):
     now = time.time()
     click.echo("It took: ", now - then, " seconds")
 
-    output_path = os.path.join(output_path, 'regularised_laplacian_kernel.pickle')
+    output_path = os.path.join(output_path, 'regularized_kernel_pathme_universe.pickle')
 
     with open(output_path, 'wb') as file:
         pickle.dump(background_mat, file)
