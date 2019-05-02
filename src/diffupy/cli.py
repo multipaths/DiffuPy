@@ -10,11 +10,11 @@ import time
 import click
 import networkx as nx
 import pybel
-from pathme.constants import DATA_DIR
 
+from diffupy.constants import DATA_DIR
 from diffupy.kernels import regularised_laplacian_kernel
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @click.group(help='DiffuPy')
@@ -40,14 +40,23 @@ def main():
     show_default=True
 )
 @click.option('--isolates', is_flag=False, help='Include isolates')
-def kernel(bel_graph_path, output_path, isolates):
+@click.option('-l', '--log', is_flag=True, help='Activate debug mode')
+def kernel(graph, output, isolates, log):
     """Generates kernel for a given BEL graph."""
-    bel_graph = pybel.from_pickle(bel_graph_path)
-    print(isolates)
 
-    if not isolates:
-        print(isolates)
-        click.echo(f'Number of isolates after getting graph: {nx.number_of_isolates(bel_graph_path)}')
+    # Configure logging level
+    if log:
+        logging.basicConfig(level=logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+        logger.setLevel(logging.INFO)
+
+    click.echo(f'Loading graph from {graph}')
+    bel_graph = pybel.from_pickle(graph)
+
+    if isolates:
+        click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
 
         bel_graph.remove_nodes_from({
             node
@@ -61,9 +70,9 @@ def kernel(bel_graph_path, output_path, isolates):
     now = time.time()
     click.echo("It took: ", now - then, " seconds")
 
-    output_path = os.path.join(output_path, 'regularized_kernel_pathme_universe.pickle')
+    output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
 
-    with open(output_path, 'wb') as file:
+    with open(output, 'wb') as file:
         pickle.dump(background_mat, file)
 
 
