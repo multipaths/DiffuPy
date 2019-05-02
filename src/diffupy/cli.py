@@ -63,7 +63,11 @@ def kernel(graph, output, isolates, log):
             for node in nx.isolates(bel_graph)
         })
 
-    click.echo(bel_graph.summary_str())
+    click.echo(
+        f'Statistics\n'
+        f'##########\n'
+        f'{bel_graph.summary_str()}'
+    )
 
     then = time.time()
     background_mat = regularised_laplacian_kernel(bel_graph)
