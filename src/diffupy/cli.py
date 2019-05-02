@@ -79,6 +79,8 @@ def kernel(graph, output, isolates, log):
     with open(output, 'wb') as file:
         pickle.dump(background_mat, file)
 
+    click.echo(f'Kernel exported to: {output}')
+
 
 if __name__ == '__main__':
     main()
