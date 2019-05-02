@@ -19,7 +19,7 @@ Installation
 .. code-block:: sh
 
     $ git clone https://github.com/jmarinllao/diffuPy.git
-    $ cd pathme
+    $ cd diffuPy
     $ python3 -m pip install -e .
 
 How to Use
