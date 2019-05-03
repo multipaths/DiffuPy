@@ -108,4 +108,3 @@ ENV/
 .pytest_cache
 
 resources/*
-*.pickle
