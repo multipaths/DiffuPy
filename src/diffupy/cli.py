@@ -69,17 +69,18 @@ def kernel(graph, output, isolates, log):
         f'{bel_graph.summary_str()}'
     )
 
-    then = time.time()
+    before = time.time()
     background_mat = regularised_laplacian_kernel(bel_graph)
     now = time.time()
-    click.echo(f"It took: ", {now} - {then}, " seconds")
 
     output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
 
     with open(output, 'wb') as file:
         pickle.dump(background_mat, file)
 
-    click.echo(f'Kernel exported to: {output}')
+    time_running = now - before
+
+    click.echo(f'Kernel exported to: {output} in {time_running} seconds"')
 
 
 if __name__ == '__main__':
