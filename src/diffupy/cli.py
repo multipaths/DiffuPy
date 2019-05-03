@@ -77,7 +77,7 @@ def kernel(graph, output, isolates, log):
     output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
 
     with open(output, 'wb') as file:
-        pickle.dump(background_mat, file)
+        pickle.dump(background_mat, file, protocol=4)
 
     time_running = now - before
 
