@@ -72,7 +72,7 @@ def kernel(graph, output, isolates, log):
     then = time.time()
     background_mat = regularised_laplacian_kernel(bel_graph)
     now = time.time()
-    click.echo("It took: ", now - then, " seconds")
+    click.echo(f"It took: ", {now} - {then}, " seconds")
 
     output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
 
