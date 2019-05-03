@@ -11,7 +11,7 @@ import click
 import networkx as nx
 import pybel
 
-from diffupy.constants import DATA_DIR
+from diffupy.constants import DATA_DIR, ensure_output_dirs
 from diffupy.kernels import regularised_laplacian_kernel
 
 logger = logging.getLogger(__name__)
@@ -43,6 +43,7 @@ def main():
 @click.option('-l', '--log', is_flag=True, help='Activate debug mode')
 def kernel(graph, output, isolates, log):
     """Generates kernel for a given BEL graph."""
+    ensure_output_dirs()
 
     # Configure logging level
     if log:
