@@ -39,7 +39,7 @@ def main():
 @click.option(
     '-o', '--output',
     help='Output kernel pickle',
-    default='/Users/jmarinllao/.pathme/universe/pathme_universe_bel_graph_no_flatten.bel.pickle',
+    default=os.path.join(DATA_DIR, 'kernels'),
     show_default=True
 )
 @click.option('--isolates', is_flag=False, help='Include isolates')
