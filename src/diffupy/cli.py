@@ -14,6 +14,9 @@ import pybel
 from diffupy.constants import DATA_DIR, ensure_output_dirs
 from diffupy.kernels import regularised_laplacian_kernel
 
+from pybel_tools.mutation.collapse import collapse_nodes_with_same_names
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -36,7 +39,7 @@ def main():
 @click.option(
     '-o', '--output',
     help='Output kernel pickle',
-    default=os.path.join(DATA_DIR, 'kernels'),
+    default='/Users/jmarinllao/.pathme/universe/pathme_universe_bel_graph_no_flatten.bel.pickle',
     show_default=True
 )
 @click.option('--isolates', is_flag=False, help='Include isolates')
@@ -55,6 +58,8 @@ def kernel(graph, output, isolates, log):
 
     click.echo(f'Loading graph from {graph}')
     bel_graph = pybel.from_pickle(graph)
+
+    collapse_nodes_with_same_names(bel_graph)
 
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
