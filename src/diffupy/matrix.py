@@ -8,7 +8,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from diffupy.utils import get_label_ix_mapping, get_label_list_graph, get_laplacian
+from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian
 
 log = logging.getLogger(__name__)
 
@@ -269,10 +269,10 @@ class Matrix:
 
         if matrix:
             cols = matrix.mat
-            cols_labels = cols_labels.cols_labels
+            cols_labels = matrix.cols_labels
 
         if list(cols):
-            self.mat = np.concatenate(self.mat, cols, axis=1)
+            self.mat = np.concatenate((self.mat, np.array(cols)), axis=1)
             self.cols_labels += cols_labels
             self.set_mappings_and_validate_labels()
         else:

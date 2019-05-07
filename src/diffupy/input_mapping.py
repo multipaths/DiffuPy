@@ -2,14 +2,26 @@
 
 """Main Matrix Class."""
 
-from diffupy.matrix import Matrix
-from diffupy.utils import get_labels_set_from_dict, check_substrings
+from .matrix import Matrix
+from .utils import get_labels_set_from_dict, check_substrings
 
-
-def generate_categoric_input_from_labels(rows_labels, cols_labels, background_mat):
-    input_mat = Matrix(rows_labels=rows_labels, cols_labels=cols_labels, init=1)
+def generate_categoric_input_vector_from_labels(rows_labels, col_label, background_mat):
+    if isinstance(col_label, str):
+        col_label = [col_label]
+    input_mat = Matrix(rows_labels=list(rows_labels), cols_labels=col_label, init=1)
     return input_mat.match_missing_rows(background_mat.rows_labels, 0).match_rows(background_mat)
 
+def generate_categoric_input_from_labels(rows_labels, cols_labels, background_mat):
+    if isinstance(cols_labels, list) and len(cols_labels) > 1:
+        input_mat = generate_categoric_input_vector_from_labels(rows_labels[0], cols_labels[0], background_mat)
+
+        for idx, row_label in enumerate(rows_labels[1:]):
+            input_vector = generate_categoric_input_vector_from_labels(row_label, cols_labels[idx + 1], background_mat)
+            input_mat.col_bind(matrix = input_vector)
+
+        return input_mat
+    else:
+        return generate_categoric_input_vector_from_labels(rows_labels, cols_labels, background_mat)
 
 def get_mapping(
         to_map,
@@ -22,7 +34,7 @@ def get_mapping(
 ):
     intersection = to_map.intersection(background_map)
 
-    if mirnas:
+    if mirnas and title in ['micrornas', 'Micrornas', 'mirna_nodes']:
         mirnas_substring = [e for e in check_substrings(mirnas, background_map) if 'mir' in e]
         intersection = intersection.union(mirnas_substring)
 
@@ -65,6 +77,7 @@ def get_mapping_subsets(subsets_dict,
                               map_labels,
                               mirnas=mirnas,
                               mirnas_mapping=mirnas_mapping,
+                              title=type_name,
                               submapping=submapping)
 
         percentage = 0

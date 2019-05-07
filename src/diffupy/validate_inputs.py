@@ -9,9 +9,9 @@
 import networkx as nx
 import numpy as np
 
-from diffupy.constants import METHODS
-from diffupy.matrix import Matrix
-from diffupy.utils import get_label_list_graph
+from .constants import METHODS
+from .matrix import Matrix
+from .utils import get_label_list_graph
 
 
 def _validate_method(method: str):
@@ -19,10 +19,10 @@ def _validate_method(method: str):
     if not isinstance(method, str):
         raise ValueError(f"The supplied 'method' must be a string. The given argument is a {type(method)}")
 
-    if len(method) > 1:
+    if len(method.split(' ')) > 1:
         raise ValueError(f"Only one method can be supplied, but you supplied {len(method.split(' '))}")
 
-    if len(method) not in METHODS:
+    if method not in METHODS:
         raise ValueError(f"The available methods are {METHODS} but you supplied {method}.")
 
 

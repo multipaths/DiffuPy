@@ -10,8 +10,8 @@ import networkx as nx
 import numpy as np
 import scipy as sp
 
-from diffupy.matrix import LaplacianMatrix, Matrix
-from diffupy.utils import set_diagonal_matrix
+from .matrix import LaplacianMatrix, Matrix
+from .utils import set_diagonal_matrix
 
 log = logging.getLogger(__name__)
 
