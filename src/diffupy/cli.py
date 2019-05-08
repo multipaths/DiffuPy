@@ -60,7 +60,7 @@ def kernel(graph, output, isolates, log):
     click.echo(f'Loading graph from {graph}')
     bel_graph = pybel.from_pickle(graph)
 
-    collapse_nodes_with_same_names(bel_graph)
+    #collapse_nodes_with_same_names(bel_graph)
 
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
