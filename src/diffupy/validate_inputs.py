@@ -50,10 +50,10 @@ def _validate_scores(scores: Matrix) -> None:
 
         elif isinstance(score, np.int32) or isinstance(score, np.int64):
             score = int(score)
-            scores.set_from_labels(row_label, col_label, score)
+            scores.set_cell_from_labels(row_label, col_label, score)
         elif isinstance(score, np.float32) or isinstance(score, np.float64):
             score = float(score)
-            scores.set_from_labels(row_label, col_label, score)
+            scores.set_cell_from_labels(row_label, col_label, score)
 
         elif not isinstance(score, float) and not isinstance(score, int):
             raise ValueError("The scores in background are not numeric.")

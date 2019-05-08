@@ -8,7 +8,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian
+from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, decode_labels
 
 log = logging.getLogger(__name__)
 
@@ -16,41 +16,48 @@ log = logging.getLogger(__name__)
 class Matrix:
     """Matrix class."""
 
-    def __init__(self, mat=None, rows_labels=None, cols_labels=None, quadratic=False, name='', graph=None, init=None,
-                 no_duplicates=True, **kwargs):
+    def __init__(self,
+                 mat=None,
+                 rows_labels=None,
+                 cols_labels=None,
+                 graph=None,
+                 quadratic=False,
+                 name='',
+                 init_value=None,
+                 **kwargs):
         """Initialize matrix."""
+        if isinstance(rows_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
+            self.rows_labels = list(rows_labels)
+        elif graph:
+            self.rows_labels = list(get_label_list_graph(graph, 'name'))
+        else:
+            raise ValueError('No rows_labels list provided.')
 
-        if rows_labels:
-            self.rows_labels = list(set(rows_labels))
+        if isinstance(cols_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
+            self._cols_labels = list(cols_labels)
 
-        if graph:
-            self.rows_labels = list(set(get_label_list_graph(graph, 'name')))
+        elif not quadratic:
+            raise ValueError('No cols_labels list provided.')
 
-        if not quadratic:
-            self._cols_labels = list(set(cols_labels))
+        self.name = name
+        self.quadratic = quadratic
 
-        self._name = name
-        self._quadratic = quadratic
+        if init_value and self.rows_labels  and list(self.cols_labels):
+            mat = np.full((len(self.rows_labels), len(self.cols_labels)), init_value)
 
-        if init and self.rows_labels and self.cols_labels:
-            mat = np.full((len(self.rows_labels), len(self.cols_labels)), init)
         elif not list(mat):
             raise ValueError('An input matrix or initialization should be provided.')
 
-        self._mat = np.array(mat)
+        self.mat = np.array(mat)
 
         self.get_labels = True
         self.get_indices = False
 
-        self.no_duplicates = no_duplicates
-
-        self.set_mappings_and_validate_labels()
+        self.validate_labels()
 
     def __str__(self):
         return f"\nmatrix {self.name} \n  {self.mat} \n row labels: \n  {self.rows_labels} " \
-               f"\n column labels: \n  {self.cols_labels} \n "
-
-    """Iterator"""
+            f"\n column labels: \n  {self.cols_labels} \n "
 
     def __iter__(self, **kargs):
         self.i = -1
@@ -89,143 +96,89 @@ class Matrix:
 
         return nxt
 
-    """Copy"""
-
     def __copy__(self):
         """Return a copy of Matrix Object."""
-        return Matrix(self.mat, rows_labels=self.rows_labels, cols_labels=self.cols_labels, quadratic=self._quadratic,
-                      name=self.name)
+        return Matrix(self.mat,
+                      rows_labels=self.rows_labels,
+                      cols_labels=self.cols_labels,
+                      name=self.name,
+                      quadratic=self.quadratic,
+                      )
 
     """Validators """
 
-    def validate_duplicates(self):
-        row_labels = []
-        col_lables = []
-        rep_col = defaultdict(lambda: dict())
-
-        mat = np.empty((len(set(self.rows_labels)), len(set(self.cols_labels))))
-
-        for value, row_index, col_index, row_label, col_label in self.__iter__(get_indices=True, get_labels=True):
-
-            if row_label in row_labels:
-                mat[row_labels.index(row_label)] = np.sum([self.mat[row_labels.index(row_label)], self.mat[row_index]])
-
-                if self.quadratic:
-                    for col_label, cols in rep_col.items():
-                        for col_index, col in cols.items():
-                            rep_col[col_label][col_index] = np.delete(col, row_index)
-
-            if self.quadratic:
-                if col_label in col_lables:
-                    rep_col[col_label][col_index] = self.mat[:, col_index]
-                else:
-                    col_lables.append(col_label)
-
-
-            else:
-                np.append(mat, self.mat[row_index])
-                row_labels.append(row_label)
-
-        for col_label, cols in rep_col.items():
-            for col_index, col in cols.items():
-                mat[:, col_lables.index(col_label)] = np.sum(
-                    [mat[:, col_lables.index(col_label)], self.mat[:, col_index]])
-            for col_index, col in cols.items():
-                np.delete(mat, col_index, 1)
-
-        self.mat = mat
-        self.rows_labels = row_labels
-
-        if self.quadratic:
-            self.col_lables = col_lables
-
-    def set_mappings_and_validate_labels(self):
-        # if self.no_duplicates and (set(self.rows_labels) != self.rows_labels or set(self.cols_labels) != self.cols_labels):
-        # self.validate_duplicates()
-
+    def validate_labels(self):
         if self.rows_labels:
-            self._rows_labels_ix_mapping, self.rows_labels = get_label_ix_mapping(self.rows_labels)
-        elif self.quadratic and not list(self.cols_labels):
-            log.warning(
-                'Rows labels empty, also columns (neither cols labels given) will be empty since duplicate labels is true.')
-        elif not self.quadratic:
-            log.warning('Rows labels empty.')
+            self.rows_labels = decode_labels(self.rows_labels)
+            if len(self.rows_labels) != len(set(self.rows_labels)):
+                raise Exception('Duplicate row labels in Matrix.')
 
-        if list(self.cols_labels):
-            self.cols_labels_ix_mapping, self.cols_labels = get_label_ix_mapping(self.cols_labels)
-            if self.quadratic:
-                log.warning('Columns labels are assigned to rows since duplicate labels is true.')
-        elif not self.quadratic:
-            log.warning('Cols labels empty.')
+        if hasattr(self, '_cols_labels'):
+            self._cols_labels = decode_labels(self.cols_labels)
+            if len(self._cols_labels) != len(set(self._cols_labels)):
+                raise Exception('Duplicate column labels in Matrix.')
+
+    def update_ix_mappings(self):
+        if hasattr(self, '_rows_labels_ix_mapping') and self.rows_labels:
+            _rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
+        if hasattr(self, '_cols_labels_ix_mapping') and hasattr(self, '_cols_labels'):
+            _cols_labels_ix_mapping = get_label_ix_mapping(self._cols_labels)
+
+    def validate_labels_and_update_ix_mappings(self):
+        self.validate_labels()
+        self.update_ix_mappings()
 
     """Getters and Setters"""
-
-    # Raw matrix (numpy array)
-    @property
-    def mat(self):
-        return self._mat
-
-    @mat.setter
-    def mat(self, mat):
-        self._mat = mat
-
-    # Name
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        self._name = name
-
-    @property
-    def quadratic(self):
-        return self._quadratic
-
-    @quadratic.setter
-    def quadratic(self, quadratic):
-        self._quadratic = quadratic
 
     # Columns labels
     @property
     def cols_labels(self):
-        if self._quadratic:
+        if self.quadratic:
             return self.rows_labels
 
         return self._cols_labels
 
     @cols_labels.setter
     def cols_labels(self, cols_labels):
-        if self._quadratic:
-            self.rows_labels = list(set(cols_labels))
+        if self.quadratic:
+            self.rows_labels = list(cols_labels)
         else:
-            self._cols_labels = list(set(cols_labels))
+            self._cols_labels = list(cols_labels)
 
-    # Rows mapping
+    # Rows ix mapping
     @property
     def rows_labels_ix_mapping(self):
+        if hasattr(self, '_rows_labels_ix_mapping'):
+            return self._rows_labels_ix_mapping
+
+        self._rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
         return self._rows_labels_ix_mapping
 
     @rows_labels_ix_mapping.setter
     def rows_labels_ix_mapping(self, rows_labels_ix_mapping):
         self._rows_labels_ix_mapping = rows_labels_ix_mapping
 
-    # Columns mapping
+    # Columns ix mapping
     @property
     def cols_labels_ix_mapping(self):
-        if self._quadratic:
-            return self._rows_labels_ix_mapping
+        if self.quadratic:
+            return self.rows_labels_ix_mapping
 
+        if hasattr(self, '_cols_labels_ix_mapping'):
+            return self._cols_labels_ix_mapping
+
+        self._cols_labels_ix_mapping = get_label_ix_mapping(self.cols_labels)
         return self._cols_labels_ix_mapping
 
     @cols_labels_ix_mapping.setter
     def cols_labels_ix_mapping(self, cols_labels_ix_mapping):
-        if self._quadratic:
+        if self.quadratic:
             self._rows_labels_ix_mapping = cols_labels_ix_mapping
-        else:
-            self._cols_labels_ix_mapping = cols_labels_ix_mapping
 
-    # From labels
+        self._cols_labels_ix_mapping = cols_labels_ix_mapping
+
+    """Getters from labels"""
+
     def set_row_from_label(self, label, x):
         self.mat[self.rows_labels_ix_mapping[label]] = x
 
@@ -238,10 +191,10 @@ class Matrix:
     def get_col_from_label(self, label):
         return self.mat[:, self.cols_labels_ix_mapping[label]]
 
-    def set_from_labels(self, row_label, col_label, x):
+    def set_cell_from_labels(self, row_label, col_label, x):
         self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]] = x
 
-    def get_from_labels(self, row_label, col_label, ):
+    def get_cell_from_labels(self, row_label, col_label, ):
         return self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]]
 
     # TODO: este nombre es un poco confuso no?
@@ -260,7 +213,7 @@ class Matrix:
         if list(rows):
             self.mat = np.concatenate((self.mat, np.array(rows)), axis=0)
             self.rows_labels += rows_labels
-            self.set_mappings_and_validate_labels()
+            self.validate_labels_and_update_ix_mappings()
         else:
             log.warning('No column given to concatenate to matrix.')
 
@@ -274,7 +227,7 @@ class Matrix:
         if list(cols):
             self.mat = np.concatenate((self.mat, np.array(cols)), axis=1)
             self.cols_labels += cols_labels
-            self.set_mappings_and_validate_labels()
+            self.validate_labels_and_update_ix_mappings()
         else:
             log.warning('No column given to concatenate to matrix.')
 
@@ -293,7 +246,7 @@ class Matrix:
         for row_label in reference_matrix.rows_labels:
             mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label]] = self.get_row_from_label(row_label)
 
-        mat_match.set_mappings_and_validate_labels()
+        mat_match.validate_labels_and_update_ix_mappings()
 
         return mat_match
 
@@ -313,7 +266,7 @@ class Matrix:
         for col_label in reference_matrix.cols_labels:
             mat_match.mat[reference_matrix.cols_labels_ix_mapping[col_label]] = self.get_col_from_label(col_label)
 
-        mat_match.set_mappings_and_validate_labels()
+        mat_match.validate_labels_and_update_ix_mappings()
 
         return mat_match
 
@@ -337,9 +290,9 @@ class Matrix:
         for score, row_label, col_label in iter(reference_matrix):
             mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label], \
                           reference_matrix.cols_labels_ix_mapping[col_label]] \
-                = self.get_from_labels(row_label, col_label)
+                = self.get_cell_from_labels(row_label, col_label)
 
-        mat_match.set_mappings_and_validate_labels()
+        mat_match.validate_labels_and_update_ix_mappings()
 
         return mat_match
 
@@ -359,7 +312,7 @@ class Matrix:
 
         mat_match.mat = np.concatenate((mat_match.mat, missing_values), axis=0)
 
-        mat_match.set_mappings_and_validate_labels()
+        mat_match.validate_labels_and_update_ix_mappings()
 
         return mat_match
 
@@ -380,16 +333,16 @@ class Matrix:
 
         mat_match.mat = np.concatenate(mat_match.mat, missing_values, axis=1)
 
-        mat_match.set_mappings_and_validate_labels()
+        mat_match.validate_labels_and_update_ix_mappings()
 
         return mat_match
 
     """Import"""
 
-    def from_csv(path):
+    def from_csv(csv_path):
         """Import matrix from csv file using the headers as a Matrix class."""
 
-        m = np.genfromtxt(path, dtype=None, delimiter=',')
+        m = np.genfromtxt(csv_path, dtype=None, delimiter=',')
         return Matrix(
             mat=np.array(
                 [
@@ -397,9 +350,9 @@ class Matrix:
                      for x in a[1:]]
                     for a in m[1:]
                 ]),
-            rows_labels=m[1:, 0],
-            cols_labels=m[0, 1:],
-            name=str(os.path.basename(path).replace('.csv', ''))
+            rows_labels=list(m[1:, 0]),
+            cols_labels=list(m[0, 1:]),
+            name=str(os.path.basename(csv_path).replace('.csv', ''))
         )
 
 
