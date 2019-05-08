@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Diffusion methods."""
-
+import copy
 import logging
 
 import numpy as np
@@ -13,9 +13,12 @@ from .validate_inputs import _validate_scores
 log = logging.getLogger(__name__)
 
 
-def diffuse(scores, method, graph=None, **kwargs):
+def diffuse(input_scores, method, graph=None, **kwargs):
     # sanity checks
+    scores = copy.copy(input_scores)
+
     _validate_scores(scores)
+
 
     # Check if we have a graph or a kernel
     if graph:

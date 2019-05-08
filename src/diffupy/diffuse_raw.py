@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Diffuse scores on a network."""
-
+import copy
 import logging
 
 import networkx as nx
@@ -70,16 +70,17 @@ def diffuse_raw(
     if K is None:
         _validate_graph(graph)
         logging.info('Kernel not supplied. Computing regularised Laplacian kernel ...')
-        K = regularised_laplacian_kernel(graph, normalized=False)
+        kernel = regularised_laplacian_kernel(graph, normalized=False)
         logging.info('Done')
     else:
-        _validate_K(K)
+        kernel = copy.copy(K)
+        _validate_K(kernel)
         logging.info('Using supplied kernel matrix...')
 
     # Match indices
     logging.info('Kernel validated scores.')
 
-    scores = scores.match_rows(K)
+    scores = scores.match_rows(kernel)
     logging.info('Scores matched.')
 
     # TODO: Sparse
@@ -88,10 +89,10 @@ def diffuse_raw(
     # Compute scores
 
     n = len(scores.mat)
-    K = K.mat
+    kernel = kernel.mat
 
     # raw scores
-    diff = np.matmul(K[:, :n], scores.mat)
+    diff = np.matmul(kernel[:, :n], scores.mat)
     logging.info('Matrix product for raw scores preformed.')
 
 
@@ -109,11 +110,11 @@ def diffuse_raw(
     # If we want z-scores, must compute rowmeans and rowmeans2
     row_sums = np.array(
         [round(np.sum(row), 2)
-         for row in K[:, :n]]
+         for row in kernel[:, :n]]
     )
     row_sums_2 = np.array(
         [np.sum(row)
-         for row in K[:, :n] ** 2]
+         for row in kernel[:, :n] ** 2]
     )
 
     logging.info('Rowmeans and rowmeans2 computatated.')
