@@ -9,7 +9,6 @@ import time
 
 import click
 import networkx as nx
-import numpy as np
 import pybel
 
 from diffupy.constants import DATA_DIR, ensure_output_dirs
@@ -79,10 +78,13 @@ def kernel(graph, output, isolates, log):
     before = time.time()
     background_mat = regularised_laplacian_kernel(bel_graph)
     now = time.time()
-
+    
+    output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
+    
     # Export numpy array
-    output = os.path.join(output, 'regularized_kernel_pathme_universe')
-    np.save(output, background_mat)
+    with open(output, 'wb') as file:
+        pickle.dump(background_mat, file)
+        pickle.dump(background_mat, file, protocol=4)
 
     time_running = now - before
 
