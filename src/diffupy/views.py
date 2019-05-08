@@ -6,6 +6,11 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
+import plotly.plotly as py
+import plotly.graph_objs as go
+
+import numpy as np
+
 
 def heatmap(
         data, row_labels, col_labels, ax=None, cbar_kw={}, cbarlabel="", title="", **kwargs
@@ -134,3 +139,32 @@ def show_heatmap(entity_number, entity_count, databases, entity_types):
     ax.set_title("Dataset 1 DiffuPath Mapping")
 
     plt.show()
+
+
+def box_plot_from_dict(d, title = 'Box plot', x_title = 'x', y_title = 'y'):
+    data = [go.Box(
+                y = v,
+                name = k
+            ) for k, v in d.items()
+           ]
+
+    layout = go.Layout(
+        title=go.layout.Title(
+            text = title,
+            xref = 'paper'
+        ),
+        xaxis=go.layout.XAxis(
+            title=go.layout.xaxis.Title(
+                text= x_title
+            )
+        ),
+        yaxis=go.layout.YAxis(
+            title=go.layout.yaxis.Title(
+                text= y_title
+            )
+        )
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+
+    return py.iplot(fig)
