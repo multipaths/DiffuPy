@@ -83,7 +83,6 @@ def kernel(graph, output, isolates, log):
     
     # Export numpy array
     with open(output, 'wb') as file:
-        pickle.dump(background_mat, file)
         pickle.dump(background_mat, file, protocol=4)
 
     time_running = now - before
