@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """Miscellaneous utils of the package."""
+
+import random
+
 import itertools
 import logging
 import warnings
@@ -178,3 +181,71 @@ def get_simplegraph_from_multigraph(multigraph):
             G.add_edge(u, v, weight=w)
 
     return G
+
+def split_random_two_subsets(to_split):
+    half_1 = random.sample(population=list(to_split), k=int(len(to_split) / 2))
+    half_2 = list(set(to_split) - set(half_1))
+
+    return half_1, half_2
+
+
+def split_random_three_subsets(to_split):
+    half_1 = random.sample(population=list(to_split), k=int(len(to_split) / 3))
+    half_2, half_3 = split_random_two_subsets(list(set(to_split) - set(half_1)))
+
+    return half_1, half_2, half_3
+
+
+def get_three_venn_intersections(set1, set2, set3):
+    set1, set2, set3 = set(set1), set(set2), set(set3)
+    set1_set2 = set1.intersection(set2)
+    set1_set3 = set1.intersection(set3)
+    core = set1_set3.intersection(set1_set2)
+
+    set1_set2 = set1_set2 - core
+    set1_set3 = set1_set3 - core
+    set2_set3 = set2.intersection(set3) - core
+
+    return {'unique_set1': set1 - set1_set2 - set1_set3 - core,
+            'unique_set2': set2 - set1_set2 - set2_set3 - core,
+            'set1_set2': set1_set2,
+            'unique_set3': set3 - set1_set3 - set2_set3 - core,
+            'set1_set3': set1_set3,
+            'set2_set3': set2_set3,
+            'core': core,
+            }
+
+
+def random_disjoint_intersection_two_subsets(unique_set1, unique_set2, intersection):
+    set1, set2 = split_random_two_subsets(intersection)
+
+    return unique_set1|set(set1), unique_set2|set(set2)
+
+
+def random_disjoint_intersection_three_subset(set1, set2, set3):
+    intersections = get_three_venn_intersections(set1, set2, set3)
+
+    set1, set2 = random_disjoint_intersection_two_subsets(intersections['unique_set1'],
+                                                          intersections['unique_set2'],
+                                                          intersections['set1_set2']
+                                                          )
+
+
+    set1, set3 = random_disjoint_intersection_two_subsets(set1,
+                                                          intersections['unique_set3'],
+                                                          intersections['set1_set3']
+                                                          )
+
+    set2, set3 = random_disjoint_intersection_two_subsets(set2,
+                                                          set3,
+                                                          intersections['set2_set3']
+                                                          )
+
+    set1_core, set2_core, set3_core = split_random_three_subsets(intersections['core'])
+
+    print(len(set1_core))
+    print(len(set2_core))
+    print(len(set3_core))
+
+
+    return set1|set(set1_core), set2|set(set2_core), set3|set(set3_core)

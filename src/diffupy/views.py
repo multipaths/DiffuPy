@@ -9,8 +9,7 @@ import numpy as np
 import plotly.plotly as py
 import plotly.graph_objs as go
 
-import numpy as np
-
+from matplotlib_venn import venn3
 
 def heatmap(
         data, row_labels, col_labels, ax=None, cbar_kw={}, cbarlabel="", title="", **kwargs
@@ -168,3 +167,14 @@ def box_plot_from_dict(d, title = 'Box plot', x_title = 'x', y_title = 'y'):
     fig = go.Figure(data=data, layout=layout)
 
     return py.iplot(fig)
+
+
+
+def show_venn_diagram(intersections):
+
+    intersections_len = [len(intersection) for name, intersection in intersections.items()]
+
+    plt.figure(figsize=(17,8))
+    v = venn3(subsets = intersections_len, set_labels = ('Keeg', 'Reactome', 'Wikipathways'))
+
+    plt.show()
