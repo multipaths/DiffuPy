@@ -40,8 +40,8 @@ def diffuse(input_scores, method, graph=None, **kwargs):
 
     elif method == "ml":
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
-            if score not in [0, 1]:
-                raise ValueError("'graph' cannot have NA as node names")
+            if score not in [-1, 0, 1]:
+                raise ValueError("Input scores must be binary.")
             if score == 0:
                 scores.mat[i, j] = -1
 

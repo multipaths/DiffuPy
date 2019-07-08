@@ -170,11 +170,11 @@ def box_plot_from_dict(d, title = 'Box plot', x_title = 'x', y_title = 'y'):
 
 
 
-def show_venn_diagram(intersections):
+def show_venn_diagram(intersections, set_labels = ('Keeg', 'Reactome', 'Wikipathways')):
 
     intersections_len = [len(intersection) for name, intersection in intersections.items()]
 
     plt.figure(figsize=(17,8))
-    v = venn3(subsets = intersections_len, set_labels = ('Keeg', 'Reactome', 'Wikipathways'))
+    v = venn3(subsets = intersections_len, set_labels = set_labels)
 
     plt.show()

@@ -182,6 +182,7 @@ def get_simplegraph_from_multigraph(multigraph):
 
     return G
 
+
 def split_random_two_subsets(to_split):
     half_1 = random.sample(population=list(to_split), k=int(len(to_split) / 2))
     half_2 = list(set(to_split) - set(half_1))
@@ -222,14 +223,19 @@ def random_disjoint_intersection_two_subsets(unique_set1, unique_set2, intersect
     return unique_set1|set(set1), unique_set2|set(set2)
 
 
-def random_disjoint_intersection_three_subset(set1, set2, set3):
+def random_disjoint_intersection_three_subsets(sets_dict):
+
+    set_labels = list(sets_dict.keys())
+    set_values = list(sets_dict.values())
+
+    set1, set2, set3 = set_values[0][0], set_values[1][0], set_values[2][0]
+
     intersections = get_three_venn_intersections(set1, set2, set3)
 
     set1, set2 = random_disjoint_intersection_two_subsets(intersections['unique_set1'],
                                                           intersections['unique_set2'],
                                                           intersections['set1_set2']
                                                           )
-
 
     set1, set3 = random_disjoint_intersection_two_subsets(set1,
                                                           intersections['unique_set3'],
@@ -243,9 +249,7 @@ def random_disjoint_intersection_three_subset(set1, set2, set3):
 
     set1_core, set2_core, set3_core = split_random_three_subsets(intersections['core'])
 
-    print(len(set1_core))
-    print(len(set2_core))
-    print(len(set3_core))
-
-
-    return set1|set(set1_core), set2|set(set2_core), set3|set(set3_core)
+    return {set_labels[0]: set1|set(set1_core),
+            set_labels[1] : set2|set(set2_core),
+            set_labels[2] : set3|set(set3_core)
+            }

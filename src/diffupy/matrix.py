@@ -42,7 +42,7 @@ class Matrix:
         self.name = name
         self.quadratic = quadratic
 
-        if init_value and self.rows_labels  and list(self.cols_labels):
+        if init_value is not None and self.rows_labels and list(self.cols_labels):
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init_value)
 
         elif not list(mat):
@@ -208,7 +208,7 @@ class Matrix:
 
         if matrix:
             rows = matrix.mat
-            rows_labels = rows_labels.rows_labels
+            rows_labels = matrix.rows_labels
 
         if list(rows):
             self.mat = np.concatenate((self.mat, np.array(rows)), axis=0)

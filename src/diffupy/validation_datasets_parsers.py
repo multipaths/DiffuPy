@@ -9,7 +9,8 @@ from openpyxl import load_workbook
 
 def munge_labels(label):
     """Process ene. """
-    remove_set = ['*', ' ', '|', '-', '"', "'"]
+    remove_set = ['*', ' ', '|', '-', '"', "'", "\n", "↑", "↓"]
+    split_set = ['/', ',']
 
     label = str(label).lower()
 
@@ -19,6 +20,11 @@ def munge_labels(label):
 
     if '/' in label:
         label = tuple(set(label.split('/')))
+        if len(label) == 1:
+            label = label[0]
+
+    if ',' in label:
+        label = tuple(set(label.split(',')))
         if len(label) == 1:
             label = label[0]
 
@@ -69,5 +75,90 @@ def parse_set1(path):
                         munge_labels(cell.value) for cell in col[1:] if munge_labels(cell.value) != '')
 
             sheet_titles.append(sheet_title)
+
+    return omics_labels
+
+
+def parse_set2(path):
+    """Process ene. """
+
+    wb = load_workbook(filename=path)
+
+    omics_data = defaultdict(lambda: defaultdict(lambda: set()))
+    omics_labels = defaultdict(lambda: set())
+
+    for sheet in wb:
+        cell_value = sheet['A1'].value
+
+        if "metabolites" in cell_value:
+            sheet_title = "metabolite"
+            min_row = 2
+
+        elif "genes" in cell_value:
+            sheet_title = "genes"
+            min_row = 2
+
+        else:
+            continue
+
+        for col in sheet.iter_cols(min_row=min_row):
+            col_label = col[0].value
+
+            if col_label in ['Metabolites', 'Metabolites name', 'Genes', 'microRNA']:
+                if col_label == 'microRNA':
+                    col_label = 'micrornas'
+
+                if col_label == 'Metabolites':
+                    col_label = 'metabolite'
+
+                omics_labels[col_label.lower()].update(
+                munge_labels(cell.value) for cell in col[1:] if munge_labels(cell.value) != '')
+
+    return omics_labels
+
+
+def parse_set3(path):
+    """Process ene. """
+
+    wb = load_workbook(filename=path)
+
+    omics_data = defaultdict(lambda: defaultdict(lambda: set()))
+    omics_labels = defaultdict(lambda: set())
+
+    for sheet in wb:
+        cell_value = sheet['A1'].value
+
+        # if "Expression data (FC) of the differentially expressed" in sheet['A1'].value:
+        #    sheet_title = sheet['A1'].value.split("Expression data (FC) of the differentially expressed ",1)[1]
+        #    sheet_title = sheet_title.split(" of HepG2 cells after treatment with ")
+        #    sheet_title[1] = sheet_title[1].replace(". Statistical significance (p value < 0.05) is indicated.", "").replace(" CsA for", "")
+        #    sheet_titles.append(sheet_title)
+
+        if "compounds" in cell_value:
+            sheet_title = "metabolite"
+            min_row = 2
+
+        elif "mRNAs" in cell_value:
+            sheet_title = "genes"
+            min_row = 2
+
+        elif "miRNAs selected" in cell_value:
+            sheet_title = "micrornas"
+            min_row = 2
+
+        elif "pathway" in cell_value:
+            sheet_title = "pathway"
+            min_row = 2
+
+        else:
+            continue
+
+        for col in sheet.iter_cols(min_row=min_row):
+            col_label = col[0].value
+
+            if col_label in ['Name', 'Abbreviation', 'miRNA']:
+                omics_labels[sheet_title].update(
+                munge_labels(cell.value) for cell in col[1:] if munge_labels(cell.value) != '')
+
 
     return omics_labels
