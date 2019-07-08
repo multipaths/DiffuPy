@@ -8,7 +8,7 @@ import numpy as np
 
 from .diffuse_raw import diffuse_raw
 from .utils import get_label_list_graph
-from .validate_inputs import _validate_scores
+from .validate_input import _validate_scores
 
 log = logging.getLogger(__name__)
 
