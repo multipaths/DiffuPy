@@ -4,6 +4,7 @@
 
 import logging
 import sys
+import time
 from math import pi
 
 import networkx as nx
@@ -92,16 +93,20 @@ def regularised_laplacian_kernel(
     diverges. More details on the parameters can be found in [Smola, 2003].
     This kernel can be computed using both the unnormalised and normalised graph Laplacian.
     """
-    regularized_laplacean = LaplacianMatrix(graph, normalized)
+    then = time.time()
+
+    regularized_laplacian = LaplacianMatrix(graph, normalized)
     # TODO Que es esto? explicalo aqui porfa
-    regularized_laplacean.mat = np.linalg.inv(
+    regularized_laplacian.mat = np.linalg.inv(
         set_diagonal_matrix(
-            sigma2 * regularized_laplacean.mat,
+            sigma2 * regularized_laplacian.mat,
             [x + add_diag
-             for x in np.diag(regularized_laplacean.mat)
+             for x in np.diag(regularized_laplacian.mat)
 
              ]
         )
     )
+    now = time.time()
+    print("The kernel generation took: ", now-then, " seconds")
 
-    return regularized_laplacean
+    return regularized_laplacian
