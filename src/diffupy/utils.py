@@ -85,6 +85,14 @@ def get_label_ix_mapping(labels):
     """Get label to mat index mappings."""
     return {label:i for i, label in enumerate(labels)}
 
+def get_label_scores_mapping(labels, scores):
+    """Get label to scores mapping."""
+    return {label:scores[i] for i, label in enumerate(labels)}
+
+def get_idx_scores_mapping(scores):
+    """Get mat index to scores mapping."""
+    return {i:score for i, score in enumerate(scores)}
+
 def decode_labels(labels):
     """Validate labels."""
     labels_decode = []

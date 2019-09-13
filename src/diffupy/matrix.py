@@ -8,7 +8,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, decode_labels
+from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, decode_labels, get_idx_scores_mapping
 
 log = logging.getLogger(__name__)
 
@@ -108,6 +108,7 @@ class Matrix:
     """Validators """
 
     def validate_labels(self):
+        """Return a copy of Matrix Object."""
         if self.rows_labels:
             self.rows_labels = decode_labels(self.rows_labels)
             if len(self.rows_labels) != len(set(self.rows_labels)):
@@ -119,12 +120,14 @@ class Matrix:
                 raise Exception('Duplicate column labels in Matrix.')
 
     def update_ix_mappings(self):
+        """Return a copy of Matrix Object."""
         if hasattr(self, '_rows_labels_ix_mapping') and self.rows_labels:
             _rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
         if hasattr(self, '_cols_labels_ix_mapping') and hasattr(self, '_cols_labels'):
             _cols_labels_ix_mapping = get_label_ix_mapping(self._cols_labels)
 
     def validate_labels_and_update_ix_mappings(self):
+        """Return a copy of Matrix Object."""
         self.validate_labels()
         self.update_ix_mappings()
 
@@ -133,6 +136,8 @@ class Matrix:
     # Columns labels
     @property
     def cols_labels(self):
+        """Return a copy of Matrix Object."""
+
         if self.quadratic:
             return self.rows_labels
 
@@ -176,6 +181,36 @@ class Matrix:
             self._rows_labels_ix_mapping = cols_labels_ix_mapping
 
         self._cols_labels_ix_mapping = cols_labels_ix_mapping
+        
+    # Rows scores mapping
+    @property
+    def rows_idx_scores_mapping(self):
+        if hasattr(self, '_rows_idx_scores_mapping'):
+            return self._rows_idx_scores_mapping
+
+        self._rows_idx_scores_mapping = get_idx_scores_mapping(self.mat)
+        
+        return self._rows_idx_scores_mapping
+
+    @rows_idx_scores_mapping.setter
+    def rows_idx_scores_mapping(self, rows_idx_scores_mapping):
+        self._rows_idx_scores_mapping = rows_idx_scores_mapping
+
+    # Columns scores mapping
+    @property
+    def cols_idx_scores_mapping(self):
+        if hasattr(self, '_cols_idx_scores_mapping'):
+            return self._cols_idx_scores_mapping
+
+        self._cols_idx_scores_mapping = get_idx_scores_mapping(self.mat.transpose())
+        
+        return self._cols_idx_scores_mapping
+
+    @cols_idx_scores_mapping.setter
+    def cols_idx_scores_mapping(self, cols_idx_scores_mapping):
+        if self.quadratic:
+            self._rows_idx_scores_mapping = cols_idx_scores_mapping
+        self._cols_idx_scores_mapping = cols_idx_scores_mapping
 
     """Getters from labels"""
 
@@ -336,6 +371,34 @@ class Matrix:
         mat_match.validate_labels_and_update_ix_mappings()
 
         return mat_match
+    
+    """Order"""
+
+    def order_rows(self, reverse = True):
+        """Order matrix rows by cell values."""
+
+        # Get the row index-cell value mapping.
+        mapping = self.rows_idx_scores_mapping
+
+        if len(self.mat[0]) == 1:
+            k = mapping.get
+        else:
+            #TODO: lambda funct to sum all the row values, for 2 dimension nparray
+            k = mapping.get
+
+        # Get a list of index ordered by row values.
+        idx_order = [k for k in sorted(mapping, key = k, reverse = reverse)]
+
+        # Get a copy of the matrix object for not infer accessing values and to return.
+        ordered_mat = self.__copy__()
+
+        # Set the matrix's cells and row labels order according the previous ordered index list.
+        for i, idx in enumerate(idx_order):
+            ordered_mat.mat[i] = self.mat[idx]
+            ordered_mat.rows_labels[i] = self.rows_labels[idx]
+
+        return ordered_mat
+
 
     """Import"""
 
