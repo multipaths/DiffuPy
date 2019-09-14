@@ -56,8 +56,12 @@ class Matrix:
         self.validate_labels()
 
     def __str__(self):
-        return f"\nmatrix {self.name} \n  {self.mat} \n row labels: \n  {self.rows_labels} " \
-            f"\n column labels: \n  {self.cols_labels} \n "
+        s = f"        {self.cols_labels}"
+
+        for i, row_label in enumerate(self.rows_labels):
+            s += f"\n {row_label}  {self.mat[i]} "
+
+        return f"\nmatrix {self.name} \n  {s} \n "
 
     def __iter__(self, **kargs):
         self.i = -1
