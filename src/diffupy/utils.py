@@ -28,7 +28,7 @@ def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
 
 
 def set_diagonal_matrix(matrix, d):
-    """"""
+    """  """
     for j, row in enumerate(matrix):
         for i, x in enumerate(row):
             if i == j:
@@ -77,6 +77,8 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
             value
             for value in nx.get_node_attributes(graph, label).values()
         ]
+
+    elif graph.nodes: return graph.nodes()
 
     raise Warning('Could not get a label list from graph.')
 

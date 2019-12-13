@@ -13,6 +13,7 @@ from .validate_input import _validate_scores
 log = logging.getLogger(__name__)
 
 
+
 def diffuse(input_scores, method, graph=None, **kwargs):
     # sanity checks
     scores = copy.copy(input_scores)

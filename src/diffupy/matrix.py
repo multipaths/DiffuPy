@@ -233,7 +233,7 @@ class Matrix:
     def set_cell_from_labels(self, row_label, col_label, x):
         self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]] = x
 
-    def get_cell_from_labels(self, row_label, col_label, ):
+    def get_cell_from_labels(self, row_label, col_label):
         return self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]]
 
     # TODO: este nombre es un poco confuso no?
@@ -378,20 +378,21 @@ class Matrix:
     
     """Order"""
 
-    def order_rows(self, reverse = True):
+    def order_rows(self, reverse = True, col_ref_idx = None):
         """Order matrix rows by cell values."""
 
         # Get the row index-cell value mapping.
         mapping = self.rows_idx_scores_mapping
 
-        if len(self.mat[0]) == 1:
-            k = mapping.get
-        else:
-            #TODO: lambda funct to sum all the row values, for 2 dimension nparray
-            k = mapping.get
+        if len(self.mat[0]) != 1:
+            if isinstance(col_ref_idx, int):
+                mapping = {k : v[col_ref_idx] for k, v in mapping.items()}
+
+            else:
+                mapping = {k : sm(v) for k, v in mapping.items()}
 
         # Get a list of index ordered by row values.
-        idx_order = [k for k in sorted(mapping, key = k, reverse = reverse)]
+        idx_order = [k for k in sorted(mapping, key = mapping.get, reverse = reverse)]
 
         # Get a copy of the matrix object for not infer accessing values and to return.
         ordered_mat = self.__copy__()
