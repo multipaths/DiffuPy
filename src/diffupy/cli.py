@@ -30,8 +30,7 @@ def main():
 
 # TODO: Refactor not BEL in diffuPy
 
-"""Diffupy"""
-
+"""DiffuPy"""
 
 @main.command()
 @click.option(
