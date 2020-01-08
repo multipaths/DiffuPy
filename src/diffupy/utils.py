@@ -26,7 +26,6 @@ def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
 
     return nx.laplacian_matrix(graph).toarray()
 
-
 def set_diagonal_matrix(matrix, d):
     """  """
     for j, row in enumerate(matrix):

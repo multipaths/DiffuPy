@@ -2,9 +2,7 @@
 
 """Sanity checks for input."""
 
-# TODO
 # .check_metric
-# TODO: por que no agregas todos los [NaN] en una lista comun en constants?
 
 import networkx as nx
 import numpy as np
@@ -13,9 +11,9 @@ from .constants import METHODS
 from .matrix import Matrix
 from .utils import get_label_list_graph
 
-
 def _validate_method(method: str):
     """Ensures that 'method' is a valid character."""
+
     if not isinstance(method, str):
         raise ValueError(f"The supplied 'method' must be a string. The given argument is a {type(method)}")
 

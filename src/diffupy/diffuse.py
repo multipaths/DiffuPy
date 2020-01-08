@@ -5,6 +5,7 @@
 import copy
 import logging
 
+import networkx as nx
 import numpy as np
 
 from .diffuse_raw import diffuse_raw
@@ -13,7 +14,7 @@ from .validate_input import _validate_scores
 
 log = logging.getLogger(__name__)
 
-def diffuse(input_scores, method, graph = None, **kwargs):
+def diffuse(input_scores : [int], method : str, graph : nx.Graph = None, **kwargs):
     """
     Generalized function to treat different methods of score diffusion on a network / modeling heat diffusion.
 
@@ -24,7 +25,6 @@ def diffuse(input_scores, method, graph = None, **kwargs):
         (a) How to distinguish positives, negatives and unlabelled examples.
         (b) Their statistical normalisation.
 
-    #  TODO: Acordar de especificar mejor el diferente tratamiento de los inputs, checkear gramma too.
     Input scores can be specified in three formats: a single set of scores to smooth can be represented as.
         (1) a named numeric vector, whereas if several of these vectors that share the node names need to be smoothed,
             they can be provided as
@@ -106,7 +106,7 @@ def diffuse(input_scores, method, graph = None, **kwargs):
     _validate_scores(scores)
 
 
-    # Check if we have a graph or a kernel
+    # Check if is treated a graph or a kernel
     if graph:
         format_network = "graph"
     else:

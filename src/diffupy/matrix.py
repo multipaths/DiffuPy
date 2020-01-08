@@ -25,7 +25,9 @@ class Matrix:
                  name='',
                  init_value=None,
                  **kwargs):
+
         """Initialize matrix."""
+
         if isinstance(rows_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
             self.rows_labels = list(rows_labels)
         elif graph:
