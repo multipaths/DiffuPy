@@ -12,9 +12,16 @@ from .diffuse_raw import diffuse_raw
 from .utils import get_label_list_graph
 from .validate_input import _validate_scores
 
+from .matrix import Matrix
+
 log = logging.getLogger(__name__)
 
-def diffuse(input_scores : [int], method : str, graph : nx.Graph = None, **kwargs):
+def diffuse(
+    input_scores : [int],
+    method : str,
+    graph : nx.Graph = None,
+    **kwargs
+) -> Matrix:
     """
     Generalized function to treat different methods of score diffusion on a network / modeling heat diffusion.
 
@@ -100,11 +107,10 @@ def diffuse(input_scores : [int], method : str, graph : nx.Graph = None, **kwarg
 
     """
 
-    # sanity checks
+    # Sanity checks
     scores = copy.copy(input_scores)
 
     _validate_scores(scores)
-
 
     # Check if is treated a graph or a kernel
     if graph:
