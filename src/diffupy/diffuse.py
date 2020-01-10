@@ -16,10 +16,11 @@ from .matrix import Matrix
 
 log = logging.getLogger(__name__)
 
+
 def diffuse(
-    input_scores : [int],
-    method : str,
-    graph : nx.Graph = None,
+    input_scores: [int],
+    method: str,
+    graph: nx.Graph = None,
     **kwargs
 ) -> Matrix:
     """
@@ -71,7 +72,7 @@ def diffuse(
                   original diffusion score.
 
             {ber_p}: as used in [Bersanelli, 2016], this score combines raw and mc, in order to take into
-                     account both the magnitude of the \code{raw} scores and the effect of the network topology :
+                     account both the magnitude of the {raw} scores and the effect of the network topology :
                      this is a quantification of the relative change in the node score before and after the network smoothing.
 
     Methods summary table:
