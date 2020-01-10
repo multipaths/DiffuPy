@@ -95,15 +95,13 @@ def diffuse_raw(
     diff = np.matmul(kernel[:, :n], scores.mat)
     logging.info('Matrix product for raw scores preformed.')
 
-
-    # Return base matrix if it is raw. Continue if we want z-scores
+    # Return base matrix if it is raw. Continue if we want z-scores.
     if not z:
         return Matrix(
-        diff,
-        scores.rows_labels,
-        scores.cols_labels
-    )
-
+            diff,
+            scores.rows_labels,
+            scores.cols_labels
+        )
 
     logging.info('Normalization z-scores.')
 

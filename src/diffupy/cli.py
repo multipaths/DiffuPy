@@ -11,11 +11,10 @@ import click
 import networkx as nx
 import pybel
 
-from diffupy.constants import DATA_DIR, ensure_output_dirs
-from diffupy.kernels import regularised_laplacian_kernel
+from .constants import DATA_DIR, ensure_output_dirs
+from .kernels import regularised_laplacian_kernel
 
 from pybel_tools.mutation.collapse import collapse_nodes_with_same_names
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +25,10 @@ def main():
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
 
 
-
-
 # TODO: Refactor not BEL in diffuPy
 
 """DiffuPy"""
+
 
 @main.command()
 @click.option(
@@ -62,8 +60,6 @@ def kernel(graph, output, isolates, log):
     click.echo(f'Loading graph from {graph}')
     bel_graph = pybel.from_pickle(graph)
 
-    #collapse_nodes_with_same_names(bel_graph)
-
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
 
@@ -81,9 +77,9 @@ def kernel(graph, output, isolates, log):
     before = time.time()
     background_mat = regularised_laplacian_kernel(bel_graph)
     now = time.time()
-    
+
     output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
-    
+
     # Export numpy array
     with open(output, 'wb') as file:
         pickle.dump(background_mat, file, protocol=4)

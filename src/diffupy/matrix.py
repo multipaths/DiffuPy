@@ -187,7 +187,7 @@ class Matrix:
             self._rows_labels_ix_mapping = cols_labels_ix_mapping
 
         self._cols_labels_ix_mapping = cols_labels_ix_mapping
-        
+
     # Rows scores mapping
     @property
     def rows_idx_scores_mapping(self):
@@ -195,7 +195,7 @@ class Matrix:
             return self._rows_idx_scores_mapping
 
         self._rows_idx_scores_mapping = get_idx_scores_mapping(self.mat)
-        
+
         return self._rows_idx_scores_mapping
 
     @rows_idx_scores_mapping.setter
@@ -209,7 +209,7 @@ class Matrix:
             return self._cols_idx_scores_mapping
 
         self._cols_idx_scores_mapping = get_idx_scores_mapping(self.mat.transpose())
-        
+
         return self._cols_idx_scores_mapping
 
     @cols_idx_scores_mapping.setter
