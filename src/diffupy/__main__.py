@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""DiffuPy main."""
+"""Entrypoint module for ´python -m diffupy´."""
 
 from .cli import main
 
