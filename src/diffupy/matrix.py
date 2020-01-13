@@ -4,7 +4,6 @@
 
 import logging
 import os
-from collections import defaultdict
 
 import numpy as np
 
@@ -329,7 +328,7 @@ class Matrix:
             Warning('Matching quadratic matrix: Same columns and row labels.')
 
         for score, row_label, col_label in iter(reference_matrix):
-            mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label], \
+            mat_match.mat[reference_matrix.rows_labels_ix_mapping[row_label],
                           reference_matrix.cols_labels_ix_mapping[col_label]] \
                 = self.get_cell_from_labels(row_label, col_label)
 
@@ -377,7 +376,7 @@ class Matrix:
         mat_match.validate_labels_and_update_ix_mappings()
 
         return mat_match
-    
+
     """Order"""
 
     def order_rows(self, reverse = True, col_ref_idx = None):

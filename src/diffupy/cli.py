@@ -24,7 +24,6 @@ def main():
     """Run DiffuPy."""
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
 
-
 # TODO: Refactor not BEL in diffuPy
 
 """DiffuPy"""
