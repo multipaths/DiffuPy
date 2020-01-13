@@ -66,16 +66,18 @@ def diffuse_raw(
     _validate_scores(scores)
     logging.info('Scores validated.')
 
-    # Kernel matrix
-    if K is None:
-        _validate_graph(graph)
-        logging.info('Kernel not supplied. Computing regularised Laplacian kernel ...')
-        kernel = regularised_laplacian_kernel(graph, normalized=False)
-        logging.info('Done')
-    else:
+    # Get the Kernel
+    if K:
         kernel = copy.copy(K)
         _validate_K(kernel)
         logging.info('Using supplied kernel matrix...')
+    elif graph:
+        _validate_graph(graph)
+        logging.info('Kernel not supplied. Computing regularised Laplacian kernel from the provided graph...')
+        kernel = regularised_laplacian_kernel(graph, normalized=False)
+        logging.info('Done')
+    else:
+        raise ValueError("No network, neither a graph or a kernel has been provided to run the diffusion.")
 
     # Match indices
     logging.info('Kernel validated scores.')

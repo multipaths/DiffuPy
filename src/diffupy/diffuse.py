@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""Diffusion methods."""
+"""This module provides a generalized function as an interface to interact with the different diffusion methods
+    presented in this package."""
 
 import copy
 import logging
@@ -24,20 +25,21 @@ def diffuse(
     **kwargs
 ) -> Matrix:
     """
-    Generalized function to treat different methods of score diffusion on a network / modeling heat diffusion.
+    Generalized function that articulates the treatment of different score diffusion methods and
+    heat diffusion on a network.
 
-    It takes a network (as a graph [graph] or as a kernel transformation [K in kwargs]
-    as an optional argument / but mandatory if graph not provided (managed programaticaly).
+    It takes a network (as a graph [graph] or as a kernel transformation [K in kwargs],
+    as an optional argument / but mandatory if a graph is not provided (managed programaticaly).
 
     Diffusion methods procedures provided in this package differ on:
         (a) How to distinguish positives, negatives and unlabelled examples.
         (b) Their statistical normalisation.
 
     Input scores can be specified in three formats: a single set of scores to smooth can be represented as.
-        (1) a named numeric vector, whereas if several of these vectors that share the node names need to be smoothed,
+        (1) A named numeric vector, whereas if several of these vectors that share the node names need to be smoothed,
             they can be provided as
-        (2) a column-wise matrix. However, if the unlabelled entities are not the same from one case to another,
-        (3) a named list of such score matrices can be passed to this function. The input format will be kept in the output.
+        (2) A column-wise matrix. However, if the unlabelled entities are not the same from one case to another,
+        (3) A named list of such score matrices can be passed to this function. The input format will be kept in the output.
     If the input labels are not quantitative, i.e. positive(1), negative(0) and possibly unlabelled, all the scores
     raw, gm, ml, z, mc, ber_s, ber_p can be used.
 
@@ -96,13 +98,13 @@ def diffuse(
     | z       |  1  | 0  | 0* |      Yes    |     No     |     Yes      | Harchaoui (2013) |
      __ __  __ __  __ __  __ __  __ __  __ __  __ __  __ __ __ __  __ __  __ __  __ __ __ _
 
-    :param input_scores: A vector input.
-    :param method: One of the possible methods described previously.
+    :param input_scores: An input vector
+    :param method: One of the possible methods described previously
                    Possible values ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
-    :param graph: A network in a graph format.
+    :param graph: A network in graph format
     :param kwargs: Optional arguments:
                     - K: a  kernel [matrix] transformation from a graph.
-                    - Other arguments, that would differ depending the chosen method.
+                    - Other arguments which would differ depending on the chosen method.
     :return: The diffused scores within the matrix transformation of the network, with the diffusion operation
              [K x input_vector] performed.
 
@@ -113,21 +115,23 @@ def diffuse(
 
     _validate_scores(scores)
 
-    # Check if is treated a graph or a kernel
+    # Discern the format of the provided network for its further treatment.
     if graph:
         format_network = "graph"
     else:
-        if not "K" in kwargs:
+        if "K" not in kwargs:
             raise ValueError("Neither a graph 'graph' or a kernel 'K' has been provided.")
         format_network = "kernel"
 
     #  TODO: que pasa si es kernel y method == 'raw'? va a entrar aqui y va a petar todo (yo meteria esta parte que
-    #   trabaja con el graph dentro del if de antes
-    # Diffuse raw
+    #   trabaja con el graph dentro del if de antes.
+    #   @ddomingof
+    #   RESPUESTA: se gestiona internamente en el ´diffuse_raw.py´
+    #              chequea linea 70. Methods descrived previously in the description.
+
     if method == "raw":
         return diffuse_raw(graph=graph, scores=scores, **kwargs)
 
-    # z scores
     elif method == "z":
         return diffuse_raw(graph, scores, z=True, **kwargs)
 
@@ -152,13 +156,13 @@ def diffuse(
         elif format_network == "kernel":
             names_ordered = kwargs['K'].rows_labels
 
-        # If the graph is defined...
+        # If the graph is defined
         ids_nobkgd = set(names_ordered) - set(scores.rows_labels)
 
         n_tot = len(names_ordered)
         n_bkgd = scores.mat.shape[0]
 
-        # normalisation has to be performed
+        # normalisation is performed
         # for each column, as it depends
         # on the number of positives and negatives...
         # n_pos and n_neg are vectors counting the number of
