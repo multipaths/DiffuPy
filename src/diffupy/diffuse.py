@@ -123,12 +123,6 @@ def diffuse(
             raise ValueError("Neither a graph 'graph' or a kernel 'K' has been provided.")
         format_network = "kernel"
 
-    #  TODO: que pasa si es kernel y method == 'raw'? va a entrar aqui y va a petar todo (yo meteria esta parte que
-    #   trabaja con el graph dentro del if de antes.
-    #   @ddomingof
-    #   RESPUESTA: se gestiona internamente en el ´diffuse_raw.py´
-    #              chequea linea 70. Methods descrived previously in the description.
-
     if method == "raw":
         return diffuse_raw(graph=graph, scores=scores, **kwargs)
 
