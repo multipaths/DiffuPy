@@ -19,17 +19,13 @@ log = logging.getLogger(__name__)
 
 
 def diffuse(
-    input_scores: [int],
+    input_scores: Matrix,
     method: str,
     graph: nx.Graph = None,
     **kwargs
 ) -> Matrix:
-    """
-    Generalized function that articulates the treatment of different score diffusion methods and
-    heat diffusion on a network.
-
-    It takes a network (as a graph [graph] or as a kernel transformation [K in kwargs],
-    as an optional argument / but mandatory if a graph is not provided (managed programaticaly).
+    """Manages the treatment of the different score diffusion methods hereby provided and/or heat diffusion applied to a
+    provided network (in graph format or a graph kernel matrix stemming from a graph). Remark that
 
     Diffusion methods procedures provided in this package differ on:
         (a) How to distinguish positives, negatives and unlabelled examples.
@@ -98,15 +94,15 @@ def diffuse(
     | z       |  1  | 0  | 0* |      Yes    |     No     |     Yes      | Harchaoui (2013) |
      __ __  __ __  __ __  __ __  __ __  __ __  __ __  __ __ __ __  __ __  __ __  __ __ __ _
 
-    :param input_scores: An input vector
-    :param method: One of the possible methods described previously
+    :param input_scores: score collection, supplied as X dimensional array, could be a List or a X dimensional Matrix.
+    :param method: Elected method from the ones described previously
                    Possible values ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
-    :param graph: A network in graph format
+    :param graph: A network as a graph. It could be optional if a Kernel is provided
     :param kwargs: Optional arguments:
-                    - K: a  kernel [matrix] transformation from a graph.
-                    - Other arguments which would differ depending on the chosen method.
+                    - K: a  kernel [matrix] steaming from a graph, thus sparing the graph transformation process
+                    - Other arguments which would differ depending on the chosen method
     :return: The diffused scores within the matrix transformation of the network, with the diffusion operation
-             [K x input_vector] performed.
+             [K x input_vector] performed
 
     """
 
