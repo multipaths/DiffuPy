@@ -26,6 +26,7 @@ def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
 
     return nx.laplacian_matrix(graph).toarray()
 
+
 def set_diagonal_matrix(matrix, d):
     """  """
     for j, row in enumerate(matrix):
@@ -35,6 +36,7 @@ def set_diagonal_matrix(matrix, d):
             else:
                 matrix[j][i] = x
     return matrix
+
 
 def get_label_node(node: nx.Graph.node) -> str:
     if hasattr(node, 'name') and node.name is not None:
@@ -77,22 +79,26 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
             for value in nx.get_node_attributes(graph, label).values()
         ]
 
-    elif graph.nodes: return graph.nodes()
+    elif graph.nodes:
+        return graph.nodes()
 
     raise Warning('Could not get a label list from graph.')
 
 
 def get_label_ix_mapping(labels):
     """Get label to mat index mappings."""
-    return {label:i for i, label in enumerate(labels)}
+    return {label: i for i, label in enumerate(labels)}
+
 
 def get_label_scores_mapping(labels, scores):
     """Get label to scores mapping."""
-    return {label:scores[i] for i, label in enumerate(labels)}
+    return {label: scores[i] for i, label in enumerate(labels)}
+
 
 def get_idx_scores_mapping(scores):
     """Get mat index to scores mapping."""
-    return {i:score for i, score in enumerate(scores)}
+    return {i: score for i, score in enumerate(scores)}
+
 
 def decode_labels(labels):
     """Validate labels."""
@@ -105,6 +111,7 @@ def decode_labels(labels):
         labels_decode.append(label)
 
     return labels_decode
+
 
 def print_dict_dimensions(entities_db, title):
     """Print dimension of the dictionary"""
@@ -128,16 +135,14 @@ def print_dict_dimensions(entities_db, title):
 def get_simplegraph_from_multigraph(multigraph):
 
     G = nx.Graph()
-    for u,v,data in multigraph.edges(data=True):
+    for u, v, data in multigraph.edges(data=True):
         u = get_label_node(u)
         v = get_label_node(v)
 
         w = data['weight'] if 'weight' in data else 1.0
-        if G.has_edge(u,v):
+        if G.has_edge(u, v):
             G[u][v]['weight'] += w
         else:
             G.add_edge(u, v, weight=w)
 
     return G
-
-

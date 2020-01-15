@@ -32,7 +32,9 @@ def _run_diffusion_method_test(method, G, input_scores, test_output_scores):
     assert np.allclose(computed_output_scores, test_output_scores)
     logging.info(' Test ' + method + ' passed')
 
+
 """Tests"""
+
 
 class DiffuseTest(unittest.TestCase):
     graph = nx.read_gml(GML_FILE_EXAMPLE, label='id')

@@ -26,6 +26,7 @@ def main():
 
 # TODO: Refactor, should not reference to BEL in diffuPy, since is a genralized package.
 
+
 """DiffuPy"""
 
 
@@ -57,7 +58,7 @@ def kernel(graph, output, isolates, log):
         logger.setLevel(logging.INFO)
 
     click.echo(f'Loading graph from {graph}')
-    bel_graph = pybel.from_pickle(graph) # TODO: Should be networkX format -- to discuss.
+    bel_graph = pybel.from_pickle(graph)  # TODO: Should be networkX format -- to discuss.
 
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')

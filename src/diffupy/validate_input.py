@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 """Sanity checks for input."""
 
 # .check_metric
@@ -11,7 +12,8 @@ from .constants import METHODS
 from .matrix import Matrix
 from .utils import get_label_list_graph
 
-def _validate_method(method: str):
+
+def _validate_method(method: str) -> None:
     """Ensures that 'method' is a valid character."""
 
     if not isinstance(method, str):

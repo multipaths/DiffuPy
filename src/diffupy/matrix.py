@@ -379,7 +379,7 @@ class Matrix:
 
     """Order"""
 
-    def order_rows(self, reverse = True, col_ref_idx = None):
+    def order_rows(self, reverse=True, col_ref_idx=None):
         """Order matrix rows by cell values."""
 
         # Get the row index-cell value mapping.
@@ -387,13 +387,13 @@ class Matrix:
 
         if len(self.mat[0]) != 1:
             if isinstance(col_ref_idx, int):
-                mapping = {k : v[col_ref_idx] for k, v in mapping.items()}
+                mapping = {k: v[col_ref_idx] for k, v in mapping.items()}
 
             else:
-                mapping = {k : sm(v) for k, v in mapping.items()}
+                mapping = {k: sm(v) for k, v in mapping.items()}
 
         # Get a list of index ordered by row values.
-        idx_order = [k for k in sorted(mapping, key = mapping.get, reverse = reverse)]
+        idx_order = [k for k in sorted(mapping, key=mapping.get, reverse=reverse)]
 
         # Get a copy of the matrix object for not infer accessing values and to return.
         ordered_mat = self.__copy__()
@@ -404,7 +404,6 @@ class Matrix:
             ordered_mat.rows_labels[i] = self.rows_labels[idx]
 
         return ordered_mat
-
 
     """Import"""
 

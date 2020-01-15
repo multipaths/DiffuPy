@@ -2,7 +2,6 @@
 
 """
 The goal of this package is to re-implement the Diffusion algorithm described in ... in Python.
-TODO: Add me
 
 Installation
 ------------

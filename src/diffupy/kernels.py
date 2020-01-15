@@ -151,8 +151,8 @@ def regularised_laplacian_kernel(
         set_diagonal_matrix(
             sigma2 * regularized_laplacian.mat,
             [x + add_diag
-                for x in np.diag(regularized_laplacian.mat)
-            ]
+             for x in np.diag(regularized_laplacian.mat)
+             ]
         )
     )
     now = time.time()

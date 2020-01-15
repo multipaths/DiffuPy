@@ -32,12 +32,12 @@ class ValidateTest(unittest.TestCase):
         """One score in the array is not numeric."""
         matrix = Matrix(
             [1, '2', 3, 4],
-            cols_labels=['1', '2', '3', '4']
-            , rows_labels=['1', '2', '3', '4'],
+            cols_labels=['1', '2', '3', '4'],
+            rows_labels=['1', '2', '3', '4'],
             name='Test Matrix 3'
         )
-        with self.assertRaises(ValueError): _validate_scores(matrix)
-
+        with self.assertRaises(ValueError):
+            _validate_scores(matrix)
 
     def test_validate_scores_4(self):
         """Test empty matrix."""
@@ -47,4 +47,5 @@ class ValidateTest(unittest.TestCase):
             rows_labels=[None],
             name='Test Matrix 4'
         )
-        with self.assertRaises(ValueError): _validate_scores(matrix)
+        with self.assertRaises(ValueError):
+            _validate_scores(matrix)
