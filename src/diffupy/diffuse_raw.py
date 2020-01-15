@@ -50,16 +50,13 @@ def diffuse_raw(
         z: bool = False,
         K: Matrix = None,
         **karg) -> Matrix:
-    """Computes the conmute-time kernel, which is the expected time of going back and forth between a couple of nodes.
-        If the network is connected, then the commute time kernel will be totally dense, therefore reflecting global
-        properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the
-        unnormalised and normalised graph Laplacian.
+    """ Computes the score diffusion procedure, given an initial stae as a set of scores and a network where diffuse it.
 
-    :param graph: background object for the diffusion
+    :param graph: background network
     :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column
     :param z-logical: bool to indicate if z-scores be computed instead of raw scores
     :param  K optional matrix precomputed diffusion kernel
-    :return:  A list of scores, with the same length and dimensions as scores
+    :return: A list of scores, with the same length and dimensions as scores
     """
     # Sanity checks
 
