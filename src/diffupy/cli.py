@@ -73,9 +73,9 @@ def kernel(graph, output, isolates, log):
         f'{bel_graph.summary_str()}'
     )
 
-    t_0 = time.time()
+    exe_t_0 = time.time()
     background_mat = regularised_laplacian_kernel(bel_graph)
-    t_f = time.time()
+    exe_t_f = time.time()
 
     output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
 
@@ -83,7 +83,7 @@ def kernel(graph, output, isolates, log):
     with open(output, 'wb') as file:
         pickle.dump(background_mat, file, protocol=4)
 
-    running_time = t_f - t_0
+    running_time = exe_t_f - exe_t_0
 
     click.echo(f'Kernel exported to: {output} in {running_time} seconds"')
 
