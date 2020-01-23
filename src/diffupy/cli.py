@@ -23,7 +23,8 @@ def main():
     """Run DiffuPy."""
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
 
-# TODO: Discuss, should not reference to BEL in diffuPy, since it is a genralized package.
+# TODO: Discuss, should not reference to PyBEL in diffuPy, since it is offered to treat with any kind/format of graphs,
+#  not only biological/BEL graphs.
 
 """DiffuPy"""
 
