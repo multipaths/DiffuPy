@@ -14,7 +14,6 @@ import pybel
 from .constants import DATA_DIR, ensure_output_dirs
 from .kernels import regularised_laplacian_kernel
 
-from pybel_tools.mutation.collapse import collapse_nodes_with_same_names
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +23,7 @@ def main():
     """Run DiffuPy."""
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
 
-# TODO: Refactor, should not reference to BEL in diffuPy, since is a genralized package.
-
+# TODO: Discuss, should not reference to BEL in diffuPy, since it is a genralized package.
 
 """DiffuPy"""
 
@@ -58,7 +56,7 @@ def kernel(graph, output, isolates, log):
         logger.setLevel(logging.INFO)
 
     click.echo(f'Loading graph from {graph}')
-    bel_graph = pybel.from_pickle(graph)  # TODO: Should be networkX format -- to discuss.
+    bel_graph = pybel.from_pickle(graph)  # TODO: Should be used import tools from networkX, no referencing to PyBEL -- to discuss, treat generalized graphs.
 
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
@@ -69,14 +67,15 @@ def kernel(graph, output, isolates, log):
         })
 
     click.echo(
-        f'Statistics\n'
-        f'##########\n'
+        f'##################\n'
+        f'Numerical Summary\n'
+        f'##################\n'
         f'{bel_graph.summary_str()}'
     )
 
-    before = time.time()
+    t_0 = time.time()
     background_mat = regularised_laplacian_kernel(bel_graph)
-    now = time.time()
+    t_f = time.time()
 
     output = os.path.join(output, 'regularized_kernel_pathme_universe.pickle')
 
@@ -84,9 +83,9 @@ def kernel(graph, output, isolates, log):
     with open(output, 'wb') as file:
         pickle.dump(background_mat, file, protocol=4)
 
-    time_running = now - before
+    running_time = t_f - t_0
 
-    click.echo(f'Kernel exported to: {output} in {time_running} seconds"')
+    click.echo(f'Kernel exported to: {output} in {running_time} seconds"')
 
 
 if __name__ == '__main__':
