@@ -160,14 +160,14 @@ def diffuse(
         n_pos = np.sum(scores.mat, axis=0)
         n_neg = n_bkgd - n_pos
 
-        # biases
+        # Biases
         p = (n_pos - n_neg) / n_tot
 
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
             if score == 0:
                 scores.mat[i, j] = -1
 
-        # add biases (each column has its bias)
+        # Add biases (each column has its bias)
         scores.row_bind(
             np.transpose(np.array(
                 [np.repeat(

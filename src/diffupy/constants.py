@@ -19,7 +19,7 @@ def ensure_output_dirs():
 # '
 # ' @rdname checks
 
-# TODO: Change to a dictionary where keys are better explanatory terms of each method
+# TODO: Change to a dictionary where keys are better explanatory terms of each methode.
 METHODS = {
     "raw",
     "ml",

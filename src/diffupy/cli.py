@@ -26,6 +26,7 @@ def main():
 # TODO: Discuss, should not reference to PyBEL in diffuPy, since it is offered to treat with any kind/format of graphs,
 #  not only biological/BEL graphs.
 
+
 """DiffuPy"""
 
 
@@ -57,7 +58,8 @@ def kernel(graph, output, isolates, log):
         logger.setLevel(logging.INFO)
 
     click.echo(f'Loading graph from {graph}')
-    bel_graph = pybel.from_pickle(graph)  # TODO: Should be used import tools from networkX, no referencing to PyBEL -- to discuss, treat generalized graphs.
+    # TODO: Should be used import tools from networkX, no referencing to PyBEL to discuss, treat generalized graphs.
+    bel_graph = pybel.from_pickle(graph)
 
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
