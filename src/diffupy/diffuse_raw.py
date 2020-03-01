@@ -50,7 +50,7 @@ def diffuse_raw(
         z: bool = False,
         K: Matrix = None,
         **karg) -> Matrix:
-    """ Computes the score diffusion procedure, given an initial stae as a set of scores and a network where diffuse it.
+    """ Computes the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
 
     :param graph: background network
     :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column

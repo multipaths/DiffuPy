@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """This module provides a generalized function as an interface to interact with the different diffusion methods
-    presented in this package."""
+   offered in this diffuPy package."""
 
 import copy
 import logging
@@ -19,13 +19,13 @@ log = logging.getLogger(__name__)
 
 
 def diffuse(
-    input_scores: Matrix,
-    method: str,
-    graph: nx.Graph = None,
-    **kwargs
+        input_scores: Matrix,
+        method: str,
+        graph: nx.Graph = None,
+        **kwargs
 ) -> Matrix:
-    """Manages the treatment of the different score diffusion methods hereby provided and/or heat diffusion applied to a
-    provided network (in graph format or a graph kernel matrix stemming from a graph). Remark that
+    """Manages the treatment of the different score diffusion methods applied of/from an input set of labels/scores
+    of/on a certain network (as a graph format or a graph kernel matrix stemming from a graph).
 
     Diffusion methods procedures provided in this package differ on:
         (a) How to distinguish positives, negatives and unlabelled examples.
@@ -35,17 +35,25 @@ def diffuse(
         (1) A named numeric vector, whereas if several of these vectors that share the node names need to be smoothed,
             they can be provided as
         (2) A column-wise matrix. However, if the unlabelled entities are not the same from one case to another,
-        (3) A named list of such score matrices can be passed to this function. The input format will be kept in the output.
+        (3) A named list of such score matrices can be passed to this function. The input format will be kept in the
+            output.
+
     If the input labels are not quantitative, i.e. positive(1), negative(0) and possibly unlabelled, all the scores
     raw, gm, ml, z, mc, ber_s, ber_p can be used.
 
     Methods [method attribute to choose one node]:
+
         - Methods without statistical normalisation:
 
-            {raw}:  positive nodes {y_raw[i] = 1} introduce unitary flow to
+            {raw}:  positive nodes introduce unitary flow {y_raw[i] = 1} to
                     the network, whereas either negative and unlabelled
-                    nodes introduce null diffusion. {y_raw[j] = 0}
-                    [Vandin, 2011]
+                    nodes introduce null diffusion {y_raw[j] = 0}.
+                    [Vandin, 2011]. They are computed as:
+
+                    f_{raw} = K · y_{raw}
+
+                    where K is a graph kernel, see kernels.py.
+                    These scores treat negative and unlabelled nodes equivalently.
 
             {ml}:   same as raw, but negative nodes introduce a negative unit of flow.
                     therefore not equivalent to unlabelled nodes.
@@ -57,21 +65,28 @@ def diffuse(
                     [Mostafavi, 2008]
 
             {ber_s}: a quantification of the relative change in the node score before
-                     and after the network smoothing.
+                     and after the network smoothing. The score for a particular node i can be written as
+
+                     f_{ber_s}[i] = f_{raw}[i] / (y_{raw}[i] + eps)
+
+                     where eps is a parameter controlling the importance of the relative change.
 
         - Methods with statistical normalisation:
+
             {z}: a parametric alternative to the raw score of node is subtracted its mean
                  value and divided by its standard deviation. Differential trait of this package.
                  The statistical moments have a closed analytical form,
                  see the main vignette, and are inspired in [Harchaoui, 2013].
 
-            {mc}: the score of node code {i} is based on its empirical p-value, computed by permuting the input {n.perm} times.
-                  It is roughly the proportion of input permutations that led to a diffusion score as high or higher than the
-                  original diffusion score.
+            {mc}: the score of node code {i} is based on its empirical p-value, computed by permuting
+                  the input {n.perm} times.
+                  It is roughly the proportion of input permutations that led to a diffusion score as
+                  high or higher than the original diffusion score.
 
             {ber_p}: as used in [Bersanelli, 2016], this score combines raw and mc, in order to take into
                      account both the magnitude of the {raw} scores and the effect of the network topology :
-                     this is a quantification of the relative change in the node score before and after the network smoothing.
+                     this is a quantification of the relative change in the node score before and after the
+                     network smoothing.
 
     Methods summary table:
      __ __  __ __   __ __   __ __  __ __  __ __  __ __  __ __ __ __ __ __ __ __ __ __ __ __
@@ -94,8 +109,9 @@ def diffuse(
     | z       |  1  | 0  | 0* |      Yes    |     No     |     Yes      | Harchaoui (2013) |
      __ __  __ __  __ __  __ __  __ __  __ __  __ __  __ __ __ __  __ __  __ __  __ __ __ _
 
-    :param input_scores: score collection, supplied as X dimensional array, could be a List or a X dimensional Matrix.
-    :param method: Elected method from the ones described previously
+    :param input_scores: score collection, supplied as n-dimensional array.
+                         Could be 1-dimensional (List) or n-dimensional (Matrix).
+    :param method: Elected method, among the previously described in the table.
                    Possible values ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
     :param graph: A network as a graph. It could be optional if a Kernel is provided
     :param kwargs: Optional arguments:
@@ -152,11 +168,8 @@ def diffuse(
         n_tot = len(names_ordered)
         n_bkgd = scores.mat.shape[0]
 
-        # normalisation is performed
-        # for each column, as it depends
-        # on the number of positives and negatives...
-        # n_pos and n_neg are vectors counting the number of
-        # positives and negatives in each column
+        # Normalisation is performed for each column, as it depends on the number of positives and negatives.
+        # n_pos and n_neg are vectors counting the number of positives and negatives in each column
         n_pos = np.sum(scores.mat, axis=0)
         n_neg = n_bkgd - n_pos
 
