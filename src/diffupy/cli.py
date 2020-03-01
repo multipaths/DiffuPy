@@ -40,13 +40,13 @@ def main():
 @main.command()
 @click.option(
     '-g', '--graph',
-    help='Path to the BEL graph',
+    help='Input path to the source BEL graph',
     default=os.path.join(DATA_DIR, 'pickles', 'pathme_universe_bel_graph_no_flatten.bel.pickle'),
     show_default=True
 )
 @click.option(
     '-o', '--output',
-    help='Output path to store kernel pickle',
+    help='Output path to store the generated kernel pickle',
     default=os.path.join(DATA_DIR, 'kernels'),
     show_default=True
 )
@@ -58,8 +58,8 @@ def kernel(graph: str,
            log: bool = None):
     """Generates a kernel for a given BEL graph.
 
-    :param graph: Path to the input BEL graph
-    :param output: Path to store  the output/generated kernel pickle
+    :param graph: Path to retrieve the input/source BEL graph
+    :param output: Path to store the output/generated kernel pickle
     :param isolates: Include isolates
     :param log: Activate debug mode
     :return: None
