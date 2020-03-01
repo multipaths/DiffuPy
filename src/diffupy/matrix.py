@@ -47,7 +47,7 @@ class Matrix:
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init_value)
 
         elif not list(mat):
-            raise ValueError('An input matrix or initialization should be provided.')
+            raise ValueError('An path matrix or initialization should be provided.')
 
         self.mat = np.array(mat)
 

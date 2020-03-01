@@ -17,8 +17,7 @@ from .utils import set_diagonal_matrix
 log = logging.getLogger(__name__)
 
 
-def commute_time_kernel(graph: nx.Graph,
-                        normalized: bool = False) -> Matrix:
+def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
     """Compute the commute-time kernel, which is the expected time of going back and forth between a couple of nodes.
     If the network is connected, then the commuted time kernel will be totally dense, therefore reflecting global
     properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the
@@ -36,9 +35,7 @@ def commute_time_kernel(graph: nx.Graph,
     return L
 
 
-def diffusion_kernel(graph: nx.Graph,
-                     sigma2: float = 1,
-                     normalized: bool = True) -> Matrix:
+def diffusion_kernel(graph: nx.Graph, sigma2: float = 1, normalized: bool = True) -> Matrix:
     """Computes the classical diffusion kernel that involves matrix exponentiation.
 
     It has a "bandwidth" parameter sigma^2 that controls the extent of the spreading.
@@ -53,7 +50,6 @@ def diffusion_kernel(graph: nx.Graph,
     :param normalized: Indicates if Laplacian transformation is normalized or not.
     :return: Laplacian representation of the graph
     """
-
     L = LaplacianMatrix(graph, normalized)
     L.mat = sp.linalg.expm(-sigma2 / 2 * L.mat)
 
@@ -81,9 +77,7 @@ def inverse_cosine_kernel(graph: nx.Graph) -> Matrix:
     return L
 
 
-def p_step_kernel(graph: nx.Graph,
-                  a: int = 2,
-                  p: int = 5) -> Matrix:
+def p_step_kernel(graph: nx.Graph, a: int = 2, p: int = 5) -> Matrix:
     """Compute the inverse cosine kernel, which is based on a cosine transform on the spectrum of the normalized
     Laplacian matrix.
 
@@ -125,7 +119,8 @@ def regularised_laplacian_kernel(
         graph: nx.Graph,
         sigma2: float = 1,
         add_diag: int = 1,
-        normalized: bool = False) -> Matrix:
+        normalized: bool = False
+) -> Matrix:
     """Compute the regularised Laplacian kernel, which is a standard in biological networks.
 
     The regularised Laplacian kernel arises in numerous situations, such as the finite difference formulation of the

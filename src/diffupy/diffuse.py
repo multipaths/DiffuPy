@@ -24,7 +24,7 @@ def diffuse(
         graph: nx.Graph = None,
         **kwargs
 ) -> Matrix:
-    """Manages the treatment of the different score diffusion methods applied of/from an input set of labels/scores
+    """Manages the treatment of the different score diffusion methods applied of/from an path set of labels/scores
     of/on a certain network (as a graph format or a graph kernel matrix stemming from a graph).
 
     Diffusion methods procedures provided in this package differ on:
@@ -35,10 +35,10 @@ def diffuse(
         (1) A named numeric vector, whereas if several of these vectors that share the node names need to be smoothed,
             they can be provided as
         (2) A column-wise matrix. However, if the unlabelled entities are not the same from one case to another,
-        (3) A named list of such score matrices can be passed to this function. The input format will be kept in the
+        (3) A named list of such score matrices can be passed to this function. The path format will be kept in the
             output.
 
-    If the input labels are not quantitative, i.e. positive(1), negative(0) and possibly unlabelled, all the scores
+    If the path labels are not quantitative, i.e. positive(1), negative(0) and possibly unlabelled, all the scores
     raw, gm, ml, z, mc, ber_s, ber_p can be used.
 
     Methods [method attribute to choose one node]:
@@ -79,8 +79,8 @@ def diffuse(
                  see the main vignette, and are inspired in [Harchaoui, 2013].
 
             {mc}: the score of node code {i} is based on its empirical p-value, computed by permuting
-                  the input {n.perm} times.
-                  It is roughly the proportion of input permutations that led to a diffusion score as
+                  the path {n.perm} times.
+                  It is roughly the proportion of path permutations that led to a diffusion score as
                   high or higher than the original diffusion score.
 
             {ber_p}: as used in [Bersanelli, 2016], this score combines raw and mc, in order to take into

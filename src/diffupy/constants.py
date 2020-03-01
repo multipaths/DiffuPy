@@ -4,14 +4,18 @@ import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 SOURCE_DIR = os.path.join(os.path.abspath(os.path.join(dir_path, os.pardir)))
-DATA_DIR = os.path.join(os.path.abspath(os.path.join(SOURCE_DIR, os.pardir)), 'data')
-KERNEL_DIR = os.path.join(DATA_DIR, 'kernels')
+
+DEFAULT_DIFFUPY_DIR = os.path.join(os.path.expanduser('~'), '.diffupy')
+OUTPUT = os.path.join(DEFAULT_DIFFUPY_DIR, 'output')
 
 
 def ensure_output_dirs():
     """Ensure that the output directories exists."""
-    os.makedirs(KERNEL_DIR, exist_ok=True)
+    os.makedirs(DEFAULT_DIFFUPY_DIR, exist_ok=True)
+    os.makedirs(OUTPUT, exist_ok=True)
 
+
+ensure_output_dirs()
 
 # TODO: Change to a dictionary where keys are better explanatory terms of each methode.
 #  ANSWER: The explanation is long and tedious, it is on diffuse.py header documentation.

@@ -19,11 +19,12 @@ def calculate_scores(
         scores: np.array,
         diff: np.array,
         const_mean: np.array,
-        const_var: np.array) -> float:
+        const_var: np.array
+) -> float:
     """Helper function for diffuse_raw, which operate the z-scores calculation given a whole column of the score matrix.
 
     :param col_ind: background object for the diffusion
-    :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column
+    :param scores: list of score matrices. For a single path with a single background, supply a list with a vector column
     :param diff: bool to indicate if z-scores be computed instead of raw scores
     :param const_mean: K optional matrix precomputed diffusion kernel
     :param const_var: K optional matrix precomputed diffusion kernel
@@ -36,7 +37,7 @@ def calculate_scores(
     s2 = np.sum(col_in ** 2)
 
     # means and vars depend on first and second moments
-    # of the input. This should be valid for non-binary
+    # of the path. This should be valid for non-binary
     # inputs as well
     score_means = const_mean * s1
     score_vars = const_var * (len(scores) * s2 - s1 ** 2)
@@ -53,13 +54,12 @@ def diffuse_raw(
     """ Computes the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
 
     :param graph: background network
-    :param scores: list of score matrices. For a single input with a single background, supply a list with a vector column
+    :param scores: list of score matrices. For a single path with a single background, supply a list with a vector column
     :param z-logical: bool to indicate if z-scores be computed instead of raw scores
     :param  K optional matrix precomputed diffusion kernel
     :return: A list of scores, with the same length and dimensions as scores
     """
     # Sanity checks
-
     _validate_scores(scores)
     logging.info('Scores validated.')
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-"""Sanity checks for input."""
+"""Sanity checks for path."""
 
 # .check_metric
 
@@ -44,9 +44,9 @@ def _validate_scores(scores: Matrix) -> None:
         #  Validate scores
 
         if score is None:
-            raise ValueError("Scores input cannot contain None.")
+            raise ValueError("Scores path cannot contain None.")
         elif score is ['NA', 'Nan', 'nan']:
-            raise ValueError("Scores input cannot contain NA values.")
+            raise ValueError("Scores path cannot contain NA values.")
 
         elif isinstance(score, np.int32) or isinstance(score, np.int64):
             score = int(score)
@@ -154,7 +154,7 @@ def _validate_K(k: Matrix) -> None:
     #         raise ValueError("'k' must be a numeric matrix, but it is not numeric.")
     #
     #     if score in ['Nan', None]:
-    #         raise ValueError("Scores input cannot contain NA, but background does.")
+    #         raise ValueError("Scores path cannot contain NA, but background does.")
     #
     #     if col_label in ['Nan', None] or row_label in ['Nan', None]:
     #         raise ValueError("'k' dimnames cannot be NA.")
