@@ -16,8 +16,7 @@ def generate_categoric_input_vector_from_labels(rows_labeled, col_label, backgro
     if rows_unlabeled:
         input_mat.row_bind(matrix=Matrix(rows_labels=list(rows_unlabeled),
                                          cols_labels=col_label,
-                                         init_value=0
-                                         )
+                                         init_value=0)
                            )
 
     return input_mat.match_missing_rows(background_mat.rows_labels, missing_value).match_rows(background_mat)
@@ -30,7 +29,8 @@ def generate_categoric_input_from_labels(rows_labels, cols_labels, background_ma
                                                                 cols_labels[0],
                                                                 background_mat,
                                                                 missing_value,
-                                                                rows_unlabeled[0])
+                                                                rows_unlabeled[0]
+                                                                )
 
         for idx, row_label in enumerate(rows_labels[1:]):
             input_vector = generate_categoric_input_vector_from_labels(row_label,
