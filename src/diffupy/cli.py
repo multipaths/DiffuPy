@@ -41,7 +41,7 @@ def main():
 @click.option('-l', '--log', is_flag=True, help='Activate debug mode')
 def kernel(
         path: str,
-        output: str,
+        output: str = OUTPUT,
         isolates: bool = None,
         log: bool = None
 ):
@@ -79,7 +79,7 @@ def kernel(
     background_mat = regularised_laplacian_kernel(graph)
     exe_t_f = time.time()
 
-    output_file = os.path.join(OUTPUT, f'{path.split("/")[-1]}.pickle')
+    output_file = os.path.join(output, f'{path.split("/")[-1]}.pickle')
 
     # Export numpy array
     with open(output_file, 'wb') as file:
