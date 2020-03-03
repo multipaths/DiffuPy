@@ -9,6 +9,7 @@ import time
 
 import click
 import networkx as nx
+import pybel
 
 from .constants import OUTPUT
 from .kernels import regularised_laplacian_kernel
@@ -62,7 +63,8 @@ def kernel(
     click.echo(f'Loading graph from {path}')
 
     # TODO Here goes a function that loads a graph using pandas from csv file and returns a networkx object
-    graph = ...
+    # Temporary is used the PyBEL import function
+    graph = pybel.from_pickle(path)
 
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
