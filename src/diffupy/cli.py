@@ -93,7 +93,7 @@ def kernel(
 @main.command()
 @click.option(
     '-p', '--path',
-    help='Path to the precalculated pickle',
+    help='Path to the pregenerated pickle',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
 )
@@ -108,7 +108,7 @@ def run(
         path: str,
         output: str,
 ):
-    """Run a diffusion method over a precalculated kernel."""
+    """Run a diffusion method over a pregenerated kernel."""
     raise NotImplementedError
 
 
