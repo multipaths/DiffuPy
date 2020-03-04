@@ -11,7 +11,7 @@ import click
 import networkx as nx
 import pybel
 
-from .constants import OUTPUT
+from .constants import OUTPUT, METHODS
 from .kernels import regularised_laplacian_kernel
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def main():
 
 @main.command()
 @click.option(
-    '-p', '--path',
+    '-n', '--network',
     help='Input network',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
@@ -92,24 +92,38 @@ def kernel(
 
 @main.command()
 @click.option(
-    '-p', '--path',
-    help='Path to the pregenerated pickle',
+    '-n', '--network',
+    help='Path to the network graph or kernel',
+    required=True,
+    type=click.Path(exists=True, dir_okay=False)
+)
+@click.option(
+    '-i', '--input',
+    help='Input data',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
 )
 @click.option(
     '-o', '--output',
-    help='Output path for results',
+    help='Output path for the results',
     default=OUTPUT,
     show_default=True,
     type=click.Path(exists=True, file_okay=False)
 )
-def run(
-        path: str,
+@click.option(
+    '-m', '--method',
+    help='Difussion method',
+    type=click.Choice(METHODS),
+)
+def diffuse(
+        network: str,
+        input: str,
         output: str,
+        method: str,
 ):
-    """Run a diffusion method over a pregenerated kernel."""
+    """Run a diffusion method over a network or pregenerated kernel."""
     raise NotImplementedError
+    #TODO : Process arguments and call diffuse
 
 
 if __name__ == '__main__':
