@@ -9,26 +9,34 @@ Installation
 
 .. code-block:: sh
 
-    $ python3 -m pip install git+https://github.com/jmarinllao/diffuPy.git@master
+    $ python3 -m pip install git+https://github.com/multipaths/DiffuPy.git@master
 
 2. or in editable mode with:
 
 .. code-block:: sh
 
-    $ git clone https://github.com/jmarinllao/diffuPy.git
+    $ git clone https://github.com/multipaths/DiffuPy.git
     $ cd diffupy
     $ python3 -m pip install -e .
 
-How to Use
-----------
+Command Line Interface
+----------------------
+The following commands can be used directly use from your terminal:
 
-1. **Generate Kernel**
-
-Generates the kernel of a given graph.
+1. **Run a diffusion analysis**
+The following command will run a diffusion method on a given network with the given data
 
 .. code-block:: sh
 
-    $ python3 -m diffupy kernel
+    $ python3 -m diffupy diffuse --network="<path-to-network-file>" --input="<path-to-data-file>" --method="<method>"
+
+
+2. **Generate a kernel with one of the seven methods implemented**
+Generates the regularised Laplian kernel of a given graph.
+
+.. code-block:: sh
+
+    $ python3 -m diffupy kernel --network="<path-to-network-file>"
 
 
 References
