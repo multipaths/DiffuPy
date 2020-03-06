@@ -114,6 +114,7 @@ def kernel(
     '-m', '--method',
     help='Difussion method',
     type=click.Choice(METHODS),
+    required=True,
 )
 def diffuse(
         network: str,
