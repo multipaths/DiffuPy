@@ -40,7 +40,7 @@ def main():
 @click.option('--isolates', is_flag=False, help='Include isolates')
 @click.option('-l', '--log', is_flag=True, help='Activate debug mode')
 def kernel(
-        path: str,
+        network: str,
         output: str = OUTPUT,
         isolates: bool = None,
         log: bool = None
@@ -60,11 +60,11 @@ def kernel(
         logging.basicConfig(level=logging.INFO)
         logger.setLevel(logging.INFO)
 
-    click.echo(f'Loading graph from {path}')
+    click.echo(f'Loading graph from {network}')
 
     # TODO Here goes a function that loads a graph using pandas from csv file and returns a networkx object
     # Temporary is used the PyBEL import function
-    graph = pybel.from_pickle(path)
+    graph = pybel.from_pickle(network)
 
     if isolates:
         click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
@@ -79,7 +79,7 @@ def kernel(
     background_mat = regularised_laplacian_kernel(graph)
     exe_t_f = time.time()
 
-    output_file = os.path.join(output, f'{path.split("/")[-1]}.pickle')
+    output_file = os.path.join(output, f'{network.split("/")[-1]}.pickle')
 
     # Export numpy array
     with open(output_file, 'wb') as file:
