@@ -17,19 +17,21 @@ __all__ = [
     'LaplacianMatrix',
 ]
 
+
 class Matrix:
     """Matrix class."""
 
-    def __init__(self,
-                 mat=None,
-                 rows_labels=None,
-                 cols_labels=None,
-                 graph=None,
-                 quadratic=False,
-                 name='',
-                 init_value=None,
-                 **kwargs):
-
+    def __init__(
+            self,
+            mat=None,
+            rows_labels=None,
+            cols_labels=None,
+            graph=None,
+            quadratic=False,
+            name='',
+            init_value=None,
+            **kwargs
+    ):
         """Initialize matrix."""
 
         if isinstance(rows_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
@@ -123,7 +125,9 @@ class Matrix:
             self.rows_labels = decode_labels(self.rows_labels)
             if len(self.rows_labels) != len(set(self.rows_labels)):
                 dup = get_repeated_labels(self.rows_labels)
-                raise Exception('Duplicate row labels in Matrix. /n duplicated number: {} /n duplicated list: {}'.format(len(dup),  dup))
+                raise Exception(
+                    'Duplicate row labels in Matrix. /n duplicated number: {} /n duplicated list: {}'.format(len(dup),
+                                                                                                             dup))
 
         if hasattr(self, '_cols_labels'):
             self._cols_labels = decode_labels(self.cols_labels)
