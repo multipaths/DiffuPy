@@ -2,5 +2,5 @@ Command Line Interface
 ======================
 DiffuPy Command Line Interface
 
-.. automodule:: diffupy.cli
-   :members:
+.. click:: diffupy.cli:main
+   :prog: diffupy
