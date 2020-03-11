@@ -17,12 +17,10 @@ def ensure_output_dirs():
 
 ensure_output_dirs()
 
-# TODO: Change to a dictionary where keys are better explanatory terms of each methode.
-#  ANSWER: The explanation is long and tedious, it is on diffuse.py header documentation.
-#  Should I provide it here too?
-
 #  Available methods for diffusion, as a character vector
 #  Check diffuse docs for the detailed explanation of each
+
+EMOJI = "🌐"
 
 METHODS = {
     "raw",
@@ -31,5 +29,5 @@ METHODS = {
     "mc",
     "z",
     "ber_s",
-    "ber_p"
+    "ber_p",
 }

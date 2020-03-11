@@ -11,7 +11,7 @@ import click
 import networkx as nx
 import pybel
 
-from .constants import OUTPUT, METHODS
+from .constants import OUTPUT, METHODS, EMOJI
 from .kernels import regularised_laplacian_kernel
 
 logger = logging.getLogger(__name__)
@@ -60,7 +60,7 @@ def kernel(
         logging.basicConfig(level=logging.INFO)
         logger.setLevel(logging.INFO)
 
-    click.echo(f'Loading graph from {network}')
+    click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
 
     # TODO Here goes a function that loads a graph using pandas from csv file and returns a networkx object
     # Temporary is used the PyBEL import function
@@ -73,7 +73,8 @@ def kernel(
             for node in nx.isolates(graph)
         })
 
-    click.echo("Calculating regulatised Laplacian kernel. This might take a while...")
+    click.secho(f'{EMOJI} Calculating regulatised Laplacian kernel. This might take a while... {EMOJI}')
+
 
     exe_t_0 = time.time()
     background_mat = regularised_laplacian_kernel(graph)
@@ -87,7 +88,7 @@ def kernel(
 
     running_time = exe_t_f - exe_t_0
 
-    click.echo(f'Kernel exported to: {output_file} in {running_time} seconds"')
+    click.secho(f'{EMOJI} Kernel exported to: {output_file} in {running_time} seconds {EMOJI}')
 
 
 @main.command()
