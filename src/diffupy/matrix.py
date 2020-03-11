@@ -7,7 +7,8 @@ import os
 
 import numpy as np
 
-from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, decode_labels, get_idx_scores_mapping
+from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, decode_labels, get_idx_scores_mapping, \
+    get_repeated_labels
 
 log = logging.getLogger(__name__)
 
@@ -117,7 +118,8 @@ class Matrix:
         if self.rows_labels:
             self.rows_labels = decode_labels(self.rows_labels)
             if len(self.rows_labels) != len(set(self.rows_labels)):
-                raise Exception('Duplicate row labels in Matrix.')
+                dup = get_repeated_labels(self.rows_labels)
+                raise Exception('Duplicate row labels in Matrix. /n duplicated number: {} /n duplicated list: {}'.format(len(dup),  dup))
 
         if hasattr(self, '_cols_labels'):
             self._cols_labels = decode_labels(self.cols_labels)

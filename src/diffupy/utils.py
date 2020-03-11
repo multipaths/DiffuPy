@@ -85,6 +85,18 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
     raise Warning('Could not get a label list from graph.')
 
 
+def get_repeated_labels(labels):
+
+    seen = set()
+    rep = []
+    for x in labels:
+        if x in seen:
+            rep.append(x)
+        seen.add(x)
+
+    return rep
+
+
 def get_label_ix_mapping(labels):
     """Get label to mat index mappings."""
     return {label: i for i, label in enumerate(labels)}
