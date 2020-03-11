@@ -10,12 +10,15 @@ import networkx as nx
 import numpy as np
 
 from .diffuse_raw import diffuse_raw
+from .matrix import Matrix
 from .utils import get_label_list_graph
 from .validate_input import _validate_scores
 
-from .matrix import Matrix
-
 log = logging.getLogger(__name__)
+
+__all__ = [
+    'diffuse',
+]
 
 
 def diffuse(

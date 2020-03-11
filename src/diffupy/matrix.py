@@ -12,6 +12,10 @@ from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, de
 
 log = logging.getLogger(__name__)
 
+__all__ = [
+    'Matrix',
+    'LaplacianMatrix',
+]
 
 class Matrix:
     """Matrix class."""
