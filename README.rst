@@ -50,7 +50,7 @@ DiffuPy is a scientific software that has been developed in an academic capacity
 .. |build| image:: https://travis-ci.com/multipaths/diffupy.svg?branch=master
     :target: https://travis-ci.com/multipaths/diffupy
     :alt: Build Status
-    
+
 .. |docs| image:: http://readthedocs.org/projects/diffupy/badge/?version=latest
     :target: https://diffupy.readthedocs.io/en/latest/
     :alt: Documentation Status
