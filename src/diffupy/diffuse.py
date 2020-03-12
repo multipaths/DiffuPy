@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-"""This module provides a generalized function as an interface to interact with the different diffusion methods
-   offered in this diffuPy package."""
+"""This module provides a generalized function as an interface to interact with the different diffusion methods offered
+in this diffuPy package.
+"""
 
 import copy
 import logging
@@ -27,7 +28,7 @@ def diffuse(
         graph: nx.Graph = None,
         **kwargs
 ) -> Matrix:
-    """Manages the treatment of the different score diffusion methods applied of/from an path set of labels/scores
+    """Manage the treatment of the different score diffusion methods applied of/from an path set of labels/scores
     of/on a certain network (as a graph format or a graph kernel matrix stemming from a graph).
 
     Diffusion methods procedures provided in this package differ on:

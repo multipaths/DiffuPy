@@ -66,8 +66,7 @@ def diffusion_kernel(graph: nx.Graph, sigma2: float = 1, normalized: bool = True
 
 
 def inverse_cosine_kernel(graph: nx.Graph) -> Matrix:
-    """Compute the inverse cosine kernel, which is based on a cosine transform
-    on the spectrum of the normalized Laplacian matrix.
+    """Compute the inverse cosine kernel, which is based on a cosine transform  on the spectrum of the normalized LM.
 
     Quoting [Smola, 2003]: the inverse cosine kernel treats lower complexity
     functions almost equally, with a significant reduction in the upper end of the spectrum.
@@ -80,15 +79,14 @@ def inverse_cosine_kernel(graph: nx.Graph) -> Matrix:
     # Decompose matrix (Singular Value Decomposition)
     laplacian = LaplacianMatrix(graph, normalized=True)
     # Decompose matrix (Singular Value Decomposition)
-    U, S, _ = np.linalg.svd(laplacian.mat * (pi / 4))
-    laplacian.mat = np.matmul(np.matmul(U, np.diag(np.cos(S))), np.transpose(U))
+    u, s, _ = np.linalg.svd(laplacian.mat * (pi / 4))
+    laplacian.mat = np.matmul(np.matmul(u, np.diag(np.cos(s))), np.transpose(u))
 
     return laplacian
 
 
 def p_step_kernel(graph: nx.Graph, a: int = 2, p: int = 5) -> Matrix:
-    """Compute the inverse cosine kernel, which is based on a cosine transform on the spectrum of the normalized
-    Laplacian matrix.
+    """Compute the inverse cosine kernel, which is based on a cosine transform on the spectrum of the normalized LM.
 
     This kernel is more focused on local properties of the nodes, because random walks
     are limited in terms of length. Therefore, if p is small, only a fraction of the values K(x1,x2)

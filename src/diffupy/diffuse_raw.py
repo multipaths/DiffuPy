@@ -26,7 +26,7 @@ def calculate_scores(
         const_mean: np.array,
         const_var: np.array
 ) -> float:
-    """Helper function for diffuse_raw, which operate the z-scores calculation given a whole column of the score matrix.
+    """Help function for diffuse_raw, which operate the z-scores calculation given a whole column of the score matrix.
 
     :param col_ind: background object for the diffusion
     :param scores: list of score matrices. For a single path with a single background, supply a list with a vector column
@@ -55,8 +55,8 @@ def diffuse_raw(
         scores: Matrix,
         z: bool = False,
         K: Matrix = None,
-        **karg) -> Matrix:
-    """ Computes the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
+    ) -> Matrix:
+    """Compute the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
 
     :param graph: background network
     :param scores: list of score matrices. For a single path with a single background, supply a list with a vector column
