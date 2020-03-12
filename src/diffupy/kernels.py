@@ -37,10 +37,10 @@ def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
     """
     # Apply pseudo-inverse (moore-penrose) of laplacian matrix
 
-    L = LaplacianMatrix(graph, normalized)
-    L.mat = np.linalg.pinv(L.mat)
+    laplacian = LaplacianMatrix(graph, normalized)
+    laplacian.mat = np.linalg.pinv(laplacian.mat)
 
-    return L
+    return laplacian
 
 
 def diffusion_kernel(graph: nx.Graph, sigma2: float = 1, normalized: bool = True) -> Matrix:
@@ -58,10 +58,10 @@ def diffusion_kernel(graph: nx.Graph, sigma2: float = 1, normalized: bool = True
     :param normalized: Indicates if Laplacian transformation is normalized or not.
     :return: Laplacian representation of the graph
     """
-    L = LaplacianMatrix(graph, normalized)
-    L.mat = sp.linalg.expm(-sigma2 / 2 * L.mat)
+    laplacian = LaplacianMatrix(graph, normalized)
+    laplacian.mat = sp.linalg.expm(-sigma2 / 2 * laplacian.mat)
 
-    return L
+    return laplacian
 
 
 def inverse_cosine_kernel(graph: nx.Graph) -> Matrix:
@@ -77,12 +77,12 @@ def inverse_cosine_kernel(graph: nx.Graph) -> Matrix:
     :return: Laplacian representation of the graph
     """
     # Decompose matrix (Singular Value Decomposition)
-    L = LaplacianMatrix(graph, normalized=True)
+    laplacian = LaplacianMatrix(graph, normalized=True)
     # Decompose matrix (Singular Value Decomposition)
-    U, S, _ = np.linalg.svd(L.mat * (pi / 4))
-    L.mat = np.matmul(np.matmul(U, np.diag(np.cos(S))), np.transpose(U))
+    U, S, _ = np.linalg.svd(laplacian.mat * (pi / 4))
+    laplacian.mat = np.matmul(np.matmul(U, np.diag(np.cos(S))), np.transpose(U))
 
-    return L
+    return laplacian
 
 
 def p_step_kernel(graph: nx.Graph, a: int = 2, p: int = 5) -> Matrix:
@@ -101,8 +101,8 @@ def p_step_kernel(graph: nx.Graph, a: int = 2, p: int = 5) -> Matrix:
     :param p: p-step kernels can be cheaper to compute and have been successful in biological tasks.
     :return: Laplacian repr'esentation of the graph.
     """
-    M = LaplacianMatrix(graph, normalized=True)
-    M.mat = -M.mat
+    laplacian = LaplacianMatrix(graph, normalized=True)
+    laplacian.mat = -laplacian.mat
 
     # Not optimal but keep for clarity
     # here we restrict to the normalised version, as the eigenvalues are
@@ -113,14 +113,14 @@ def p_step_kernel(graph: nx.Graph, a: int = 2, p: int = 5) -> Matrix:
     if p < 0:
         sys.exit('p must be greater than 0')
 
-    M.mat = set_diagonal_matrix(M.mat, [x + a for x in np.diag(M.mat)])
+    laplacian.mat = set_diagonal_matrix(laplacian.mat, [x + a for x in np.diag(laplacian.mat)])
 
     if p == 1:
-        return M
+        return laplacian
 
-    M.mat = np.linalg.matrix_power(M.mat, p)
+    laplacian.mat = np.linalg.matrix_power(laplacian.mat, p)
 
-    return M
+    return laplacian
 
 
 def regularised_laplacian_kernel(

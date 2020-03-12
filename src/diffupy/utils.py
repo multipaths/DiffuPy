@@ -10,7 +10,6 @@ import networkx as nx
 import numpy as np
 import pybel
 
-
 log = logging.getLogger(__name__)
 
 
@@ -28,7 +27,7 @@ def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
 
 
 def set_diagonal_matrix(matrix, d):
-    """  """
+    """Set diagonal matrix."""
     for j, row in enumerate(matrix):
         for i, x in enumerate(row):
             if i == j:
@@ -39,6 +38,7 @@ def set_diagonal_matrix(matrix, d):
 
 
 def get_label_node(node: nx.Graph.node) -> str:
+    """Get label node."""
     if hasattr(node, 'name') and node.name is not None:
         if node.name.lower() == "":
             log.debug(f'Empty attribute name: {node.as_bel()}')
@@ -86,7 +86,7 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
 
 
 def get_repeated_labels(labels):
-
+    """Get duplicate labels."""
     seen = set()
     rep = []
     for x in labels:
@@ -145,16 +145,16 @@ def print_dict_dimensions(entities_db, title):
 
 
 def get_simplegraph_from_multigraph(multigraph):
-
-    G = nx.Graph()
+    """Convert undirected graph from multigraph."""
+    graph = nx.Graph()
     for u, v, data in multigraph.edges(data=True):
         u = get_label_node(u)
         v = get_label_node(v)
 
         w = data['weight'] if 'weight' in data else 1.0
-        if G.has_edge(u, v):
-            G[u][v]['weight'] += w
+        if graph.has_edge(u, v):
+            graph[u][v]['weight'] += w
         else:
-            G.add_edge(u, v, weight=w)
+            graph.add_edge(u, v, weight=w)
 
-    return G
+    return graph
