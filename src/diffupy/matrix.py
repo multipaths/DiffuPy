@@ -64,6 +64,7 @@ class Matrix:
         self.validate_labels()
 
     def __str__(self):
+        """Return string version of the matrix class."""
         s = f"        {self.cols_labels}"
 
         for i, row_label in enumerate(self.rows_labels):
@@ -72,6 +73,7 @@ class Matrix:
         return f"\nmatrix {self.name} \n  {s} \n "
 
     def __iter__(self, **kargs):
+        """Helper method for the matrix class."""
         self.i = -1
         self.j = 0
 
@@ -83,6 +85,7 @@ class Matrix:
         return self
 
     def __next__(self):
+        """Helper method for the matrix class."""
         if self.i >= len(self.rows_labels) - 1 and self.j >= len(self.cols_labels) - 1:
             self.get_labels = True
             self.get_indices = False
@@ -152,7 +155,6 @@ class Matrix:
     @property
     def cols_labels(self):
         """Return a copy of Matrix Object."""
-
         if self.quadratic:
             return self.rows_labels
 
@@ -160,6 +162,7 @@ class Matrix:
 
     @cols_labels.setter
     def cols_labels(self, cols_labels):
+        """Set column labels."""
         if self.quadratic:
             self.rows_labels = list(cols_labels)
         else:
@@ -168,6 +171,7 @@ class Matrix:
     # Rows ix mapping
     @property
     def rows_labels_ix_mapping(self):
+        """Set row labels to ix."""
         if hasattr(self, '_rows_labels_ix_mapping'):
             return self._rows_labels_ix_mapping
 
@@ -176,11 +180,13 @@ class Matrix:
 
     @rows_labels_ix_mapping.setter
     def rows_labels_ix_mapping(self, rows_labels_ix_mapping):
+        """Set labels labels to ix."""
         self._rows_labels_ix_mapping = rows_labels_ix_mapping
 
     # Columns ix mapping
     @property
     def cols_labels_ix_mapping(self):
+        """Set column labels to ix."""
         if self.quadratic:
             return self.rows_labels_ix_mapping
 
@@ -192,6 +198,7 @@ class Matrix:
 
     @cols_labels_ix_mapping.setter
     def cols_labels_ix_mapping(self, cols_labels_ix_mapping):
+        """Set mapping labels to ix."""
         if self.quadratic:
             self._rows_labels_ix_mapping = cols_labels_ix_mapping
 
@@ -200,6 +207,7 @@ class Matrix:
     # Rows scores mapping
     @property
     def rows_idx_scores_mapping(self):
+        """Set mapping indexes to scores."""
         if hasattr(self, '_rows_idx_scores_mapping'):
             return self._rows_idx_scores_mapping
 
@@ -209,11 +217,13 @@ class Matrix:
 
     @rows_idx_scores_mapping.setter
     def rows_idx_scores_mapping(self, rows_idx_scores_mapping):
+        """Set mapping rows to ids."""
         self._rows_idx_scores_mapping = rows_idx_scores_mapping
 
     # Columns scores mapping
     @property
     def cols_idx_scores_mapping(self):
+        """Set mapping indexes to scores."""
         if hasattr(self, '_cols_idx_scores_mapping'):
             return self._cols_idx_scores_mapping
 
@@ -230,24 +240,28 @@ class Matrix:
     """Getters from labels"""
 
     def set_row_from_label(self, label, x):
+        """Set row from label."""
         self.mat[self.rows_labels_ix_mapping[label]] = x
 
     def get_row_from_label(self, label):
+        """Get row from labels."""
         return self.mat[self.rows_labels_ix_mapping[label]]
 
     def set_col_from_label(self, label, x):
+        """Set col from label."""
         self.mat[:, self.cols_labels_ix_mapping[label]] = x
 
     def get_col_from_label(self, label):
+        """Get col from labels."""
         return self.mat[:, self.cols_labels_ix_mapping[label]]
 
     def set_cell_from_labels(self, row_label, col_label, x):
+        """Set cell from labels."""
         self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]] = x
 
     def get_cell_from_labels(self, row_label, col_label):
+        """Get cell from labels."""
         return self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]]
-
-    # TODO: este nombre es un poco confuso no?
 
     """Methods"""
 
@@ -255,7 +269,6 @@ class Matrix:
 
     def row_bind(self, rows=None, rows_labels=None, matrix=None):
         """Return a copy of Matrix Object."""
-
         if matrix:
             rows = matrix.mat
             rows_labels = matrix.rows_labels
@@ -269,7 +282,6 @@ class Matrix:
 
     def col_bind(self, cols=None, cols_labels=None, matrix=None):
         """Return a copy of Matrix Object."""
-
         if matrix:
             cols = matrix.mat
             cols_labels = matrix.cols_labels
@@ -285,7 +297,6 @@ class Matrix:
 
     def match_rows(self, reference_matrix):
         """Match method to set rows labels as reference matrix."""
-
         if self.quadratic:
             log.warning('Changing rows of a symmetric Matrix implies changing also columns.')
             return self.match_mat(reference_matrix, True)
@@ -302,7 +313,6 @@ class Matrix:
 
     def match_cols(self, reference_matrix):
         """Match method to set cols labels as reference matrix."""
-
         if reference_matrix.cols_labels == reference_matrix.cols_labels:
             return self
 
@@ -322,7 +332,6 @@ class Matrix:
 
     def match_mat(self, reference_matrix, match_quadratic=None):
         """Match method to set axis labels as reference matrix."""
-
         if reference_matrix.cols_labels == self.cols_labels and reference_matrix.rows_labels == self.rows_labels:
             return self
 
@@ -348,7 +357,6 @@ class Matrix:
 
     def match_missing_rows(self, reference_labels, missing_fill):
         """Match method to set missing rows labels from reference labels with the missing_fill value."""
-
         if reference_labels == self.rows_labels:
             return self
 
@@ -368,7 +376,6 @@ class Matrix:
 
     def match_missing_cols(self, reference_labels, missing_fill):
         """Match method to set missing cols labels from reference labels with the missing_fill value."""
-
         if reference_labels == self.cols_labels:
             return self
 
@@ -391,7 +398,6 @@ class Matrix:
 
     def order_rows(self, reverse=True, col_ref_idx=None):
         """Order matrix rows by cell values."""
-
         # Get the row index-cell value mapping.
         mapping = self.rows_idx_scores_mapping
 
@@ -419,7 +425,6 @@ class Matrix:
 
     def from_csv(csv_path):
         """Import matrix from csv file using the headers as a Matrix class."""
-
         m = np.genfromtxt(csv_path, dtype=None, delimiter=',')
         return Matrix(
             mat=np.array(
@@ -434,8 +439,9 @@ class Matrix:
         )
 
 
-# TODO: Poner que es matriz simetrica
 class LaplacianMatrix(Matrix):
+    """Laplacian matrix class"""
+
     def __init__(self, graph, normalized=False, name=''):
         l_mat = get_laplacian(graph, normalized)
 
