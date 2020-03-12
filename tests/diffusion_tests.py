@@ -3,12 +3,12 @@
 """Tests checking kernel functions py implementation based on R package computations."""
 
 import logging
-import networkx as nx
-import numpy as np
 import unittest
 
-from diffupy.diffuse import diffuse
+import networkx as nx
+import numpy as np
 
+from diffupy.diffuse import diffuse
 from diffupy.matrix import Matrix
 from .constants import *
 
@@ -17,9 +17,9 @@ log = logging.getLogger(__name__)
 """Helper functions for testing"""
 
 
-def _run_diffusion_method_test(method, G, input_scores, test_output_scores):
-    """Helper for test class."""
-    computed_output_scores = diffuse(input_scores, method, graph=G)
+def _run_diffusion_method_test(method, g, input_scores, test_output_scores):
+    """Help for test class."""
+    computed_output_scores = diffuse(input_scores, method, graph=g)
 
     if isinstance(computed_output_scores, Matrix):
         computed_output_scores = computed_output_scores.mat
@@ -39,6 +39,7 @@ def _run_diffusion_method_test(method, G, input_scores, test_output_scores):
 
 class DiffuseTest(unittest.TestCase):
     """Test diffusion methods."""
+
     graph = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
     _run_diffusion_method_test('raw', graph, INPUT_SCORES, OUTPUT_RAW_SCORES)

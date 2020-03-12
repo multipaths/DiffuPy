@@ -37,7 +37,6 @@ def diffuse(
     :return: The diffused scores within the matrix transformation of the network, with the diffusion operation
              [k x input_vector] performed
     """
-
     # Sanity checks
     scores = copy.copy(input_scores)
 

@@ -16,7 +16,6 @@ from .utils import set_diagonal_matrix
 
 log = logging.getLogger(__name__)
 
-
 __all__ = [
     'diffusion_kernel',
     'commute_time_kernel',
@@ -24,6 +23,7 @@ __all__ = [
     'regularised_laplacian_kernel',
     'p_step_kernel',
 ]
+
 
 def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
     """Compute the commute-time kernel, which is the expected time of going back and forth between a couple of nodes.

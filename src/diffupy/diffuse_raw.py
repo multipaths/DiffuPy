@@ -55,7 +55,7 @@ def diffuse_raw(
         scores: Matrix,
         z: bool = False,
         k: Matrix = None,
-    ) -> Matrix:
+) -> Matrix:
     """Compute the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
 
     :param graph: background network

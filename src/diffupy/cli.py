@@ -75,7 +75,6 @@ def kernel(
 
     click.secho(f'{EMOJI} Calculating regulatised Laplacian kernel. This might take a while... {EMOJI}')
 
-
     exe_t_0 = time.time()
     background_mat = regularised_laplacian_kernel(graph)
     exe_t_f = time.time()
