@@ -9,7 +9,7 @@ import numpy as np
 
 from .kernels import regularised_laplacian_kernel
 from .matrix import Matrix
-from .validate_input import _validate_scores, _validate_graph, _validate_K
+from .validate_input import _validate_scores, _validate_graph, _validate_k
 
 logger = logging.getLogger()
 
@@ -31,8 +31,8 @@ def calculate_scores(
     :param col_ind: background object for the diffusion
     :param scores: list of score matrices. For a single path with a single background, supply a list with a vector column
     :param diff: bool to indicate if z-scores be computed instead of raw scores
-    :param const_mean: K optional matrix precomputed diffusion kernel
-    :param const_var: K optional matrix precomputed diffusion kernel
+    :param const_mean: k optional matrix precomputed diffusion kernel
+    :param const_var: k optional matrix precomputed diffusion kernel
     :return:  Calculated column z-score
     """
     col_in = scores[:, col_ind]
@@ -54,14 +54,14 @@ def diffuse_raw(
         graph: nx.Graph,
         scores: Matrix,
         z: bool = False,
-        K: Matrix = None,
+        k: Matrix = None,
     ) -> Matrix:
     """Compute the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
 
     :param graph: background network
-    :param scores: list of score matrices. For a single path with a single background, supply a list with a vector column
-    :param z-logical: bool to indicate if z-scores be computed instead of raw scores
-    :param  K optional matrix precomputed diffusion kernel
+    :param scores: list of score matrices. For a single path with a single background, supply a list with a vector col
+    :param z: bool to indicate if z-scores be computed instead of raw scores
+    :param k: optional matrix precomputed diffusion kernel
     :return: A list of scores, with the same length and dimensions as scores
     """
     # Sanity checks
@@ -69,9 +69,9 @@ def diffuse_raw(
     logging.info('Scores validated.')
 
     # Get the Kernel
-    if K:
-        kernel = copy.copy(K)
-        _validate_K(kernel)
+    if k:
+        kernel = copy.copy(k)
+        _validate_k(kernel)
         logging.info('Using supplied kernel matrix...')
     elif graph:
         _validate_graph(graph)

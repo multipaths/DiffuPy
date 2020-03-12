@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""This module provides a generalized function as an interface to interact with the different diffusion methods offered
-in this diffuPy package.
-"""
+"""This module provides a generalized function as an interface to interact with the different diffusion methods."""
 
 import copy
 import logging
@@ -28,8 +26,7 @@ def diffuse(
         graph: nx.Graph = None,
         **kwargs
 ) -> Matrix:
-    """Manage the treatment of the different score diffusion methods applied of/from an path set of labels/scores
-    of/on a certain network (as a graph format or a graph kernel matrix stemming from a graph).
+    """Run diffusion on a network given an input and a diffusion method.
 
     Diffusion methods procedures provided in this package differ on:
         (a) How to distinguish positives, negatives and unlabelled examples.
@@ -54,9 +51,9 @@ def diffuse(
                     nodes introduce null diffusion {y_raw[j] = 0}.
                     [Vandin, 2011]. They are computed as:
 
-                    f_{raw} = K · y_{raw}
+                    f_{raw} = k · y_{raw}
 
-                    where K is a graph kernel, see kernels.py.
+                    where k is a graph kernel, see kernels.py.
                     These scores treat negative and unlabelled nodes equivalently.
 
             {ml}:   same as raw, but negative nodes introduce a negative unit of flow.
@@ -119,10 +116,10 @@ def diffuse(
                    Possible values ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
     :param graph: A network as a graph. It could be optional if a Kernel is provided
     :param kwargs: Optional arguments:
-                    - K: a  kernel [matrix] steaming from a graph, thus sparing the graph transformation process
+                    - k: a  kernel [matrix] steaming from a graph, thus sparing the graph transformation process
                     - Other arguments which would differ depending on the chosen method
     :return: The diffused scores within the matrix transformation of the network, with the diffusion operation
-             [K x input_vector] performed
+             [k x input_vector] performed
 
     """
 
@@ -135,8 +132,8 @@ def diffuse(
     if graph:
         format_network = "graph"
     else:
-        if "K" not in kwargs:
-            raise ValueError("Neither a graph 'graph' or a kernel 'K' has been provided.")
+        if "k" not in kwargs:
+            raise ValueError("Neither a graph 'graph' or a kernel 'k' has been provided.")
         format_network = "kernel"
 
     if method == "raw":
@@ -164,7 +161,7 @@ def diffuse(
         if format_network == "graph":
             names_ordered = get_label_list_graph(graph, 'name')
         elif format_network == "kernel":
-            names_ordered = kwargs['K'].rows_labels
+            names_ordered = kwargs['k'].rows_labels
 
         # If the graph is defined
         ids_nobkgd = set(names_ordered) - set(scores.rows_labels)

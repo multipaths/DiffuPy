@@ -37,7 +37,6 @@ def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
     :return: Laplacian representation of the graph.
     """
     # Apply pseudo-inverse (moore-penrose) of laplacian matrix
-
     laplacian = LaplacianMatrix(graph, normalized)
     laplacian.mat = np.linalg.pinv(laplacian.mat)
 
@@ -49,7 +48,7 @@ def diffusion_kernel(graph: nx.Graph, sigma2: float = 1, normalized: bool = True
 
     It has a "bandwidth" parameter sigma^2 that controls the extent of the spreading.
     Quoting [Smola, 2003]:
-    K(x1,x2) can be visualized as the quantity of some substance that would accumulate at
+    k(x1,x2) can be visualized as the quantity of some substance that would accumulate at
     vertex x2 after a given amount of time if we injected the substance at vertex x1 and let
     it diffuse through the graph along the edges.
 
@@ -89,7 +88,7 @@ def p_step_kernel(graph: nx.Graph, a: int = 2, p: int = 5) -> Matrix:
     """Compute the inverse cosine kernel, which is based on a cosine transform on the spectrum of the normalized LM.
 
     This kernel is more focused on local properties of the nodes, because random walks
-    are limited in terms of length. Therefore, if p is small, only a fraction of the values K(x1,x2)
+    are limited in terms of length. Therefore, if p is small, only a fraction of the values k(x1,x2)
     will be non-null if the network is sparse [Smola, 2003]. The parameter a is a regularising term
     that is summed to the spectrum of the normalised Laplacian matrix, and has to be 2 or greater.
     The p-step kernels can be cheaper to compute and have been successful in biological tasks, see the benchmark in

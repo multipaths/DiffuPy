@@ -33,7 +33,6 @@ class Matrix:
             **kwargs
     ):
         """Initialize matrix."""
-
         if isinstance(rows_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
             self.rows_labels = list(rows_labels)
         elif graph:
@@ -423,7 +422,7 @@ class Matrix:
 
     """Import"""
 
-    def from_csv(csv_path):
+    def from_csv(self, csv_path):
         """Import matrix from csv file using the headers as a Matrix class."""
         m = np.genfromtxt(csv_path, dtype=None, delimiter=',')
         return Matrix(
@@ -440,7 +439,7 @@ class Matrix:
 
 
 class LaplacianMatrix(Matrix):
-    """Laplacian matrix class"""
+    """Laplacian matrix class."""
 
     def __init__(self, graph, normalized=False, name=''):
         """Initialize object."""

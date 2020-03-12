@@ -126,7 +126,7 @@ def decode_labels(labels):
 
 
 def print_dict_dimensions(entities_db, title):
-    """Print dimension of the dictionary"""
+    """Print dimension of the dictionary."""
     total = 0
     print(title)
     for k1, v1 in entities_db.items():

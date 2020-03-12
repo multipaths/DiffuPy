@@ -14,7 +14,7 @@ from .utils import get_label_list_graph
 
 
 def _validate_method(method: str) -> None:
-    """Ensures that 'method' is a valid character."""
+    """Ensure that 'method' is a valid character."""
     if not isinstance(method, str):
         raise ValueError(f"The supplied 'method' must be a string. The given argument is a {type(method)}")
 
@@ -101,8 +101,8 @@ def _validate_graph(graph: nx.Graph) -> None:
             raise Warning("'graph' should not contain negative edge weights.")
 
 
-def _validate_K(k: Matrix) -> None:
-    """Check kernel sanity: Ensures that 'k' is a formally valid kernel. Does not check for spd"""
+def _validate_k(k: Matrix) -> None:
+    """Check kernel sanity: Ensures that 'k' is a formally valid kernel."""
     if not isinstance(k, Matrix):
         raise ValueError("'k' must be a Matrix object")
 

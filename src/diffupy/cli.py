@@ -125,7 +125,7 @@ def diffuse(
 ):
     """Run a diffusion method over a network or pregenerated kernel."""
     raise NotImplementedError
-    #TODO : Process arguments and call diffuse
+    # TODO : Process arguments and call diffuse
 
 
 if __name__ == '__main__':
