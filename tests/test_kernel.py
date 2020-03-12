@@ -16,7 +16,7 @@ from diffupy.kernels import (
     regularised_laplacian_kernel,
 )
 from diffupy.matrix import Matrix
-from .constants import *
+from tests.constants import *
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 def _run_kernel_test(kernel_func, g, validate_matrix_path):
     """Run kernel test."""
     matrix = kernel_func(g)
-    v = Matrix.from_csv(validate_matrix_path)
+    v = Matrix.from_csv(validate_matrix_path, DIFFUSION_KERNEL)
 
     logging.info(' %s  \n %s\n', 'Computed matrix', matrix)
     logging.info(' %s  \n %s\n', 'Test matrix', v)
