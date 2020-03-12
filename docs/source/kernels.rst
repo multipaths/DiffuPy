@@ -2,5 +2,5 @@ Kernel
 ======
 Pool of kernels available at DiffuPy.
 
-.. automodule:: diffupy.kernel
+.. automodule:: diffupy.kernels
    :members:
