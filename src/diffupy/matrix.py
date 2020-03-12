@@ -400,7 +400,7 @@ class Matrix:
                 mapping = {k: v[col_ref_idx] for k, v in mapping.items()}
 
             else:
-                mapping = {k: sm(v) for k, v in mapping.items()}
+                raise ValueError('Please use integers as indexes')
 
         # Get a list of index ordered by row values.
         idx_order = [k for k in sorted(mapping, key=mapping.get, reverse=reverse)]
