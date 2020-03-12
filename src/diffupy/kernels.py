@@ -27,6 +27,7 @@ __all__ = [
 
 def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
     """Compute the commute-time kernel, which is the expected time of going back and forth between a couple of nodes.
+
     If the network is connected, then the commuted time kernel will be totally dense, therefore reflecting global
     properties of the network. For further details, see [Yen, 2007]. This kernel can be computed using both the
     unnormalised and normalised graph Laplacian.
@@ -44,7 +45,7 @@ def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
 
 
 def diffusion_kernel(graph: nx.Graph, sigma2: float = 1, normalized: bool = True) -> Matrix:
-    """Computes the classical diffusion kernel that involves matrix exponentiation.
+    """Compute the classical diffusion kernel that involves matrix exponentiation.
 
     It has a "bandwidth" parameter sigma^2 that controls the extent of the spreading.
     Quoting [Smola, 2003]:

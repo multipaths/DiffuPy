@@ -15,7 +15,6 @@ from .utils import get_label_list_graph
 
 def _validate_method(method: str) -> None:
     """Ensures that 'method' is a valid character."""
-
     if not isinstance(method, str):
         raise ValueError(f"The supplied 'method' must be a string. The given argument is a {type(method)}")
 
@@ -28,7 +27,6 @@ def _validate_method(method: str) -> None:
 
 def _validate_scores(scores: Matrix) -> None:
     """Check scores sanity: Ensures that scores are suitable for diffusion."""
-
     #  Check labels list
     if not scores.cols_labels:
         raise ValueError("Scores must be a named list but supplied list contains no names.")
@@ -76,7 +74,6 @@ def _validate_scores(scores: Matrix) -> None:
 
 def _validate_graph(graph: nx.Graph) -> None:
     """Check graph sanity: Ensures that 'graph' is a valid NetworkX Graph object."""
-
     if graph in [None, 'NA', 'Nan']:
         raise ValueError("'graph' missing")
 

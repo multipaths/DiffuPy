@@ -73,7 +73,7 @@ class Matrix:
         return f"\nmatrix {self.name} \n  {s} \n "
 
     def __iter__(self, **kargs):
-        """Helper method for the matrix class."""
+        """Help method for the matrix class."""
         self.i = -1
         self.j = 0
 
@@ -85,7 +85,7 @@ class Matrix:
         return self
 
     def __next__(self):
-        """Helper method for the matrix class."""
+        """Help method for the matrix class."""
         if self.i >= len(self.rows_labels) - 1 and self.j >= len(self.cols_labels) - 1:
             self.get_labels = True
             self.get_indices = False
@@ -443,6 +443,7 @@ class LaplacianMatrix(Matrix):
     """Laplacian matrix class"""
 
     def __init__(self, graph, normalized=False, name=''):
+        """Initialize object."""
         l_mat = get_laplacian(graph, normalized)
 
         Matrix.__init__(self, mat=l_mat, quadratic=True, name=name, graph=graph)
