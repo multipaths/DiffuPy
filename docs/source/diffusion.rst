@@ -81,7 +81,7 @@ Summary table of methods with statistical normalization
 
 .. automodule:: diffupy.diffusion_raw
    :members:
-   
+
 References
 ----------
 1. Bersanelli, M. et al. (2016). Network diffusion-based analysis of high-throughput data for the detection of

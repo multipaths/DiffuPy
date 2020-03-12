@@ -29,7 +29,7 @@ Installation is as easy as getting the code from `PyPI <https://pypi.python.org/
 References
 ----------
 .. [1] Picart-Armada, S., *et al.* (2017). `Null diffusion-based enrichment for metabolomics data
-<https://doi.org/10.1371/journal.pone.0189012>`_. *PloS one* 12.12.
+   <https://doi.org/10.1371/journal.pone.0189012>`_. *PloS one* 12.12.
 
 Disclaimer
 ----------
