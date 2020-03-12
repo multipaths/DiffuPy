@@ -16,14 +16,17 @@ def generate_categoric_input_vector_from_labels(
     if isinstance(col_label, str):
         col_label = [col_label]
 
-    input_mat = Matrix(rows_labels=list(rows_labeled),
-                       cols_labels=col_label,
-                       init_value=1)
+    input_mat = Matrix(
+        rows_labels=list(rows_labeled),
+        cols_labels=col_label,
+        init_value=1)
     if rows_unlabeled:
-        input_mat.row_bind(matrix=Matrix(rows_labels=list(rows_unlabeled),
-                                         cols_labels=col_label,
-                                         init_value=0)
-                           )
+        input_mat.row_bind(
+            matrix=Matrix(
+                rows_labels=list(rows_unlabeled),
+                cols_labels=col_label,
+                init_value=0)
+        )
 
     return input_mat.match_missing_rows(background_mat.rows_labels, missing_value).match_rows(background_mat)
 
