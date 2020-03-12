@@ -1,7 +1,7 @@
 DiffuPy |release| Documentation
 ===============================
 DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms inspired by the diffuStats
-R package [1]. DiffuPy supports generic graph formats such as JSON, CSV, GraphML, or GML.
+R package [1]_. DiffuPy supports generic graph formats such as JSON, CSV, GraphML, or GML.
 
 Installation is as easy as getting the code from `PyPI <https://pypi.python.org/pypi/diffupy>`_ with
 :code:`python3 -m pip install diffupy`. See the :doc:`installation <installation>` documentation.
@@ -21,7 +21,7 @@ Installation is as easy as getting the code from `PyPI <https://pypi.python.org/
 
    installation
    cli
-   kernel
+   kernels
    diffusion
    constants
    matrix
@@ -29,7 +29,7 @@ Installation is as easy as getting the code from `PyPI <https://pypi.python.org/
 References
 ----------
 .. [1] Picart-Armada, S., *et al.* (2017). `Null diffusion-based enrichment for metabolomics data
-<https://doi.org/10.1371/journal.pone.0189012>`_. *PloS one* 12.12.
+   <https://doi.org/10.1371/journal.pone.0189012>`_. *PloS one* 12.12.
 
 Disclaimer
 ----------

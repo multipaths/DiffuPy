@@ -41,16 +41,18 @@ Generates the regularised Laplian kernel of a given graph.
 
 References
 ----------
-.. [1] Picart-Armada, S., *et al.* (2017). `Null diffusion-based enrichment for metabolomics data <https://doi.org/10.1371/journal.pone.0189012>`_. *PloS one* 12.12.
+.. [1] Picart-Armada, S., *et al.* (2017). `Null diffusion-based enrichment for metabolomics data
+   <https://doi.org/10.1371/journal.pone.0189012>`_. *PloS one* 12.12.
 
 Disclaimer
 ----------
-DiffuPy is a scientific software that has been developed in an academic capacity, and thus comes with no warranty or guarantee of maintenance, support, or back-up of data.
+DiffuPy is a scientific software that has been developed in an academic capacity, and thus comes with no warranty or
+guarantee of maintenance, support, or back-up of data.
 
 .. |build| image:: https://travis-ci.com/multipaths/diffupy.svg?branch=master
     :target: https://travis-ci.com/multipaths/diffupy
     :alt: Build Status
-    
+
 .. |docs| image:: http://readthedocs.org/projects/diffupy/badge/?version=latest
     :target: https://diffupy.readthedocs.io/en/latest/
     :alt: Documentation Status

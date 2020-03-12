@@ -76,8 +76,20 @@ Summary table of methods with statistical normalization
 +-------------+----------+----------+----------+---------------+----------------+----------------+---------------------+
 
 
-.. automodule:: diffupy.diffusion
+.. automodule:: diffupy.diffuse
    :members:
 
-.. automodule:: diffupy.diffusion_raw
+.. automodule:: diffupy.diffuse_raw
    :members:
+
+References
+----------
+1. Bersanelli, M. et al. (2016). Network diffusion-based analysis of high-throughput data for the detection of
+differentially enriched modules. Scientific Reports. (6), 34841.
+2. Harchaoui, Z., et al. (2013). Kernel-based methods for hypothesis testing: a unified view. IEEE Signal Processing
+Magazine. (30), 87–97.
+3. Mostafavi, S., et al. (2008). Genemania: a real-time multiple association network integration algorithm for
+predicting gene function.Genome Biology. (9), S4.
+4. Tsuda, K., et al. (2005).  Fast  protein  classification  with  multiple  networks. Bioinformatics, (21), 59–65.
+5. Vandin, F., et al. (2010). Algorithms for detecting significantly mutated pathways in cancer. Lecture Notes in
+Computer Science. 6044, 506–521.
