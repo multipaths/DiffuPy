@@ -37,7 +37,7 @@ def set_diagonal_matrix(matrix, d):
     return matrix
 
 
-def get_label_node(node: nx.Graph.node) -> str:
+def get_label_node(node: pybel.dsl.BaseAbundance) -> str:
     """Get label node."""
     if hasattr(node, 'name') and node.name is not None:
         if node.name.lower() == "":
@@ -144,7 +144,7 @@ def print_dict_dimensions(entities_db, title):
     print(f'Total: {total} ')
 
 
-def get_simplegraph_from_multigraph(multigraph):
+def get_simple_graph_from_multigraph(multigraph):
     """Convert undirected graph from multigraph."""
     graph = nx.Graph()
     for u, v, data in multigraph.edges(data=True):

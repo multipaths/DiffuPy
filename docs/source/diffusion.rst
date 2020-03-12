@@ -93,4 +93,3 @@ predicting gene function.Genome Biology. (9), S4.
 4. Tsuda, K., et al. (2005).  Fast  protein  classification  with  multiple  networks. Bioinformatics, (21), 59–65.
 5. Vandin, F., et al. (2010). Algorithms for detecting significantly mutated pathways in cancer. Lecture Notes in
 Computer Science. 6044, 506–521.
-   
