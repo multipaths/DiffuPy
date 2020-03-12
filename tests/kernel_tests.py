@@ -8,8 +8,13 @@ import unittest
 import networkx as nx
 import numpy as np
 
-from diffupy.kernels import commute_time_kernel, p_step_kernel, inverse_cosine_kernel, diffusion_kernel, \
-    regularised_laplacian_kernel
+from diffupy.kernels import (
+    commute_time_kernel,
+    p_step_kernel,
+    inverse_cosine_kernel,
+    diffusion_kernel,
+    regularised_laplacian_kernel,
+)
 from diffupy.matrix import Matrix
 from .constants import *
 
@@ -19,13 +24,14 @@ log = logging.getLogger(__name__)
 
 
 def _run_kernel_test(kernel_func, G, validate_matrix_path):
-    M = kernel_func(G)
-    V = Matrix.from_csv(validate_matrix_path)
+    """Run kernel test."""
+    matrix = kernel_func(G)
+    v = Matrix.from_csv(validate_matrix_path)
 
-    logging.info(' %s  \n %s\n', 'Computed matrix', M)
-    logging.info(' %s  \n %s\n', 'Test matrix', V)
+    logging.info(' %s  \n %s\n', 'Computed matrix', matrix)
+    logging.info(' %s  \n %s\n', 'Test matrix', v)
     # Assert rounded similarity (floating comma)
-    assert np.allclose(M, V)
+    assert np.allclose(matrix, v)
     logging.info(' Test ' + kernel_func.__name__ + ' passed')
 
 
@@ -33,10 +39,11 @@ def _run_kernel_test(kernel_func, G, validate_matrix_path):
 
 
 class KernelsTest(unittest.TestCase):
-    G = nx.read_gml(GML_FILE_EXAMPLE, label='id')
+    """Kernel test."""
+    graph = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
-    _run_kernel_test(commute_time_kernel, G, COMMUTE_TIME_KERNEL)
-    _run_kernel_test(diffusion_kernel, G, DIFFUSION_KERNEL)
-    _run_kernel_test(p_step_kernel, G, P_STEP_KERNEL)
-    _run_kernel_test(inverse_cosine_kernel, G, INVERSE_COSINE_KERNEL)
-    _run_kernel_test(regularised_laplacian_kernel, G, REGULARISED_LAPLACIAN_KERNEL)
+    _run_kernel_test(commute_time_kernel, graph, COMMUTE_TIME_KERNEL)
+    _run_kernel_test(diffusion_kernel, graph, DIFFUSION_KERNEL)
+    _run_kernel_test(p_step_kernel, graph, P_STEP_KERNEL)
+    _run_kernel_test(inverse_cosine_kernel, graph, INVERSE_COSINE_KERNEL)
+    _run_kernel_test(regularised_laplacian_kernel, graph, REGULARISED_LAPLACIAN_KERNEL)
