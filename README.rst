@@ -34,7 +34,7 @@ The following command will run a diffusion method on a given network with the gi
 
 
 2. **Generate a kernel with one of the seven methods implemented**
-Generates the regularised Laplian kernel of a given graph. More information `here
+Generates the regularised Laplian kernel of a given graph. More information in the `documentation
 <https://diffupy.readthedocs.io/en/latest/kernels.html)>`_.
 
 .. code-block:: sh
