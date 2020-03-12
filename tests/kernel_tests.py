@@ -23,9 +23,9 @@ log = logging.getLogger(__name__)
 """Helper functions for testing."""
 
 
-def _run_kernel_test(kernel_func, G, validate_matrix_path):
+def _run_kernel_test(kernel_func, g, validate_matrix_path):
     """Run kernel test."""
-    matrix = kernel_func(G)
+    matrix = kernel_func(g)
     v = Matrix.from_csv(validate_matrix_path)
 
     logging.info(' %s  \n %s\n', 'Computed matrix', matrix)
@@ -40,6 +40,7 @@ def _run_kernel_test(kernel_func, G, validate_matrix_path):
 
 class KernelsTest(unittest.TestCase):
     """Kernel test."""
+
     graph = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
     _run_kernel_test(commute_time_kernel, graph, COMMUTE_TIME_KERNEL)
