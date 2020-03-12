@@ -12,13 +12,16 @@ log = logging.getLogger(__name__)
 
 
 class ValidateTest(unittest.TestCase):
+    """Test validation of results."""
 
     def test_validate_scores_1(self):
+        """Test validate scores 1."""
         matrix = Matrix([1, 2, 3, 4], name='Test Matrix')
 
         _validate_scores(matrix)
 
     def test_validate_scores_2(self):
+        """Test validate scores 2."""
         matrix = Matrix(
             [1, 2, 3, 4],
             cols_labels=['1', '2', '3', '4'],
