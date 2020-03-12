@@ -2,7 +2,7 @@ DiffuPy |build| |docs|
 ======================
 
 DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms `(see all here)
-<https://diffupy.readthedocs.io/en/latest/diffusion.html#summary-tables)>`_.
+<https://diffupy.readthedocs.io/en/latest/diffusion.html#summary-tables>`_.
 
 Installation
 ------------
