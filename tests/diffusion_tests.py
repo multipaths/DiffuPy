@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 
 def _run_diffusion_method_test(method, G, input_scores, test_output_scores):
+    """Helper for test class."""
     computed_output_scores = diffuse(input_scores, method, graph=G)
 
     if isinstance(computed_output_scores, Matrix):
@@ -37,6 +38,7 @@ def _run_diffusion_method_test(method, G, input_scores, test_output_scores):
 
 
 class DiffuseTest(unittest.TestCase):
+    """Test diffusion methods."""
     graph = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
     _run_diffusion_method_test('raw', graph, INPUT_SCORES, OUTPUT_RAW_SCORES)
