@@ -1,7 +1,7 @@
 DiffuPy |release| Documentation
 ===============================
 DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms inspired by the diffuStats
-R package [1]. DiffuPy supports generic graph formats such as JSON, CSV, GraphML, or GML.
+R package [1]_. DiffuPy supports generic graph formats such as JSON, CSV, GraphML, or GML.
 
 Installation is as easy as getting the code from `PyPI <https://pypi.python.org/pypi/diffupy>`_ with
 :code:`python3 -m pip install diffupy`. See the :doc:`installation <installation>` documentation.
