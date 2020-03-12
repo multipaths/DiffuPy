@@ -76,10 +76,10 @@ Summary table of methods with statistical normalization
 +-------------+----------+----------+----------+---------------+----------------+----------------+---------------------+
 
 
-.. automodule:: diffupy.diffusion
+.. automodule:: diffupy.diffuse
    :members:
 
-.. automodule:: diffupy.diffusion_raw
+.. automodule:: diffupy.diffuse_raw
    :members:
 
 References
