@@ -1,5 +1,5 @@
-DiffuPy |build| |docs| |coverage|
-=================================
+DiffuPy |build| |docs|
+======================
 
 DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms inspired by the `diffuStats <https://github.com/b2slab/diffuStats>`_ R package [1]_.
 
