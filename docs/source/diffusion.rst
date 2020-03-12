@@ -22,7 +22,7 @@ Methods without statistical normalisation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - **raw**: positive nodes introduce unitary flow {y_raw[i] = 1} to the network, whereas either negative and unlabelled
   nodes introduce null diffusion {y_raw[j] = 0}. [Vandin, 2011]. They are computed as: f_{raw} = K · y_{raw}. Where K is
-  a graph kernel, see :doc:`kernel <kernel>`. These scores treat negative and unlabelled nodes equivalently.
+  a graph kernel, see :doc:`kernels <kernels>`. These scores treat negative and unlabelled nodes equivalently.
 
 - **ml**: Same as raw, but negative nodes introduce a negative unit of flow. Therefore not equivalent to unlabelled
   nodes. [Zoidi, 2015]
