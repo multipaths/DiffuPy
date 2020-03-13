@@ -8,11 +8,15 @@ Installation
 ------------
 1. ``diffupy`` can be installed with the following commands:
 
+ $ python3 -m pip install diffupy
+
+2. ``diffupy`` can be installed with the following commands:
+
 .. code-block:: sh
 
     $ python3 -m pip install git+https://github.com/multipaths/DiffuPy.git@master
 
-2. or in editable mode with:
+3. or in editable mode with:
 
 .. code-block:: sh
 
