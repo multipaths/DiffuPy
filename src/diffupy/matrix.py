@@ -33,8 +33,10 @@ class Matrix:
             **kwargs
     ):
         """Initialize matrix."""
+        # This initialization would make a matrix representing the input scores
         if isinstance(rows_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
             self.rows_labels = list(rows_labels)
+        # This initialization would make a matrix representing the graph (taken the graph labels 'name')
         elif graph:
             self.rows_labels = list(get_label_list_graph(graph, 'name'))
         else:
