@@ -442,7 +442,7 @@ class LaplacianMatrix(Matrix):
     """Laplacian matrix class."""
 
     def __init__(self, graph, normalized=False, name=''):
-        """Initialize object."""
+        """Initialize laplacian."""
         l_mat = get_laplacian(graph, normalized)
 
         Matrix.__init__(self, mat=l_mat, quadratic=True, name=name, graph=graph)
