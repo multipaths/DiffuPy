@@ -6,11 +6,11 @@ DiffuPy is a generalizable Python implementation of the numerous label propagati
 
 Installation
 ------------
-1. ``diffupy`` can be installed with the following commands:
+1. ``diffupy`` can be installed with pip:
 
  $ python3 -m pip install diffupy
-
-2. ``diffupy`` can be installed with the following commands:
+ 
+2. `The latest version of `diffupy`` can be installed with the following commands:
 
 .. code-block:: sh
 
