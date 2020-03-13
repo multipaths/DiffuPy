@@ -8,9 +8,13 @@ import pickle
 import time
 
 import click
-import networkx as nx
 import pybel
+from networkx import read_graphml, read_gml, node_link_graph
 
+from diffupy.constants import (
+    CSV, TSV, FORMATS, GRAPHML, GML, BEL, BEL_PICKLE, NODE_LINK_JSON
+)
+from diffupy.utils import process_network, load_json_file
 from .constants import OUTPUT, METHODS, EMOJI
 from .kernels import regularised_laplacian_kernel
 
@@ -37,12 +41,10 @@ def main():
     show_default=True,
     type=click.Path(exists=True, file_okay=False)
 )
-@click.option('--isolates', is_flag=False, help='Include isolates')
 @click.option('-l', '--log', is_flag=True, help='Activate debug mode')
 def kernel(
         network: str,
         output: str = OUTPUT,
-        isolates: bool = None,
         log: bool = None
 ):
     """Generate a kernel for a given network.
@@ -62,16 +64,33 @@ def kernel(
 
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
 
-    # TODO Here goes a function that loads a graph using pandas from csv file and returns a networkx object
-    # Temporary is used the PyBEL import function
-    graph = pybel.from_pickle(network)
+    if network.endswith(CSV):
+        graph = process_network(network, CSV)
 
-    if isolates:
-        click.echo(f'Removing {nx.number_of_isolates(graph)} isolated nodes')
-        graph.remove_nodes_from({
-            node
-            for node in nx.isolates(graph)
-        })
+    elif network.endswith(TSV):
+        graph = process_network(network, TSV)
+
+    elif network.endswith(GRAPHML):
+        graph = read_graphml(network)
+
+    elif network.endswith(GML):
+        graph = read_gml(network)
+
+    elif network.endswith(BEL):
+        graph = pybel.from_path(network)
+
+    elif network.endswith(BEL_PICKLE):
+        graph = pybel.from_pickle(network)
+
+    elif network.endswith(NODE_LINK_JSON):
+        data = load_json_file(network)
+        graph = node_link_graph(data)
+
+    else:
+        raise IOError(
+            f'{EMOJI} The selected format {format} is not valid. Please ensure you use one of the following formats: '
+            f'{FORMATS}'
+        )
 
     click.secho(f'{EMOJI} Calculating regulatised Laplacian kernel. This might take a while... {EMOJI}')
 

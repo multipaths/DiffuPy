@@ -42,7 +42,7 @@ def diffuse(
 
     _validate_scores(scores)
 
-    # Discern the format of the provided network for its further treatment.
+    # Discern the sep of the provided network for its further treatment.
     if graph:
         format_network = "graph"
     else:
