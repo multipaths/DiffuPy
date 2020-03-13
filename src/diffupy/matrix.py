@@ -32,7 +32,16 @@ class Matrix:
             init_value=None,
             **kwargs
     ):
-        """Initialize matrix."""
+        """Initialize matrix.
+
+        :param mat: matrix initialization
+        :param rows_labels:
+        :param cols_labels: column labels
+        :param graph: graph
+        :param quadratic: quadratic
+        :param name: name
+        :param init_value: value to be initialized (int) or list of values from labels
+        """
         # This initialization would make a matrix representing the input scores
         if isinstance(rows_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
             self.rows_labels = list(rows_labels)
@@ -51,6 +60,9 @@ class Matrix:
         self.name = name
         self.quadratic = quadratic
 
+        # if isinstance(init_value, list):
+        #     mat = init_value
+        # todo: THIS SHOULD BE AN ELIF
         if init_value is not None and self.rows_labels and list(self.cols_labels):
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init_value)
 
