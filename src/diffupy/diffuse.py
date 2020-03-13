@@ -111,4 +111,4 @@ def diffuse(
         return diffuse_raw(graph, scores, **kwargs)
 
     else:
-        raise ValueError("")
+        raise ValueError(f"Method not allowed {method}")
