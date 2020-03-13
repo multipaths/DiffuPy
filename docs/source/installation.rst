@@ -1,6 +1,6 @@
 Installation
 ============
-The latest stable code can be installed from `PyPI <https://pypi.python.org/pypi/diffupath>`_ with:
+The latest stable code can be installed from `PyPI <https://pypi.python.org/pypi/diffupy>`_ with:
 
 .. code-block:: sh
 
