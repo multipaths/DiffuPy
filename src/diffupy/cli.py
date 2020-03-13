@@ -45,13 +45,7 @@ def kernel(
         output: str = OUTPUT,
         log: bool = None
 ):
-    """Generate a kernel for a given network.
-
-    :param path: Path to retrieve the input/source network
-    :param output: Path to store the output/generated kernel pickle
-    :param isolates: Include isolates
-    :param log: Activate debug mode
-    """
+    """Generate a kernel for a given network."""
     # Configure logging level
     if log:
         logging.basicConfig(level=logging.DEBUG)
