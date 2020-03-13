@@ -18,7 +18,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 project = 'diffupy'
-copyright = '2019,  Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
+copyright = '2020,  Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 author = ' Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 
 release = '0.0.3-dev'
