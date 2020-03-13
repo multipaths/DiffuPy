@@ -6,23 +6,26 @@ DiffuPy is a generalizable Python implementation of the numerous label propagati
 
 Installation
 ------------
-1. ``diffupy`` can be installed with pip:
-
- $ python3 -m pip install diffupy
- 
-2. `The latest version of `diffupy`` can be installed with the following commands:
+The latest stable code can be installed from `PyPI <https://pypi.python.org/pypi/diffupy>`_ with:
 
 .. code-block:: sh
 
-    $ python3 -m pip install git+https://github.com/multipaths/DiffuPy.git@master
+   $ python3 -m pip install diffupy
 
-3. or in editable mode with:
+The most recent code can be installed from the source on `GitHub <https://github.com/multipaths/DiffuPy>`_ with:
 
 .. code-block:: sh
 
-    $ git clone https://github.com/multipaths/DiffuPy.git
-    $ cd diffupy
-    $ python3 -m pip install -e .
+   $ python3 -m pip install git+https://github.com/multipaths/DiffuPy.git
+
+For developers, the repository can be cloned from `GitHub <https://github.com/multipaths/DiffuPy>`_ and installed in
+editable mode with:
+
+.. code-block:: sh
+
+   $ git clone https://github.com/multipaths/DiffuPy.git
+   $ cd diffupy
+   $ python3 -m pip install -e .
 
 Command Line Interface
 ----------------------
