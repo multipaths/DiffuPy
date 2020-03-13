@@ -265,3 +265,7 @@ def process_network_from_cli(network: str) -> nx.Graph:
             f'{FORMATS}'
         )
     return graph
+
+def _process_input(input):
+    """Read input file and prepare scores."""
+    raise NotImplementedError('Not yet implemented')

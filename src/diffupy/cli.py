@@ -2,19 +2,19 @@
 
 """Command line interface for diffuPy."""
 
+import json
 import logging
 import os
 import pickle
-import time
-import json
 import sys
+import time
 
 import click
 
 from .constants import OUTPUT, METHODS, EMOJI
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
-from .utils import process_network_from_cli
+from .utils import process_network_from_cli, _process_input
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +121,8 @@ def diffuse(
         f'{graph.number_of_edges()} edges\n'
         f'{EMOJI}'
     )
+
+    input_scores = _process_input(input)
 
     results = run_diffusion(
         input_scores,
