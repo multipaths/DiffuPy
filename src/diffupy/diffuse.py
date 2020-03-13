@@ -21,7 +21,7 @@ __all__ = [
 
 
 def diffuse(
-        input_scores: Matrix,
+        input_scores,
         method: str,
         graph: nx.Graph = None,
         **kwargs

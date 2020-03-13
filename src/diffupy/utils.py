@@ -7,13 +7,14 @@ import logging
 import warnings
 from typing import List
 
+import networkx as nx
 import numpy as np
 import pandas as pd
 import pybel
-from networkx import DiGraph
-import networkx as nx
+from networkx import DiGraph, read_graphml, read_gml, node_link_graph
 
 from .constants import *
+from .constants import CSV, TSV, GRAPHML, GML, BEL, BEL_PICKLE, NODE_LINK_JSON, EMOJI, FORMATS
 
 log = logging.getLogger(__name__)
 
@@ -232,3 +233,35 @@ def load_json_file(path: str) -> DiGraph:
     """Read json file."""
     with open(path) as f:
         return json.load(f)
+
+
+def process_network_from_cli(network: str) -> nx.Graph:
+    """Load network from path."""
+    if network.endswith(CSV):
+        graph = process_network(network, CSV)
+
+    elif network.endswith(TSV):
+        graph = process_network(network, TSV)
+
+    elif network.endswith(GRAPHML):
+        graph = read_graphml(network)
+
+    elif network.endswith(GML):
+        graph = read_gml(network)
+
+    elif network.endswith(BEL):
+        graph = pybel.from_path(network)
+
+    elif network.endswith(BEL_PICKLE):
+        graph = pybel.from_pickle(network)
+
+    elif network.endswith(NODE_LINK_JSON):
+        data = load_json_file(network)
+        graph = node_link_graph(data)
+
+    else:
+        raise IOError(
+            f'{EMOJI} The selected format {format} is not valid. Please ensure you use one of the following formats: '
+            f'{FORMATS}'
+        )
+    return graph

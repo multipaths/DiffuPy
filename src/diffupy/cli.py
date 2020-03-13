@@ -6,17 +6,15 @@ import logging
 import os
 import pickle
 import time
+import json
+import sys
 
 import click
-import pybel
-from networkx import read_graphml, read_gml, node_link_graph
 
-from diffupy.constants import (
-    CSV, TSV, FORMATS, GRAPHML, GML, BEL, BEL_PICKLE, NODE_LINK_JSON
-)
-from diffupy.utils import process_network, load_json_file
 from .constants import OUTPUT, METHODS, EMOJI
+from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
+from .utils import process_network_from_cli
 
 logger = logging.getLogger(__name__)
 
@@ -64,36 +62,9 @@ def kernel(
 
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
 
-    if network.endswith(CSV):
-        graph = process_network(network, CSV)
-
-    elif network.endswith(TSV):
-        graph = process_network(network, TSV)
-
-    elif network.endswith(GRAPHML):
-        graph = read_graphml(network)
-
-    elif network.endswith(GML):
-        graph = read_gml(network)
-
-    elif network.endswith(BEL):
-        graph = pybel.from_path(network)
-
-    elif network.endswith(BEL_PICKLE):
-        graph = pybel.from_pickle(network)
-
-    elif network.endswith(NODE_LINK_JSON):
-        data = load_json_file(network)
-        graph = node_link_graph(data)
-
-    else:
-        raise IOError(
-            f'{EMOJI} The selected format {format} is not valid. Please ensure you use one of the following formats: '
-            f'{FORMATS}'
-        )
+    graph = process_network_from_cli(network)
 
     click.secho(f'{EMOJI} Calculating regulatised Laplacian kernel. This might take a while... {EMOJI}')
-
     exe_t_0 = time.time()
     background_mat = regularised_laplacian_kernel(graph)
     exe_t_f = time.time()
@@ -124,10 +95,9 @@ def kernel(
 )
 @click.option(
     '-o', '--output',
-    help='Output path for the results',
-    default=OUTPUT,
-    show_default=True,
-    type=click.Path(exists=True, file_okay=False)
+    type=click.File('w'),
+    help="Output file",
+    default=sys.stdout,
 )
 @click.option(
     '-m', '--method',
@@ -141,9 +111,24 @@ def diffuse(
         output: str,
         method: str,
 ):
-    """Run a diffusion method over a network or pregenerated kernel."""
-    raise NotImplementedError
-    # TODO : Process arguments and call diffuse
+    """Run a diffusion method over a network or pre-generated kernel."""
+    click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
+    graph = process_network_from_cli(network)
+
+    click.secho(
+        f'{EMOJI} Graph loaded with: \n'
+        f'{graph.number_of_nodes()} nodes\n'
+        f'{graph.number_of_edges()} edges\n'
+        f'{EMOJI}'
+    )
+
+    results = run_diffusion(
+        input_scores,
+        method,
+        graph,
+    )
+
+    json.dump(results, output, indent=2)
 
 
 if __name__ == '__main__':
