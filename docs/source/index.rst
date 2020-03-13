@@ -13,8 +13,6 @@ Installation is as easy as getting the code from `PyPI <https://pypi.python.org/
     - Tested on `Travis CI <https://travis-ci.org/multipaths/diffupy>`_
     - Distributed by `PyPI <https://pypi.python.org/pypi/diffupy>`_
 
-.. automodule:: diffupy
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
