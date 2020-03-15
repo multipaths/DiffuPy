@@ -1,7 +1,7 @@
 DiffuPy |build| |docs|
 ======================
 
-DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms. DiffuPy supports generic graph formats such as JSON, CSV, GraphML, or GML. Check out `DiffuPy's documentation here <https://diffupy.readthedocs.io/en/latest.html>`_.
+DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms. DiffuPy supports generic graph formats such as JSON, CSV, GraphML, or GML. Check out `DiffuPy's documentation here <https://diffupy.readthedocs.io/en/latest/>`_.
 
 Installation
 ------------
