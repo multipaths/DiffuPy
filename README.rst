@@ -1,6 +1,7 @@
 
 .. image:: https://github.com/multipaths/diffupy/blob/master/docs/source/meta/diffupy_logo.png
-    :align: center
+   :align: center
+   :target: https://diffupy.readthedocs.io/en/latest/
 
 Introduction |build| |docs|
 ===========================
