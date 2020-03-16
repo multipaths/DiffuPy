@@ -1,6 +1,6 @@
 
 .. image:: https://github.com/multipaths/diffupy/blob/master/docs/source/meta/diffupy_logo.png
-    :width: 500px
+    :align: center
 
 Introduction |build| |docs|
 ===========================
