@@ -124,7 +124,11 @@ def decode_labels(labels):
 
     for label in labels:
         if not isinstance(label, str):
-            label = label.decode('utf-8').replace('"', '')
+
+            if isinstance(label, int):
+                label = str(label)
+            else:
+                label = label.decode('utf-8').replace('"', '')
 
         labels_decode.append(label)
 
