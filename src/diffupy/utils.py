@@ -11,7 +11,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import pybel
-from networkx import DiGraph, read_graphml, read_gml, node_link_graph
+from networkx import DiGraph, read_graphml, read_gml, node_link_graph, read_edgelist
 
 from .constants import *
 from .constants import CSV, TSV, GRAPHML, GML, BEL, BEL_PICKLE, NODE_LINK_JSON, EMOJI, FORMATS
@@ -258,6 +258,9 @@ def process_network_from_cli(network: str) -> nx.Graph:
 
     elif network.endswith(BEL_PICKLE):
         graph = pybel.from_pickle(network)
+
+    elif network.endswith(EDGE_LIST):
+        graph = read_edgelist(network)
 
     elif network.endswith(NODE_LINK_JSON):
         data = load_json_file(network)

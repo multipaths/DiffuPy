@@ -38,7 +38,6 @@ METHODS = {
     "ber_p",
 }
 
-
 """Available formats"""
 
 CSV = 'csv'
@@ -48,6 +47,7 @@ BEL = 'bel'
 NODE_LINK_JSON = 'json'
 BEL_PICKLE = 'pickle'
 GML = 'gml'
+EDGE_LIST = '.lst'
 
 #: DiffuPath available network formats
 FORMATS = [
