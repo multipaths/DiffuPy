@@ -319,7 +319,6 @@ def prepare_quantitative_input_data(df: pd.DataFrame, method: str, p_value: int,
 
 def filter_by_threshold(df: pd.DataFrame, threshold: int):
     """Filter expression values in dataset by a threshold and set node labels."""
-
     # Label nodes with expression values falling above the threshold with 1
     df.loc[(df[EXPRESSION] >= threshold), LABEL] = 1
 
@@ -337,7 +336,6 @@ def filter_by_threshold(df: pd.DataFrame, threshold: int):
 
 def filter_by_abs_val(df: pd.DataFrame, threshold: int):
     """Label nodes as 1 or 0 if expression values fall above or below absolute value of a threshold, respectively."""
-
     # Get absolute values of all expressin values
     df[ABSOLUTE_VALUE] = df[EXPRESSION].abs()
 
