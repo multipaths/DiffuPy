@@ -27,26 +27,51 @@ ensure_output_dirs()
 #: DiffuPy emoji
 EMOJI = "🌐"
 
+"""Available diffusion methods"""
+
+#: raw
+RAW = 'raw'
+#: ml
+ML = 'ml'
+#: gm
+GM = 'gm'
+#: mc
+MC = 'mc'
+#: z
+Z = 'z'
+#: ber_s
+BER_S = 'ber_s'
+#: ber p
+BER_P = 'ber_p'
+
 #: DiffuPy diffusion methods
 METHODS = {
-    "raw",
-    "ml",
-    "gm",
-    "mc",
-    "z",
-    "ber_s",
-    "ber_p",
+    RAW,
+    ML,
+    GM,
+    MC,
+    Z,
+    BER_S,
+    BER_P,
 }
 
 """Available formats"""
 
+#: csv
 CSV = 'csv'
+#: tsv
 TSV = 'tsv'
+#: graphML
 GRAPHML = 'graphml'
+#: bel
 BEL = 'bel'
+#: node link json
 NODE_LINK_JSON = 'json'
+#: pickle
 BEL_PICKLE = 'pickle'
+#: gml
 GML = 'gml'
+#: edge list
 EDGE_LIST = '.lst'
 
 #: DiffuPath available network formats
@@ -65,6 +90,10 @@ FORMAT_SEPARATOR_MAPPING = {
     TSV: '\t'
 }
 
+"""Optional parameters"""
+THRESHOLD = 'threshold'
+ABSOLUTE_VALUE = 'absolute_value'
+
 """Acceptable column names of user submitted network"""
 
 #: Column name for source node
@@ -73,3 +102,14 @@ SOURCE = 'source'
 TARGET = 'target'
 #: Column name for relation
 RELATION = 'relation '
+
+"""Column names for dataset"""
+
+#: Node name
+NODE = 'Node'
+#: Expression value
+EXPRESSION = 'Expression'
+#: Statistical significance (p-value)
+P_VALUE = 'p-value'
+#: Label
+LABEL = 'label'

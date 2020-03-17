@@ -99,6 +99,20 @@ def kernel(
     type=click.Choice(METHODS),
     required=True,
 )
+# TODO
+@click.option(
+    '-t', '--threshold',
+    help='Apply a threshold for input data expression value.',
+    type=int,
+)
+# TODO
+@click.option(
+    '-p', '--p_value',
+    help='Statistical significance (p-value).',
+    type=int,
+    default=0.05,
+    show_default=True,
+)
 def diffuse(
         network: str,
         input: str,
