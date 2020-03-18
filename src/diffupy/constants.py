@@ -92,7 +92,7 @@ FORMAT_SEPARATOR_MAPPING = {
 
 """Optional parameters"""
 THRESHOLD = 'threshold'
-ABSOLUTE_VALUE = 'absolute_value'
+ABSOLUTE_VALUE_EXP = 'absolute_value'
 
 """Acceptable column names of user submitted network"""
 

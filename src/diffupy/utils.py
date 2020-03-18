@@ -306,10 +306,10 @@ def prepare_quantitative_input_data(df: pd.DataFrame, method: str, p_value: int,
 
             # Label nodes with |expression values| over threshold as 1 and below threshold as 0
             if absolute_value:
-                return filter_by_abs_val(df, threshold)
+                return _filter_by_abs_val(df, threshold)
 
             # Label nodes with values over threshold as 1, below threshold as 0 and remove nodes with negative values
-            return filter_by_threshold(df, threshold)
+            return _filter_by_threshold(df, threshold)
 
         # No threshold provided; labels will be expression values that are significant
         df = df.loc[df[P_VALUE] < p_value]
@@ -317,7 +317,7 @@ def prepare_quantitative_input_data(df: pd.DataFrame, method: str, p_value: int,
         return df[[NODE, LABEL]]
 
 
-def filter_by_threshold(df: pd.DataFrame, threshold: int):
+def _filter_by_threshold(df: pd.DataFrame, threshold: int):
     """Filter expression values in dataset by a threshold and set node labels."""
     # Label nodes with expression values falling above the threshold with 1
     df.loc[(df[EXPRESSION] >= threshold), LABEL] = 1
@@ -334,16 +334,16 @@ def filter_by_threshold(df: pd.DataFrame, threshold: int):
     return df[[NODE, LABEL]]
 
 
-def filter_by_abs_val(df: pd.DataFrame, threshold: int):
+def _filter_by_abs_val(df: pd.DataFrame, threshold: int):
     """Label nodes as 1 or 0 if expression values fall above or below absolute value of a threshold, respectively."""
-    # Get absolute values of all expressin values
-    df[ABSOLUTE_VALUE] = df[EXPRESSION].abs()
+    # Get absolute values of all expression values
+    df[ABSOLUTE_VALUE_EXP] = df[EXPRESSION].abs()
 
     # Label nodes with |expression values| falling above the threshold with 1
-    df.loc[(df[ABSOLUTE_VALUE] >= threshold), LABEL] = 1
+    df.loc[(df[ABSOLUTE_VALUE_EXP] >= threshold), LABEL] = 1
 
     # Label nodes with |expression values| falling below the threshold with 0
-    df.loc[(df[ABSOLUTE_VALUE] < threshold), LABEL] = 0
+    df.loc[(df[ABSOLUTE_VALUE_EXP] < threshold), LABEL] = 0
 
     # TODO: remove nodes that are not significant?
 
