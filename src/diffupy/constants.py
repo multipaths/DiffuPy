@@ -91,7 +91,9 @@ FORMAT_SEPARATOR_MAPPING = {
 }
 
 """Optional parameters"""
+#: Expression value threshold
 THRESHOLD = 'threshold'
+#: Absolute value of expression level
 ABSOLUTE_VALUE_EXP = 'absolute_value'
 
 """Acceptable column names of user submitted network"""

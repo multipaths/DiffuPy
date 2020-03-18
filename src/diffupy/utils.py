@@ -5,7 +5,7 @@
 import json
 import logging
 import warnings
-from typing import List
+from typing import List, Optional
 
 import networkx as nx
 import numpy as np
@@ -281,7 +281,7 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
     df = pd.read_csv(
         path,
         header=0,
-        sep=',' if format == 'csv' else '\t'
+        sep=FORMAT_SEPARATOR_MAPPING[CSV] if format == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
     )
     if not (df.columns.isin([NODE, EXPRESSION, P_VALUE]).all()):
         raise ValueError(
@@ -291,33 +291,49 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
     return df
 
 
-def prepare_quantitative_input_data(df: pd.DataFrame, method: str, p_value: int, threshold: int, absolute_value: True) \
-        -> pd.DataFrame:
+def prepare_input_data(df: pd.DataFrame, method: str, absolute_value=False, p_value=0.05, threshold=None):
     """Prepare input data for diffusion."""
-    # TODO: ber_s, ber_p, mc?
     if method == RAW or method == Z:
 
-        # TODO: when to remove rows with non-significant p-values?
-        # Remove nodes if p-values are not significant
-        # df = df.loc[df[P_VALUE] < p_val]
+        # Get input data dataFrame for quantitative diffusion methods
+        return prepare_quantitative_input_data(df, method, absolute_value, p_value, threshold)
 
-        # Threshold is given
-        if threshold:
+    elif method == ML or method == GM:
 
-            # Label nodes with |expression values| over threshold as 1 and below threshold as 0
-            if absolute_value:
-                return _filter_by_abs_val(df, threshold)
+        # Get input data dataFrame for non-quantitative diffusion methods
+        return prepare_non_quantitative_input_data(df, method, absolute_value, p_value, threshold)
 
-            # Label nodes with values over threshold as 1, below threshold as 0 and remove nodes with negative values
-            return _filter_by_threshold(df, threshold)
-
-        # No threshold provided; labels will be expression values that are significant
-        df = df.loc[df[P_VALUE] < p_value]
-        df[LABEL] = df[EXPRESSION]
-        return df[[NODE, LABEL]]
+    else:
+        # TODO: ber_s, ber_p, mc?
+        raise NotImplementedError('This diffusion method has not yet been implemented.')
 
 
-def _filter_by_threshold(df: pd.DataFrame, threshold: int):
+def prepare_quantitative_input_data(df: pd.DataFrame, absolute_value: bool, p_value: int, threshold: Optional[int]) \
+        -> pd.DataFrame:
+    """Prepare input data for diffusion."""
+    # Threshold value is provided
+    if threshold:
+
+        # Label nodes with |expression values| over threshold as 1 and below threshold as 0
+        if absolute_value is True:
+            return _filter_by_abs_val(df, threshold)
+
+        # Label nodes with values over threshold as 1, below threshold as 0 and remove nodes with negative values
+        return _filter_by_threshold(df, threshold)
+
+    # No threshold provided
+    df[LABEL] = df[EXPRESSION]
+    # Labels will be expression values that are significant
+    significant_values_df = df.loc[df[P_VALUE] < p_value].copy()
+
+    return significant_values_df[[NODE, LABEL]]
+
+
+def prepare_non_quantitative_input_data(df, method, absolute_value, p_value, threshold) -> pd.DataFrame:
+    """Process input data for non-quantitative diffusion methods."""
+
+
+def _filter_by_threshold(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     """Filter expression values in dataset by a threshold and set node labels."""
     # Label nodes with expression values falling above the threshold with 1
     df.loc[(df[EXPRESSION] >= threshold), LABEL] = 1
@@ -329,12 +345,11 @@ def _filter_by_threshold(df: pd.DataFrame, threshold: int):
     df = df.loc[df[EXPRESSION] > 0]
 
     # TODO: remove nodes that are not significant?
-
-    # Get nodes and labels dataframe
+    # Get nodes and labels dataFrame
     return df[[NODE, LABEL]]
 
 
-def _filter_by_abs_val(df: pd.DataFrame, threshold: int):
+def _filter_by_abs_val(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     """Label nodes as 1 or 0 if expression values fall above or below absolute value of a threshold, respectively."""
     # Get absolute values of all expression values
     df[ABSOLUTE_VALUE_EXP] = df[EXPRESSION].abs()
@@ -346,6 +361,5 @@ def _filter_by_abs_val(df: pd.DataFrame, threshold: int):
     df.loc[(df[ABSOLUTE_VALUE_EXP] < threshold), LABEL] = 0
 
     # TODO: remove nodes that are not significant?
-
-    # Get nodes and labels dataframe
+    # Get nodes and labels dataFrame
     return df[[NODE, LABEL]]

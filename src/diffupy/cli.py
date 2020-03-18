@@ -113,6 +113,12 @@ def kernel(
     default=0.05,
     show_default=True,
 )
+# TODO
+@click.option(
+    '-a', '--absolute_value',
+    help='Get the absolute values of expression values in the input dataset.',
+    type=bool,
+)
 def diffuse(
         network: str,
         input: str,
