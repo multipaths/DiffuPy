@@ -294,7 +294,6 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
 def prepare_input_data(df: pd.DataFrame, method: str, absolute_value=False, p_value=0.05, threshold=None) -> \
         pd.DataFrame:
     """Prepare input data for diffusion."""
-
     # Prepare input data dataFrame for quantitative diffusion methods
     if method == RAW or method == Z:
         return _prepare_quantitative_input_data(df, absolute_value, p_value, threshold)
@@ -333,7 +332,6 @@ def _prepare_quantitative_input_data(df: pd.DataFrame, absolute_value: bool, p_v
 
 def _prepare_non_quantitative_input_data(df: pd.DataFrame, p_value: int, threshold: Optional[int]) -> pd.DataFrame:
     """Process input data for non-quantitative diffusion methods."""
-
     # TODO: is p-value mandatory or optional?
     if p_value and threshold:
 
