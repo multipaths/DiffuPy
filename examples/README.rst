@@ -29,7 +29,8 @@ Input dataset example
 | Gene D       | 3          |  0.07   |
 +--------------+------------+---------+
 
-See the sample datasets directory for example files.
+See the `sample datasets <https://github.com/multipaths/DiffuPy/tree/master/examples/datasets>`_ directory for example
+files.
 
 .. [*] Differential expression values e.g. fold change (FC)
 
@@ -83,7 +84,8 @@ Custom-network example
 | Gene A    | Pathology D  | Association |
 +-----------+--------------+-------------+
 
-See the sample networks directory for some example networks.
+See the `sample networks <https://github.com/multipaths/DiffuPy/tree/master/examples/networks>`_ directory for some
+examples.
 
 Disclaimer
 ----------
