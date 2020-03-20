@@ -1,0 +1,4 @@
+FirstNode,SecondNode,Relation
+Gene A,Gene B,Increase
+Gene B,Metabolite C,Association
+Gene A,Pathology D,Association
