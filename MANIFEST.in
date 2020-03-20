@@ -5,6 +5,7 @@ recursive-include notebooks *.csv
 recursive-include docs/source *.py
 recursive-include docs/source *.rst
 recursive-include examples *.csv
+recursive-include examples *.rst
 include docs/Makefile
 include config/config.ini
 recursive-include docs *.png
