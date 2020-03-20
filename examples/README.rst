@@ -49,7 +49,7 @@ If you would like to submit your own networks, please ensure they are in one of 
 
 - GraphML_ (.graphml or .xml)
 
-- Pickle (.pickle)
+- Pickle (.pickle). BELGraph object from PyBEL_ 0.13.2
 
 - TSV (.tsv)
 
@@ -60,6 +60,7 @@ __ Edge_
 .. _GraphML: http://graphml.graphdrawing.org
 .. _BEL: https://language.bel.bio/
 .. _GML: http://docs.yworks.com/yfiles/doc/developers-guide/gml.html
+.. _PyBEL: https://github.com/pybel/pybel/
 
 
 Minimally, please ensure each of the following columns are included in the network file you submit:
