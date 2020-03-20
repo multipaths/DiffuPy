@@ -4,6 +4,7 @@ graft tests
 recursive-include notebooks *.csv
 recursive-include docs/source *.py
 recursive-include docs/source *.rst
+recursive-include examples *.csv
 include docs/Makefile
 include config/config.ini
 recursive-include docs *.png
