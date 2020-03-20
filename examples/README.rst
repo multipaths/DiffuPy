@@ -87,7 +87,3 @@ Custom-network example
 See the `sample networks <https://github.com/multipaths/DiffuPy/tree/master/examples/networks>`_ directory for some
 examples.
 
-Disclaimer
-----------
-DiffuPath is a scientific software that has been developed in an academic capacity, and thus comes with no warranty or
-guarantee of maintenance, support, or back-up of data.
