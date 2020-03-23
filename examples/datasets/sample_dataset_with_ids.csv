@@ -1,8 +1,8 @@
-Node
-Gene A
-Gene B
-Metabolite C
-Gene D
-Metabolite E
-Gene F
-Pathology G
+NodeType,Node
+Gene,A
+Gene,B
+Metabolite,C
+Gene,D
+Metabolite,E
+Gene,F
+Pathology,G
