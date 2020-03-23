@@ -182,6 +182,9 @@ def _format_checker(format: str) -> None:
         )
 
 
+"""Process networks"""
+
+
 def _read_network_file(path: str, format: str) -> pd.DataFrame:
     """Read network file."""
     _format_checker(format)
@@ -274,6 +277,9 @@ def process_network_from_cli(network: str) -> nx.Graph:
     return graph
 
 
+"""Process datasets"""
+
+
 def _process_input(path: str, format: str) -> pd.DataFrame:
     """Read input file and ensure necessary columns exist."""
     _format_checker(format)
@@ -290,8 +296,8 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
             f'Ensure that your file contains a column {NODE} with node IDs.'
         )
 
-    # If expression and p-value columns are not in dataFrame, ensure node type column is given
-    elif EXPRESSION and P_VALUE not in df.columns:
+    # If expression column not in dataFrame, ensure node type column is at least given
+    elif EXPRESSION not in df.columns:
         if NODE_TYPE not in df.columns:
             raise ValueError(
                 f'Ensure that your file contains a column, {NODE_TYPE}, indicating node types.'
@@ -300,7 +306,10 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
     return df
 
 
-def prepare_input_data(df: pd.DataFrame, method: str, absolute_value=False, p_value=0.05, threshold=None) -> \
+"""Prepare datasets for input"""
+
+
+def prepare_input_data(df: pd.DataFrame, method: str, absolute_value: bool, p_value: int, threshold: Optional[int]) -> \
         pd.DataFrame:
     """Prepare input data for diffusion."""
     # Prepare input data dataFrame for quantitative diffusion methods
@@ -316,11 +325,16 @@ def prepare_input_data(df: pd.DataFrame, method: str, absolute_value=False, p_va
         raise NotImplementedError('This diffusion method has not yet been implemented.')
 
 
+# TODO: out
 def _prepare_quantitative_input_data(df: pd.DataFrame, absolute_value: bool, p_value: int, threshold: Optional[int]) \
         -> pd.DataFrame:
     """Prepare input data for quantitative diffusion methods."""
+    # Only Node and Node Type columns are provided
+    if EXPRESSION and P_VALUE not in df.columns:
+        return binarize_quantitative_input_data(df)
+
     # Threshold value is provided
-    if threshold:
+    elif threshold:
 
         # Label nodes with |expression values| over threshold as 1 and below threshold as 0
         if absolute_value is True:
@@ -339,6 +353,7 @@ def _prepare_quantitative_input_data(df: pd.DataFrame, absolute_value: bool, p_v
     return significant_values_df[[NODE, LABEL]]
 
 
+# TODO: out
 def _prepare_non_quantitative_input_data(df: pd.DataFrame, p_value: int, threshold: Optional[int]) -> pd.DataFrame:
     """Process input data for non-quantitative diffusion methods."""
     # TODO: is p-value mandatory or optional?
@@ -380,6 +395,7 @@ def _prepare_non_quantitative_input_data(df: pd.DataFrame, p_value: int, thresho
         return df[[NODE, LABEL]]
 
 
+# TODO: out
 def _filter_by_abs_val(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     """Label nodes as 1 or 0 if |expression values| fall above or below the value of a threshold, respectively."""
     # Get absolute values of all expression values
@@ -396,8 +412,9 @@ def _filter_by_abs_val(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     return df[[NODE, LABEL]]
 
 
+# TODO: out
 def _filter_by_threshold(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
-    """Filter expression values in dataset by a threshold and set node labels."""
+    """Filter expression values in datasets by a threshold and set node labels."""
     # Label nodes with expression values falling above the threshold with 1
     df.loc[(df[EXPRESSION] >= threshold), LABEL] = 1
 
@@ -412,15 +429,55 @@ def _filter_by_threshold(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     return df[[NODE, LABEL]]
 
 
-def binarize_values(df):
-    """Convert expression values to binary values."""
-    # If expression values given, binarize values to 1 if over-expressed and -1 if under-expressed,
+def binarize_quantitative_input_data(df: pd.DataFrame, threshold: Optional[int], p_value: Optional[int],
+                                     absolute_value: bool) -> pd.DataFrame:
+    """Convert nodes to binary labels for quantitative diffusion methods."""
+    # Expression values are provided in dataset
     if EXPRESSION in df.columns:
-        df.loc[df[EXPRESSION] > 0, EXPRESSION] = 1
-        df.loc[df[EXPRESSION] < 0, EXPRESSION] = -1
+
+        # Expression values and p-values are provided in dataset
+        if P_VALUE in df.columns:
+
+            # Add label 0 if p-value is not significant
+            df.loc[df[P_VALUE] < p_value, LABEL] = 0
+
+            # Add binning labels where |expression values| above threshold are 1 and below are 0
+            if absolute_value is True:
+                return _process_quantitative_input_by_abs_val(df, threshold)
+
+            # Add signed labels where |expression values| above threshold are 1 or -1 (signed) and below are 0
+            return _process_quantitative_input_by_threshold(df, threshold)
+
+        # Add binning labels where |expression values| above threshold are 1 and below are 0
+        if absolute_value is True:
+            return _process_quantitative_input_by_abs_val(df, threshold)
+
+        # Add signed labels where |expression values| above threshold are 1 or -1 (signed) and below are 0
+        return _process_quantitative_input_by_threshold(df, threshold)
 
     # If input dataset exclusively contains IDs, then assign labels as 1
-    else:
-        df[LABEL] = 1
+    df[LABEL] = 1
 
-    return df[[NODE, LABEL]]
+    return df[[NODE_TYPE, NODE, LABEL]]
+
+
+def _process_quantitative_input_by_abs_val(df: pd.DataFrame, threshold:int) -> pd.DataFrame:
+    """Process quantitative inputs by absolute value."""
+    # Add label 1 if |expression value| is above threshold
+    df.loc[(df[EXPRESSION]).abs() >= threshold, LABEL] = 1
+    # Add label 0 if |expression value| below threshold
+    df.loc[(df[EXPRESSION]).abs() < threshold, LABEL] = 0
+
+    return df
+
+
+def _process_quantitative_input_by_threshold(df: pd.DataFrame, threshold:int) -> pd.DataFrame:
+    """Process quantitative inputs by threshold."""
+    # Add label 1 if expression value is above threshold
+    df.loc[df[EXPRESSION] >= threshold, LABEL] = 1
+    # Add label 0 if |expression value| below threshold
+    df.loc[(df[EXPRESSION]).abs() < threshold, LABEL] = 0
+    # Replace remaining labels with -1 (i.e. |expression value| above threshold but sign is negative)
+    df = df.fillna(-1)
+
+    return df

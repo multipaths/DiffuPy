@@ -116,4 +116,4 @@ EXPRESSION = 'Expression'
 #: Statistical significance (p-value)
 P_VALUE = 'p-value'
 #: Label
-LABEL = 'label'
+LABEL = 'Label'
