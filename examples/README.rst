@@ -8,33 +8,39 @@ You can submit your dataset in any of the following formats:
 - CSV (.csv)
 - TSV (.tsv)
 
-Please ensure that minimally, the dataset has a column 'Node' containing node IDs. Optionally, you can also add the
-following columns to your dataset:
+Please ensure that the dataset has a column 'Node' containing node IDs. If you only provide the node IDs, you must
+also ensure your dataset has a column 'NodeType' indicating the entity type for each node. You can also optionally add
+the following columns to your dataset:
 
-- Expresssion [*]_
+- log :sub:`2`  fold change (LogFC)
 - p-value
 
 Input dataset examples
 ~~~~~~~~~~~~~~~~~~~~~~
 
-1. Minimally, you must provide a list of entities as input.
+DiffuPath accepts several input formats which can be codified in different ways. See the
+`diffusion scores <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_ summary for more
+details.
 
-+--------------+
-| Node         |
-+==============+
-| Gene A       |
-+--------------+
-| Gene  B      |
-+--------------+
-| Metabolite C |
-+--------------+
-| Gene D       |
-+--------------+
-
-2. You can also choose to provide entities as well as their expression values (e.g., logFC).
+1. You can provide a dataset with a column 'Node' containing node IDs along with a column 'NodeType' indicating the entity type.
 
 +--------------+------------+
-| Node         | Expression |
+|   NodeType   |    Node    |
++==============+============+
+|     Gene     |     A      |
++--------------+------------+
+|     Gene     |     B      |
++--------------+------------+
+|  Metabolite  |     C      |
++--------------+------------+
+|     Gene     |     D      |
++--------------+------------+
+
+2. You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
+their log :sub:`2` FC.
+
++--------------+------------+
+| Node         |   LogFC    |
 +==============+============+
 | Gene A       | 4          |
 +--------------+------------+
@@ -45,10 +51,11 @@ Input dataset examples
 | Gene D       | 3          |
 +--------------+------------+
 
-3. Finally, you can provide entities with expression values and adjusted p-values.
+3. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their log :sub:`2`
+FC and a column 'p-value' with adjusted p-values.
 
 +--------------+------------+---------+
-| Node         | Expression | p-value |
+| Node         |   LogFC    | p-value |
 +==============+============+=========+
 | Gene A       | 4          | 0.03    |
 +--------------+------------+---------+
@@ -56,13 +63,11 @@ Input dataset examples
 +--------------+------------+---------+
 | Metabolite C | 1.5        | 0.001   |
 +--------------+------------+---------+
-| Gene D       | 3          |  0.07   |
+| Gene D       | 3          | 0.07    |
 +--------------+------------+---------+
 
 See the `sample datasets <https://github.com/multipaths/DiffuPy/tree/master/examples/datasets>`_ directory for example
 files.
-
-.. [*] Differential expression values e.g. fold change (FC)
 
 Networks
 --------
