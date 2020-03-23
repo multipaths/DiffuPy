@@ -99,16 +99,18 @@ ABSOLUTE_VALUE_EXP = 'absolute_value'
 """Acceptable column names of user submitted network"""
 
 #: Column name for source node
-SOURCE = 'source'
+SOURCE = 'Source'
 #: Column name for target node
-TARGET = 'target'
+TARGET = 'Target'
 #: Column name for relation
-RELATION = 'relation '
+RELATION = 'Relation '
 
-"""Column names for dataset"""
+"""Dataset column names"""
 
 #: Node name
 NODE = 'Node'
+#: Node type
+NODE_TYPE = 'NodeType'
 #: Expression value
 EXPRESSION = 'Expression'
 #: Statistical significance (p-value)
