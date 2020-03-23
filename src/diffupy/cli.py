@@ -100,25 +100,32 @@ def kernel(
     required=True,
 )
 # TODO
-@click.option(
-    '-t', '--threshold',
-    help='Apply a threshold for input data expression value.',
-    type=int,
-)
-# TODO
-@click.option(
-    '-p', '--p_value',
-    help='Statistical significance (p-value).',
-    type=int,
-    default=0.05,
-    show_default=True,
-)
-# TODO
-@click.option(
-    '-a', '--absolute_value',
-    help='Get the absolute values of expression values in the input dataset.',
-    type=bool,
-)
+# @click.option(
+#     '-t', '--threshold',
+#     help='Apply a threshold for input data expression value.',
+#     type=int,
+# )
+# # TODO
+# @click.option(
+#     '-p', '--p_value',
+#     help='Statistical significance (p-value).',
+#     type=int,
+#     default=0.05,
+#     show_default=True,
+# )
+# # # TODO
+# @click.option(
+#     '-a', '--absolute_value',
+#     help='Get the absolute values of expression values in the input datasets.',
+#     type=bool,
+# )
+# #TODO
+# @click.option(
+#     '-b', '--binarize',
+#     help='Convert expression values to binary (e.g., up-regulated entities to 1 down-regulated to -1).',
+#     type=bool,
+# )
+
 def diffuse(
         network: str,
         input: str,
