@@ -410,3 +410,17 @@ def _filter_by_threshold(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     # TODO: remove nodes that are not significant?
     # Get nodes and labels dataFrame
     return df[[NODE, LABEL]]
+
+
+def binarize_values(df):
+    """Convert expression values to binary values."""
+    # If expression values given, binarize values to 1 if over-expressed and -1 if under-expressed,
+    if EXPRESSION in df.columns:
+        df.loc[df[EXPRESSION] > 0, EXPRESSION] = 1
+        df.loc[df[EXPRESSION] < 0, EXPRESSION] = -1
+
+    # If input dataset exclusively contains IDs, then assign labels as 1
+    else:
+        df[LABEL] = 1
+
+    return df[[NODE, LABEL]]
