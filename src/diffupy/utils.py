@@ -222,7 +222,7 @@ def process_network(path: str, sep: str) -> DiGraph:
             # Store edge in the graph
             graph.add_edge(
                 sub_name, obj_name,
-                relation=relation
+                relation=relation,
             )
 
         else:
@@ -283,10 +283,19 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
         header=0,
         sep=FORMAT_SEPARATOR_MAPPING[CSV] if format == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
     )
-    if not (df.columns.isin([NODE, EXPRESSION, P_VALUE]).all()):
+
+    # Ensure that column Node is in dataset
+    if NODE not in df.columns:
         raise ValueError(
-            f'Ensure that your file contains columns for {NODE}, {EXPRESSION} and {P_VALUE}.'
+            f'Ensure that your file contains a column {NODE} with node IDs.'
         )
+
+    # If expression and p-value columns are not in dataFrame, ensure node type column is given
+    elif EXPRESSION and P_VALUE not in df.columns:
+        if NODE_TYPE not in df.columns:
+            raise ValueError(
+                f'Ensure that your file contains a column, {NODE_TYPE}, indicating node types.'
+            )
 
     return df
 
