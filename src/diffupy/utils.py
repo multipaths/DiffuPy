@@ -314,7 +314,8 @@ def prepare_input_data(df: pd.DataFrame, method: str, absolute_value: bool, p_va
     """Prepare input data for diffusion."""
     # Prepare input data dataFrame for quantitative diffusion methods
     if method == RAW or method == Z:
-        return _prepare_quantitative_input_data(df, absolute_value, p_value, threshold)
+        # TODO: check if bin or quant
+        return _binarize_quantitative_input_data(df, absolute_value, p_value, threshold)
 
     # Prepare input data dataFrame for non-quantitative diffusion methods
     elif method == ML or method == GM:
@@ -429,7 +430,7 @@ def _filter_by_threshold(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     return df[[NODE, LABEL]]
 
 
-def binarize_quantitative_input_data(df: pd.DataFrame, threshold: Optional[int], p_value: Optional[int],
+def _binarize_quantitative_input_data(df: pd.DataFrame, threshold: Optional[int], p_value: Optional[int],
                                      absolute_value: bool) -> pd.DataFrame:
     """Convert nodes to binary labels for quantitative diffusion methods."""
     # Expression values are provided in dataset
