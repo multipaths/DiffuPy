@@ -51,7 +51,7 @@ class Matrix:
         else:
             raise ValueError('No rows_labels list provided.')
 
-        if isinstance(cols_labels, list) or isinstance(rows_labels, set) or isinstance(rows_labels, np.ndarray):
+        if isinstance(cols_labels, list) or isinstance(cols_labels, set) or isinstance(cols_labels, np.ndarray):
             self._cols_labels = list(cols_labels)
 
         elif not quadratic:
