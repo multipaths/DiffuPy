@@ -4,6 +4,7 @@
 
 import json
 import logging
+import pickle
 import warnings
 from typing import List, Optional
 
@@ -15,6 +16,7 @@ from networkx import DiGraph, read_graphml, read_gml, node_link_graph, read_edge
 
 from .constants import *
 from .constants import CSV, TSV, GRAPHML, GML, BEL, BEL_PICKLE, NODE_LINK_JSON, EMOJI, FORMATS
+
 
 log = logging.getLogger(__name__)
 
@@ -242,31 +244,40 @@ def load_json_file(path: str) -> DiGraph:
         return json.load(f)
 
 
-def process_network_from_cli(network: str) -> nx.Graph:
+def from_pickle(input_path):
+    """Read network from pickle."""
+    with open(input_path, 'rb') as f:
+        unpickler = pickle.Unpickler(f)
+        background_mat = unpickler.load()
+
+    return background_mat
+
+
+def process_network_from_cli(path: str) -> nx.Graph:
     """Load network from path."""
-    if network.endswith(CSV):
-        graph = process_network(network, CSV)
+    if path.endswith(CSV):
+        graph = process_network(path, CSV)
 
-    elif network.endswith(TSV):
-        graph = process_network(network, TSV)
+    elif path.endswith(TSV):
+        graph = process_network(path, TSV)
 
-    elif network.endswith(GRAPHML):
-        graph = read_graphml(network)
+    elif path.endswith(GRAPHML):
+        graph = read_graphml(path)
 
-    elif network.endswith(GML):
-        graph = read_gml(network)
+    elif path.endswith(GML):
+        graph = read_gml(path)
 
-    elif network.endswith(BEL):
-        graph = pybel.from_path(network)
+    elif path.endswith(BEL):
+        graph = pybel.from_path(path)
 
-    elif network.endswith(BEL_PICKLE):
-        graph = pybel.from_pickle(network)
+    elif path.endswith(BEL_PICKLE):
+        graph = pybel.from_pickle(path)
 
-    elif network.endswith(EDGE_LIST):
-        graph = read_edgelist(network)
+    elif path.endswith(EDGE_LIST):
+        graph = read_edgelist(path)
 
-    elif network.endswith(NODE_LINK_JSON):
-        data = load_json_file(network)
+    elif path.endswith(NODE_LINK_JSON):
+        data = load_json_file(path)
         graph = node_link_graph(data)
 
     else:
@@ -276,6 +287,9 @@ def process_network_from_cli(network: str) -> nx.Graph:
         )
     return graph
 
+def process_kernel_from_cli(path: str):
+    # TODO process different kinds of input format kernel
+    return from_pickle(path)
 
 """Process datasets"""
 
