@@ -112,7 +112,7 @@ NODE = 'Node'
 #: Node type
 NODE_TYPE = 'NodeType'
 #: Expression value
-EXPRESSION = 'Expression'
+LOG_FC = 'LogFC'
 #: Statistical significance (p-value)
 P_VALUE = 'p-value'
 #: Label
