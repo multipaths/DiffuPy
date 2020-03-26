@@ -22,7 +22,7 @@ __all__ = [
 
 def diffuse(
         input_scores,
-        method: str,
+        method: str = 'raw',
         graph: nx.Graph = None,
         **kwargs
 ) -> Matrix:
@@ -44,19 +44,19 @@ def diffuse(
 
     # Discern the sep of the provided network for its further treatment.
     if graph:
-        format_network = "graph"
+        format_network = 'graph'
     else:
-        if "k" not in kwargs:
+        if 'k' not in kwargs:
             raise ValueError("Neither a graph 'graph' or a kernel 'k' has been provided.")
-        format_network = "kernel"
+        format_network = 'kernel'
 
-    if method == "raw":
-        return diffuse_raw(graph=graph, scores=scores, **kwargs)
+    if method == 'raw':
+        return diffuse_raw(graph, scores, **kwargs)
 
-    elif method == "z":
+    elif method == 'z':
         return diffuse_raw(graph, scores, z=True, **kwargs)
 
-    elif method == "ml":
+    elif method == 'ml':
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
             if score not in [-1, 0, 1]:
                 raise ValueError("Input scores must be binary.")
@@ -65,16 +65,16 @@ def diffuse(
 
         return diffuse_raw(graph, scores, **kwargs)
 
-    elif method == "gm":
+    elif method == 'gm':
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
             if score not in [0, 1]:
                 raise ValueError("Input scores must be binary.")
                 # Have to match rownames with background
                 # If the kernel is provided...
 
-        if format_network == "graph":
+        if format_network == 'graph':
             names_ordered = get_label_list_graph(graph, 'name')
-        elif format_network == "kernel":
+        elif format_network == 'kernel':
             names_ordered = kwargs['k'].rows_labels
 
         # If the graph is defined
