@@ -1,4 +1,4 @@
-Node,Expression,p-value
+Node,LogFC,p-value
 A,4.8,0.04
 B,2.0,0.08
 C,1.7,0.003

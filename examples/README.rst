@@ -12,8 +12,10 @@ Please ensure that the dataset has a column 'Node' containing node IDs. If you o
 also ensure your dataset has a column 'NodeType' indicating the entity type for each node. You can also optionally add
 the following columns to your dataset:
 
-- log :sub:`2`  fold change (LogFC)
+- LogFC [*]_
 - p-value
+
+.. [*] log :sub:`2`  fold change
 
 Input dataset examples
 ~~~~~~~~~~~~~~~~~~~~~~
