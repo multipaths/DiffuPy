@@ -41,33 +41,36 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
 """Codify input according to diffusion scoring method"""
 
 
-def prepare_input_data(df: pd.DataFrame,
-                       method: str,
-                       binning: bool,
-                       absolute_value: Optional[bool],
-                       p_value: Optional[int],
-                       threshold: Optional[int],
-                       ) -> pd.DataFrame:
+def prepare_input_data(
+        df: pd.DataFrame,
+        method: str,
+        binning: bool,
+        absolute_value: Optional[bool],
+        p_value: Optional[int],
+        threshold: Optional[int],
+) -> pd.DataFrame:
     """Prepare input data for diffusion."""
     # Prepare input data dataFrame for quantitative diffusion scoring methods
     if method == RAW or method == Z:
-        return codify_quantitative_input_data(df, binning, threshold, absolute_value, p_value)
+        return _codify_quantitative_input_data(df, binning, threshold, absolute_value, p_value)
 
     # Prepare input data dataFrame for non-quantitative diffusion methods
     elif method == ML or method == GM:
-        raise NotImplementedError('This diffusion method has not yet been implemented.')
+        raise _codify_non_quantitative_input_data(df, threshold, absolute_value, p_value)
 
     else:
         # TODO: ber_s, ber_p, mc
         raise NotImplementedError('This diffusion method has not yet been implemented.')
 
 
-def codify_quantitative_input_data(df: pd.DataFrame,
-                                   binning: bool,
-                                   threshold: Optional[int],
-                                   p_value: Optional[int],
-                                   absolute_value: bool,
-                                   ) -> pd.DataFrame:
+def _codify_quantitative_input_data(
+        df: pd.DataFrame,
+        binning: bool,
+        threshold: Optional[int],
+        p_value: Optional[int],
+        absolute_value: bool,
+) -> pd.DataFrame:
+
     """Codify input data to get a set of labelled nodes for scoring methods that accept quantitative values."""
     # LogFC provided in dataset
     if LOG_FC in df.columns:
@@ -100,8 +103,12 @@ def codify_quantitative_input_data(df: pd.DataFrame,
 """Assign binary labels for input for scoring methods that accept quantitative values"""
 
 
-def _bin_quantitative_input_by_abs_val(df: pd.DataFrame, threshold: int, p_value: int) -> pd.DataFrame:
-    """Process quantitative inputs by absolute value."""
+def _bin_quantitative_input_by_abs_val(
+        df: pd.DataFrame,
+        threshold: Optional[int],
+        p_value: Optional[int],
+)-> pd.DataFrame:
+    """Process quantitative inputs and bin labels by absolute value."""
     # Add label 1 if |logFC| is above threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = 1
     # Add label 0 if |logFC| below threshold
@@ -114,18 +121,25 @@ def _bin_quantitative_input_by_abs_val(df: pd.DataFrame, threshold: int, p_value
     return df[[NODE, LABEL]]
 
 
-def _bin_quantitative_input_by_threshold(df: pd.DataFrame, threshold: int, p_value: int) -> pd.DataFrame:
-    # Add label 1 if logFC is above threshold
-    df.loc[df[LOG_FC] >= threshold, LABEL] = 1
-    # Add label 0 if |logFC| below threshold
-    df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = 0
-    # Replace remaining labels with -1 (i.e. |logFC| above threshold but sign is negative)
-    df = df.fillna(-1)
+def _bin_quantitative_input_by_threshold(
+        df: pd.DataFrame,
+        threshold: Optional[int],
+        p_value: Optional[int],
+)-> pd.DataFrame:
+    """Process quantitative inputs and bin labels by threshold."""
+    if threshold:
+        # Add label 1 if logFC is above threshold
+        df.loc[df[LOG_FC] >= threshold, LABEL] = 1
+        # Add label 0 if |logFC| below threshold
+        df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = 0
+        # Replace remaining labels with -1 (i.e. |logFC| above threshold but sign is negative)
+        df = df.fillna(-1)
 
-    # LogFC values and adjusted p-values are provided in dataset
-    if P_VALUE in df.columns:
-        # Disregard entities if logFC adjusted p-value is not significant
-        return _remove_non_significant_entities(df, p_value)
+        if p_value:
+            # LogFC values and adjusted p-values are provided in dataset
+            if P_VALUE in df.columns:
+                # Disregard entities if logFC adjusted p-value is not significant
+                return _remove_non_significant_entities(df, p_value)
 
     return df[[NODE, LABEL]]
 
@@ -133,7 +147,11 @@ def _bin_quantitative_input_by_threshold(df: pd.DataFrame, threshold: int, p_val
 """Assign logFC as labels for input for scoring methods that accept quantitative values"""
 
 
-def _codify_quantitative_input_by_abs_val(df, threshold, p_value):
+def _codify_quantitative_input_by_abs_val(
+        df: pd.DataFrame,
+        threshold: Optional[int],
+        p_value: Optional[int],
+) -> pd.DataFrame:
     """Codify nodes with |logFC| if they pass threshold, otherwise label is 0."""
     # Codify nodes with |logFC| if they pass threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = (df[LOG_FC]).abs()
@@ -148,7 +166,7 @@ def _codify_quantitative_input_by_abs_val(df, threshold, p_value):
     return df[[NODE, LABEL]]
 
 
-def _codify_quantitative_input_by_threshold(df, threshold, p_value):
+def _codify_quantitative_input_by_threshold(df: pd.DataFrame, threshold: Optional[int], p_value: Optional[int]):
     """Codify inputs with logFC if they pass threshold value."""
     df.loc[df[LOG_FC] >= threshold, LABEL] = df[LOG_FC]
     df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = 0
@@ -162,7 +180,7 @@ def _codify_quantitative_input_by_threshold(df, threshold, p_value):
     return df[[NODE, LABEL]]
 
 
-def _remove_non_significant_entities(df, p_value):
+def _remove_non_significant_entities(df: pd.DataFrame, p_value: int):
     # Label entity 0 if adjusted p-value for logFC is not significant
     df.loc[df[P_VALUE] > p_value, LABEL] = 0
 
