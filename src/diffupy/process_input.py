@@ -70,6 +70,7 @@ def _codify_quantitative_input_data(
         p_value: Optional[int],
         absolute_value: bool,
 ) -> pd.DataFrame:
+
     """Codify input data to get a set of labelled nodes for scoring methods that accept quantitative values."""
     # LogFC provided in dataset
     if LOG_FC in df.columns:
