@@ -63,6 +63,27 @@ def prepare_input_data(
         raise NotImplementedError('This diffusion method has not yet been implemented.')
 
 
+"""Assign binary labels to input for scoring methods that accept non-quantitative values"""
+
+
+def _codify_non_quantitative_input_data(df: pd.DataFrame, threshold, p_value):
+    """Codify input for non-quantitative methods."""
+    # Label nodes with 1 if |logFC| passes threshold
+    df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = 1
+    # Label nodes with -1 if |logFC| below threshold
+    df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = -1
+
+    # If adjusted p-values are provided in dataset, label nodes that are not statistically significant with -1
+    if P_VALUE in df.columns:
+
+        df.loc[df[P_VALUE] > p_value, LABEL] = -1
+
+    return df[[NODE, LABEL]]
+
+
+"""Assign binary labels for input for scoring methods that accept quantitative values"""
+
+
 def _codify_quantitative_input_data(
         df: pd.DataFrame,
         binning: bool,
@@ -98,9 +119,6 @@ def _codify_quantitative_input_data(
     df[LABEL] = 1
 
     return df[[NODE_TYPE, NODE, LABEL]]
-
-
-"""Assign binary labels for input for scoring methods that accept quantitative values"""
 
 
 def _bin_quantitative_input_by_abs_val(
