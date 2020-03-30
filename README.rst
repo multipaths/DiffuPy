@@ -35,7 +35,7 @@ editable mode with:
 
 Command Line Interface
 ----------------------
-The following commands can be used directly use from your terminal:
+The following commands can be used directly from your terminal:
 
 1. **Run a diffusion analysis**
 The following command will run a diffusion method on a given network with the given data.  More information `here
