@@ -286,8 +286,9 @@ def process_network_from_cli(path: str) -> nx.Graph:
             f'{FORMATS}'
         )
     return graph
-  
+
 
 def process_kernel_from_cli(path: str):
+    """Process kernel from cli."""
     # TODO process different kinds of input format kernel
     return from_pickle(path)

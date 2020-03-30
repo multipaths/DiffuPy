@@ -14,6 +14,7 @@ import click
 from .constants import OUTPUT, METHODS, EMOJI
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
+from .process_input import _process_input
 from .utils import process_network_from_cli
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,6 @@ logger = logging.getLogger(__name__)
 def main():
     """Command line interface for diffuPy."""
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
-
 
 
 @main.command()
@@ -139,7 +139,6 @@ def diffuse(
         threshold: float,
         p_value: float,
 ):
-    print(binarize,absolute_value,threshold,p_value)
     """Run a diffusion method over a network or pre-generated kernel."""
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
     graph = process_network_from_cli(network)
