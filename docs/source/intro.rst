@@ -2,7 +2,6 @@ First Steps
 ===========
 The first step before running diffusion algorithms on your network using DiffuPy is to learn about the graph and data
 formats are supported. Next, you can find samples of input datasets and networks to run diffusion methods over.
-
 Input Data
 ----------
 
@@ -11,17 +10,56 @@ You can submit your dataset in any of the following formats:
 - CSV (.csv)
 - TSV (.tsv)
 
-Please ensure the dataset has a column for each of the following:
+Please ensure that the dataset has a column 'Node' containing node IDs. If you only provide the node IDs, you must
+also ensure your dataset has a column 'NodeType' indicating the entity type for each node. You can also optionally add
+the following columns to your dataset:
 
-- Node
-- Expresssion [*]_
+- LogFC [*]_
 - p-value
+
+.. [*] log :sub:`2`  fold change
 
 Input dataset example
 ~~~~~~~~~~~~~~~~~~~~~
+DiffuPath accepts several input formats which can be codified in different ways. See the
+`diffusion scores <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_ summary for more
+details.
+
+1. You can provide a dataset with a column 'Node' containing node IDs along with a column 'NodeType' indicating the
+entity type.
+
++--------------+------------+
+|   NodeType   |    Node    |
++==============+============+
+|     Gene     |     A      |
++--------------+------------+
+|     Gene     |     B      |
++--------------+------------+
+|  Metabolite  |     C      |
++--------------+------------+
+|     Gene     |     D      |
++--------------+------------+
+
+2. You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
+their log :sub:`2` FC.
+
++--------------+------------+
+| Node         |   LogFC    |
++==============+============+
+| Gene A       | 4          |
++--------------+------------+
+| Gene  B      | -1         |
++--------------+------------+
+| Metabolite C | 1.5        |
++--------------+------------+
+| Gene D       | 3          |
++--------------+------------+
+
+3. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their log :sub:`2`
+FC and a column 'p-value' with adjusted p-values.
 
 +--------------+------------+---------+
-| Node         | Expression | p-value |
+| Node         |   LogFC    | p-value |
 +==============+============+=========+
 | Gene A       | 4          | 0.03    |
 +--------------+------------+---------+
@@ -29,13 +67,12 @@ Input dataset example
 +--------------+------------+---------+
 | Metabolite C | 1.5        | 0.001   |
 +--------------+------------+---------+
-| Gene D       | 3          |  0.07   |
+| Gene D       | 3          | 0.07    |
 +--------------+------------+---------+
 
-See the `sample datasets <https://github.com/multipaths/DiffuPy/tree/master/examples/datasets>`_ directory for example
-files.
+You can also take a look at our `sample datasets <https://github.com/multipaths/DiffuPy/tree/master/examples/datasets>`_
+folder for some examples files.
 
-.. [*] Differential expression values e.g. fold change (FC)
 
 Networks
 --------
@@ -68,18 +105,19 @@ __ Edge_
 
 Minimally, please ensure each of the following columns are included in the network file you submit:
 
-- FirstNode
-- SecondNode
+- Source
+- Target
 
 Optionally, you can choose to add a third column, "Relation" in your network (as in the example below). If the relation
 between the **Source** and **Target** nodes is omitted, and/or if the directionality is ambiguous, either node can be
 assigned as the **Source** or **Target**.
 
+
 Custom-network example
 ~~~~~~~~~~~~~~~~~~~~~~
 
 +-----------+--------------+-------------+
-| FirstNode | SecondNode   | Relation    |
+|  Source   |   Target     | Relation    |
 +===========+==============+=============+
 | Gene A    | Gene B       | Increase    |
 +-----------+--------------+-------------+
@@ -88,5 +126,5 @@ Custom-network example
 | Gene A    | Pathology D  | Association |
 +-----------+--------------+-------------+
 
-See the `sample networks <https://github.com/multipaths/DiffuPy/tree/master/examples/networks>`_ directory for some
-examples.
+You can also take a look at our `sample networks <https://github.com/multipaths/DiffuPy/tree/master/examples/networks>`_
+folder for some examples.
