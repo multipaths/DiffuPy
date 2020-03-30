@@ -14,6 +14,7 @@ import click
 from .constants import OUTPUT, METHODS, EMOJI
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
+from .process_input import _process_input
 from .utils import process_network_from_cli
 
 logger = logging.getLogger(__name__)
