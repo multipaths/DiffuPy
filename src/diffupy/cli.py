@@ -14,7 +14,7 @@ import click
 from .constants import OUTPUT, METHODS, EMOJI
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
-from .utils import process_network_from_cli, _process_input
+from .utils import process_network_from_cli
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 def main():
     """Command line interface for diffuPy."""
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
+
 
 
 @main.command()
@@ -99,39 +100,46 @@ def kernel(
     type=click.Choice(METHODS),
     required=True,
 )
-# TODO
-# @click.option(
-#     '-t', '--threshold',
-#     help='Apply a threshold for input data expression value.',
-#     type=int,
-# )
-# # TODO
-# @click.option(
-#     '-p', '--p_value',
-#     help='Statistical significance (p-value).',
-#     type=int,
-#     default=0.05,
-#     show_default=True,
-# )
-# # # TODO
-# @click.option(
-#     '-a', '--absolute_value',
-#     help='Get the absolute values of expression values in the input datasets.',
-#     type=bool,
-# )
-# #TODO
-# @click.option(
-#     '-b', '--binarize',
-#     help='Convert expression values to binary (e.g., up-regulated entities to 1 down-regulated to -1).',
-#     type=bool,
-# )
-
+@click.option(
+    '-b', '--binarize',
+    help='If logFCs provided in dataset, convert logFCs to binary (e.g., up-regulated entities to 1, down-regulated to '
+         '-1). For scoring methods that accept quantitative values (i.e., raw & z), node labels can also be codified '
+         'with LogFCs (in this case, set binarize==False).',
+    type=bool,
+    default=True,
+    show_default=True,
+)
+@click.option(
+    '-t', '--threshold',
+    help='Codify node labels by applying a threshold to logFCs in input.',
+    type=float,
+)
+@click.option(
+    '-a', '--absolute_value',
+    help='Codify node labels by applying threshold to |logFCs| in input. If absolute_value is set to False, node labels '
+         'will be signed.',
+    type=bool,
+    default=True,
+    show_default=True,
+)
+@click.option(
+    '-p', '--p_value',
+    help='Statistical significance (p-value).',
+    type=float,
+    default=0.05,
+    show_default=True,
+)
 def diffuse(
         network: str,
         input: str,
         output: str,
         method: str,
+        binarize: bool,
+        absolute_value: bool,
+        threshold: float,
+        p_value: float,
 ):
+    print(binarize,absolute_value,threshold,p_value)
     """Run a diffusion method over a network or pre-generated kernel."""
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
     graph = process_network_from_cli(network)
