@@ -26,7 +26,6 @@ def main():
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
 
 
-
 @main.command()
 @click.option(
     '-n', '--network',
@@ -140,7 +139,6 @@ def diffuse(
         threshold: float,
         p_value: float,
 ):
-    print(binarize,absolute_value,threshold,p_value)
     """Run a diffusion method over a network or pre-generated kernel."""
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
     graph = process_network_from_cli(network)
