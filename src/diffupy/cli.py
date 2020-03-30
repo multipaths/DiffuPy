@@ -14,7 +14,7 @@ import click
 from .constants import OUTPUT, METHODS, EMOJI
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
-from .process_input import _process_input
+from .process_input import _process_input, prepare_input_data
 from .utils import process_network_from_cli
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ def kernel(
 
     graph = process_network_from_cli(network)
 
-    click.secho(f'{EMOJI} Calculating regulatised Laplacian kernel. This might take a while... {EMOJI}')
+    click.secho(f'{EMOJI} Calculating regularized Laplacian kernel. This might take a while... {EMOJI}')
     exe_t_0 = time.time()
     background_mat = regularised_laplacian_kernel(graph)
     exe_t_f = time.time()
@@ -102,21 +102,21 @@ def kernel(
 )
 @click.option(
     '-b', '--binarize',
-    help='If logFCs provided in dataset, convert logFCs to binary (e.g., up-regulated entities to 1, down-regulated to '
+    help='If F provided in dataset, convert logFC to binary (e.g., up-regulated entities to 1, down-regulated to '
          '-1). For scoring methods that accept quantitative values (i.e., raw & z), node labels can also be codified '
-         'with LogFCs (in this case, set binarize==False).',
+         'with LogFC (in this case, set binarize==False).',
     type=bool,
     default=True,
     show_default=True,
 )
 @click.option(
     '-t', '--threshold',
-    help='Codify node labels by applying a threshold to logFCs in input.',
+    help='Codify node labels by applying a threshold to logFC in input.',
     type=float,
 )
 @click.option(
     '-a', '--absolute_value',
-    help='Codify node labels by applying threshold to |logFCs| in input. If absolute_value is set to False, node labels '
+    help='Codify node labels by applying threshold to |logFC| in input. If absolute_value is set to False, node labels '
          'will be signed.',
     type=bool,
     default=True,
@@ -150,7 +150,13 @@ def diffuse(
         f'{EMOJI}'
     )
 
-    input_scores = _process_input(input)
+    click.secho(f'Codifying data from {input}.')
+
+    input_df = _process_input(input)
+
+    input_scores = prepare_input_data(input_df, method, binarize, absolute_value, p_value, threshold)
+
+    click.secho(f'Running the diffusion algorithm.')
 
     results = run_diffusion(
         input_scores,
@@ -159,6 +165,8 @@ def diffuse(
     )
 
     json.dump(results, output, indent=2)
+
+    click.secho(f'Finished!')
 
 
 if __name__ == '__main__':
