@@ -21,10 +21,10 @@ def process_input(
 ) -> pd.DataFrame:
     """Read input file and ensure necessary columns exist."""
     if path.endswith(CSV):
-        format = CSV
+        fmt = CSV
 
     elif path.endswith(TSV):
-        format = TSV
+        fmt = TSV
 
     else:
         raise IOError(
@@ -35,7 +35,7 @@ def process_input(
     df = pd.read_csv(
         path,
         header=0,
-        sep=FORMAT_SEPARATOR_MAPPING[CSV] if format == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
+        sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
     )
 
     # Ensure that column Node is in dataset

@@ -175,11 +175,11 @@ def get_simple_graph_from_multigraph(multigraph):
 """Check formats of networks """
 
 
-def _format_checker(format: str) -> None:
+def _format_checker(fmt: str) -> None:
     """Check column sep."""
-    if format not in FORMATS:
+    if fmt not in FORMATS:
         raise ValueError(
-            f'The selected sep {format} is not valid. Please ensure you use one of the following formats: '
+            f'The selected sep {fmt} is not valid. Please ensure you use one of the following formats: '
             f'{FORMATS}'
         )
 
@@ -187,14 +187,14 @@ def _format_checker(format: str) -> None:
 """Process networks"""
 
 
-def _read_network_file(path: str, format: str) -> pd.DataFrame:
+def _read_network_file(path: str, fmt: str) -> pd.DataFrame:
     """Read network file."""
-    _format_checker(format)
+    _format_checker(fmt)
 
     df = pd.read_csv(
         path,
         header=0,
-        sep=FORMAT_SEPARATOR_MAPPING[CSV] if format == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
+        sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
     )
 
     if SOURCE and TARGET not in df.columns:
@@ -207,7 +207,7 @@ def _read_network_file(path: str, format: str) -> pd.DataFrame:
 
 
 def process_network(path: str, sep: str) -> DiGraph:
-    """Return network from dataframe."""
+    """Return network from dataFrame."""
     _format_checker(sep)
 
     df = _read_network_file(path, sep)
@@ -282,7 +282,7 @@ def process_network_from_cli(path: str) -> nx.Graph:
 
     else:
         raise IOError(
-            f'{EMOJI} The selected format {format} is not valid. Please ensure you use one of the following formats: '
+            f'{EMOJI} The selected format is not valid. Please ensure you use one of the following formats: '
             f'{FORMATS}'
         )
     return graph
