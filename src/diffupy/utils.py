@@ -197,7 +197,7 @@ def _read_network_file(path: str, fmt: str) -> pd.DataFrame:
         sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
     )
 
-    if SOURCE and TARGET not in df.columns:
+    if SOURCE not in df.columns or TARGET not in df.columns:
         raise ValueError(
             f'Ensure that your file contains columns for {SOURCE} and {TARGET}. The column for {RELATION} is optional'
             f'and can be omitted.'
