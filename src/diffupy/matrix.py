@@ -6,6 +6,7 @@ import logging
 import os
 
 import numpy as np
+import pandas as pd
 
 from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, decode_labels, get_idx_scores_mapping, \
     get_repeated_labels
@@ -454,6 +455,23 @@ class Matrix:
             name=str(os.path.basename(csv_path).replace('.csv', ''))
         )
 
+    """Export"""
+
+    def to_dict(self):
+        """Export/convert matrix as a dictionary data structure."""
+
+        d = {col_label : self.get_row_from_label(col_label) for ix, col_label in enumerate(self.cols_labels)}
+        d['rows_labels'] = self.rows_labels
+
+        return d
+
+    def to_csv(self, path, index = True):
+        """Export matrix to csv file using the headers of the Matrix class."""
+
+        # Generate dataframe
+        df = pd.DataFrame(data = self.to_dict())
+
+        df.to_csv(path, index = index)
 
 class LaplacianMatrix(Matrix):
     """Laplacian matrix class."""
