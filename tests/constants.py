@@ -13,7 +13,10 @@ INVERSE_COSINE_KERNEL = os.path.join(RESOURCES_FOLDER, 'inverseCosineKernel.csv'
 P_STEP_KERNEL = os.path.join(RESOURCES_FOLDER, 'pStepKernel.csv')
 REGULARISED_LAPLACIAN_KERNEL = os.path.join(RESOURCES_FOLDER, 'regularisedLaplacianKernel.csv')
 
-
+DATASETS_FOLDER = os.path.join(RESOURCES_FOLDER, 'datasets')
+NODE_TEST_PATH = os.path.join(DATASETS_FOLDER, 'node.csv')
+NODE_LOGFC_TEST_PATH = os.path.join(DATASETS_FOLDER, 'node_logfc.csv')
+NODE_LOGFC_PVAL_TEST_PATH = os.path.join(DATASETS_FOLDER, 'node_logfc_pval.csv')
 INPUT_SCORES = os.path.join(RESOURCES_FOLDER, 'input_scores.csv')
 INPUT_UNLABELED_SCORES = os.path.join(RESOURCES_FOLDER, 'input_unlabeled_scores.csv')
 
