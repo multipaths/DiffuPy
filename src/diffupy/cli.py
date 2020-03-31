@@ -14,7 +14,7 @@ import click
 from .constants import OUTPUT, METHODS, EMOJI
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
-from .process_input import _process_input, prepare_input_data
+from .process_input import process_input
 from .utils import process_network_from_cli
 
 logger = logging.getLogger(__name__)
@@ -152,14 +152,12 @@ def diffuse(
 
     click.secho(f'Codifying data from {input}.')
 
-    input_df = _process_input(input)
-
-    input_scores = prepare_input_data(input_df, method, binarize, absolute_value, p_value, threshold)
+    input_scores_dict = process_input(input, method, binarize, absolute_value, p_value, threshold)
 
     click.secho(f'Running the diffusion algorithm.')
 
     results = run_diffusion(
-        input_scores,
+        input_scores_dict,
         method,
         graph,
     )

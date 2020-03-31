@@ -7,14 +7,30 @@ import pandas as pd
 
 from .constants import *
 from .matrix import Matrix
-from .utils import _format_checker
 
 """Process datasets"""
 
 
-def _process_input(path: str, format: str) -> pd.DataFrame:
+def process_input(
+        path: str,
+        method: str,
+        binning: bool,
+        absolute_value: bool,
+        p_value: float,
+        threshold: Optional[float],
+) -> pd.DataFrame:
     """Read input file and ensure necessary columns exist."""
-    _format_checker(format)
+    if path.endswith(CSV):
+        format = CSV
+
+    elif path.endswith(TSV):
+        format = TSV
+
+    else:
+        raise IOError(
+            f'There is a problem with your file. Please ensure the file you submitted is correctly formatted with a'
+            f'.csv or .tsv file extension.'
+        )
 
     df = pd.read_csv(
         path,
@@ -35,13 +51,13 @@ def _process_input(path: str, format: str) -> pd.DataFrame:
                 f'Ensure that your file contains a column, {NODE_TYPE}, indicating node types.'
             )
 
-    return df
+    return _codify_input_data(df, method, binning, absolute_value, p_value, threshold)
 
 
 """Codify input according to diffusion scoring method"""
 
 
-def prepare_input_data(
+def _codify_input_data(
         df: pd.DataFrame,
         method: str,
         binning: bool,
@@ -84,15 +100,15 @@ def _codify_non_quantitative_input_data(
         if P_VALUE in df.columns:
             df.loc[df[P_VALUE] > p_value, LABEL] = -1
 
-        return df[[NODE, LABEL]]
+        return df.set_index(NODE)[LABEL].to_dict()
 
     # If input dataset exclusively contains IDs and no logFC, or if threshold is not given, then assign labels as 1
     df[LABEL] = 1
 
-    return df[[NODE, LABEL]]
+    return df.set_index(NODE)[LABEL].to_dict()
 
 
-"""Assign binary labels for input for scoring methods that accept quantitative values"""
+"""Assign binary labels to input for scoring methods that accept quantitative values"""
 
 
 def _codify_quantitative_input_data(
@@ -129,7 +145,8 @@ def _codify_quantitative_input_data(
     # If input dataset exclusively contains IDs and no logFC, or if threshold is not given, then assign labels as 1
     df[LABEL] = 1
 
-    return df[[NODE_TYPE, NODE, LABEL]]
+    # TODO return df[[NODE_TYPE, NODE, LABEL]]
+    return df.set_index(NODE)[LABEL].to_dict()
 
 
 def _bin_quantitative_input_by_abs_val(
@@ -147,7 +164,7 @@ def _bin_quantitative_input_by_abs_val(
     if P_VALUE in df.columns:
         return _remove_non_significant_entities(df, p_value)
 
-    return df[[NODE, LABEL]]
+    return df.set_index(NODE)[LABEL].to_dict()
 
 
 def _bin_quantitative_input_by_threshold(
@@ -169,7 +186,7 @@ def _bin_quantitative_input_by_threshold(
             # Disregard entities if logFC adjusted p-value is not significant
             return _remove_non_significant_entities(df, p_value)
 
-    return df[[NODE, LABEL]]
+    return df.set_index(NODE)[LABEL].to_dict()
 
 
 """Assign logFC as labels for input for scoring methods that accept quantitative values"""
@@ -191,7 +208,7 @@ def _codify_quantitative_input_by_abs_val(
         # Disregard entities if logFC adjusted p-value is not significant
         return _remove_non_significant_entities(df, p_value)
 
-    return df[[NODE, LABEL]]
+    return df.set_index(NODE)[LABEL].to_dict()
 
 
 def _codify_quantitative_input_by_threshold(
@@ -209,14 +226,14 @@ def _codify_quantitative_input_by_threshold(
         # Disregard entities if logFC adjusted p-value is not significant
         return _remove_non_significant_entities(df, p_value)
 
-    return df[[NODE, LABEL]]
+    return df.set_index(NODE)[LABEL].to_dict()
 
 
 def _remove_non_significant_entities(df: pd.DataFrame, p_value: float) -> pd.DataFrame:
     # Label entity 0 if adjusted p-value for logFC is not significant
     df.loc[df[P_VALUE] > p_value, LABEL] = 0
 
-    return df[[NODE, LABEL]]
+    return df.set_index(NODE)[LABEL].to_dict()
 
 
 """Generate input vector from dataset labels"""
