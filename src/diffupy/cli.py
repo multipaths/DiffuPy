@@ -102,7 +102,7 @@ def kernel(
 )
 @click.option(
     '-b', '--binarize',
-    help='If F provided in dataset, convert logFC to binary (e.g., up-regulated entities to 1, down-regulated to '
+    help='If logFC provided in dataset, convert logFC to binary (e.g., up-regulated entities to 1, down-regulated to '
          '-1). For scoring methods that accept quantitative values (i.e., raw & z), node labels can also be codified '
          'with LogFC (in this case, set binarize==False).',
     type=bool,
