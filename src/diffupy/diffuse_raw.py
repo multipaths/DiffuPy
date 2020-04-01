@@ -103,8 +103,9 @@ def diffuse_raw(
     if not z:
         return Matrix(
             diff,
-            scores.rows_labels,
-            scores.cols_labels
+            rows_labels = scores.rows_labels,
+            cols_labels = ['output diffusion scores'],
+            name = scores.name
         )
 
     logging.info('Normalization z-scores.')
@@ -139,6 +140,7 @@ def diffuse_raw(
             )
                 for i in range(diff.shape[1])
             ]),
-        scores.rows_labels,
-        scores.cols_labels
+        rows_labels = scores.rows_labels,
+        cols_labels = ['output diffusion scores'],
+        name = scores.name
     )

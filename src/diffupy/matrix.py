@@ -457,25 +457,29 @@ class Matrix:
 
     """Export"""
 
-    def to_dict(self):
+    def to_dict(self, ordered = True):
         """Export/convert matrix as a dictionary data structure."""
+        if ordered:
+            mat = self.order_rows()
+        else:
+            mat = self
 
-        d = {col_label : self.get_row_from_label(col_label) for ix, col_label in enumerate(self.cols_labels)}
-        d['rows_labels'] = self.rows_labels
+        # Construct dict first assigning the headers of rows_labels
+        d = {'rows_labels': mat.rows_labels}
+        for col_label in mat.cols_labels:
+            d[col_label] = mat.get_col_from_label(col_label)
 
         return d
 
-    def to_csv(self, path, index = True):
-        """Export matrix to csv file using the headers of the Matrix class."""
-
+    def to_csv(self, path, file_name = '_export.csv', index = False, ordered = True):
+        """Export matrix to csv file using the headers (row_labels, cols_labels) of the Matrix class."""
         # Generate dataframe
-        df = pd.DataFrame(data = self.to_dict())
+        df = pd.DataFrame(data = self.to_dict(ordered))
 
-        df.to_csv(path, index = index)
+        df.to_csv(os.path.join(path, self.name, file_name), index = index)
 
 class LaplacianMatrix(Matrix):
     """Laplacian matrix class."""
-
     def __init__(self, graph, normalized=False, name=''):
         """Initialize laplacian."""
         l_mat = get_laplacian(graph, normalized)
