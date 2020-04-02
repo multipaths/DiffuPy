@@ -258,7 +258,7 @@ def generate_categoric_input_vector_from_labels(
         missing_value=-1,
         rows_unlabeled=None,
 ):
-    """Generate input vector from labels."""
+    """Generate categoric input vector from labels."""
     if isinstance(col_label, str):
         col_label = [col_label]
 
