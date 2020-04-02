@@ -237,6 +237,17 @@ def _remove_non_significant_entities(df: pd.DataFrame, p_value: float) -> pd.Dat
     return df.set_index(NODE)[LABEL].to_dict()
 
 
+"""Map nodes from input to network"""
+
+
+def map_nodes(input_node_dict: Dict[str, int], network: nx.Graph) -> List:
+    """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
+    # List of nodes in network
+    network_nodes = list(network.nodes)
+
+    return [input_node_dict[node] if node in input_node_dict else None for node in network_nodes]
+
+
 """Generate input vector from dataset labels"""
 
 
