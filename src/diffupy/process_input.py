@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """Main matrix class and processing of input data."""
-from typing import Optional
+from typing import Dict, List, Optional
 
+import networkx as nx
 import pandas as pd
 
 from .constants import *
@@ -18,7 +19,7 @@ def process_input(
         absolute_value: bool,
         p_value: float,
         threshold: Optional[float],
-) -> pd.DataFrame:
+) -> Dict[str, int]:
     """Read input file and ensure necessary columns exist."""
     if path.endswith(CSV):
         fmt = CSV
@@ -64,13 +65,13 @@ def _codify_input_data(
         absolute_value: bool,
         p_value: float,
         threshold: Optional[float],
-) -> pd.DataFrame:
+) -> Dict[str, int]:
     """Prepare input data for diffusion."""
-    # Prepare input data dataFrame for quantitative diffusion scoring methods
+    # Prepare input data for quantitative diffusion scoring methods
     if method == RAW or method == Z:
         return _codify_quantitative_input_data(df, binning, absolute_value, p_value, threshold)
 
-    # Prepare input data dataFrame for non-quantitative diffusion methods
+    # Prepare input data for non-quantitative diffusion methods
     elif method == ML or method == GM:
         return _codify_non_quantitative_input_data(df, p_value, threshold)
 
@@ -86,7 +87,7 @@ def _codify_non_quantitative_input_data(
         df: pd.DataFrame,
         p_value: float,
         threshold: Optional[float]
-):
+) -> Dict[str, int]:
     """Codify input data to get a set of labelled nodes for scoring methods that accept non-quantitative values."""
     # LogFC provided in dataset and threshold given
     if LOG_FC in df.columns and threshold:
@@ -117,7 +118,7 @@ def _codify_quantitative_input_data(
         absolute_value: bool,
         p_value: float,
         threshold: Optional[float],
-) -> pd.DataFrame:
+) -> Dict[str, int]:
     """Codify input data to get a set of labelled nodes for scoring methods that accept quantitative values."""
     # LogFC provided in dataset and threshold given
     if LOG_FC in df.columns and threshold:
@@ -145,7 +146,7 @@ def _codify_quantitative_input_data(
     # If input dataset exclusively contains IDs and no logFC, or if threshold is not given, then assign labels as 1
     df[LABEL] = 1
 
-    # TODO return df[[NODE_TYPE, NODE, LABEL]]
+    # TODO handle NODE_TYPE
     return df.set_index(NODE)[LABEL].to_dict()
 
 
@@ -153,7 +154,7 @@ def _bin_quantitative_input_by_abs_val(
         df: pd.DataFrame,
         threshold: float,
         p_value: float,
-) -> pd.DataFrame:
+) -> Dict[str, int]:
     """Process quantitative inputs and bin labels by absolute value."""
     # Add label 1 if |logFC| is above threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = 1
@@ -171,7 +172,7 @@ def _bin_quantitative_input_by_threshold(
         df: pd.DataFrame,
         threshold: float,
         p_value: float,
-) -> pd.DataFrame:
+) -> Dict[str, int]:
     """Process quantitative inputs and bin labels by threshold."""
     # Add label 1 if logFC is above threshold
     df.loc[df[LOG_FC] >= threshold, LABEL] = 1
@@ -196,7 +197,7 @@ def _codify_quantitative_input_by_abs_val(
         df: pd.DataFrame,
         threshold: float,
         p_value: float,
-) -> pd.DataFrame:
+) -> Dict[str, int]:
     """Codify nodes with |logFC| if they pass threshold, otherwise label is 0."""
     # Codify nodes with |logFC| if they pass threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = (df[LOG_FC]).abs()
@@ -215,7 +216,7 @@ def _codify_quantitative_input_by_threshold(
         df: pd.DataFrame,
         threshold: float,
         p_value: float,
-) -> pd.DataFrame:
+) -> Dict[str, int]:
     """Codify inputs with logFC if they pass threshold value."""
     df.loc[df[LOG_FC] >= threshold, LABEL] = df[LOG_FC]
     df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = 0
