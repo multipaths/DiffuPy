@@ -245,12 +245,10 @@ def load_json_file(path: str) -> DiGraph:
 
 
 def from_pickle(input_path):
-    """Read network from pickle."""
+    """Read from pickle file."""
     with open(input_path, 'rb') as f:
         unpickler = pickle.Unpickler(f)
-        background_mat = unpickler.load()
-
-    return background_mat
+        return unpickler.load()
 
 
 def process_network_from_cli(path: str) -> nx.Graph:
