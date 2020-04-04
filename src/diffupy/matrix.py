@@ -157,9 +157,10 @@ class Matrix:
     def update_ix_mappings(self):
         """Return a copy of Matrix Object."""
         if hasattr(self, '_rows_labels_ix_mapping') and self.rows_labels:
-            _rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
+            self._rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
+
         if hasattr(self, '_cols_labels_ix_mapping') and hasattr(self, '_cols_labels'):
-            _cols_labels_ix_mapping = get_label_ix_mapping(self._cols_labels)
+            self._cols_labels_ix_mapping = get_label_ix_mapping(self._cols_labels)
 
     def validate_labels_and_update_ix_mappings(self):
         """Return a copy of Matrix Object."""
@@ -254,23 +255,31 @@ class Matrix:
             self._rows_idx_scores_mapping = cols_idx_scores_mapping
         self._cols_idx_scores_mapping = cols_idx_scores_mapping
 
-    """Getters from labels"""
-
-    def set_row_from_label(self, label, x):
-        """Set row from label."""
-        self.mat[self.rows_labels_ix_mapping[label]] = x
+    """Getters setters and delete from labels"""
 
     def get_row_from_label(self, label):
         """Get row from labels."""
         return self.mat[self.rows_labels_ix_mapping[label]]
 
-    def set_col_from_label(self, label, x):
-        """Set col from label."""
-        self.mat[:, self.cols_labels_ix_mapping[label]] = x
+    def set_row_from_label(self, label, x):
+        """Set row from label."""
+        self.mat[self.rows_labels_ix_mapping[label]] = x
+
+    def delete_row_from_label(self, label):
+        """Set row from label."""
+        self.mat = np.delete(self.mat, self.rows_labels_ix_mapping[label], 0)
+        self.rows_labels.remove(label)
+        self.update_ix_mappings()
 
     def get_col_from_label(self, label):
         """Get col from labels."""
         return self.mat[:, self.cols_labels_ix_mapping[label]]
+
+    def delete_col_from_label(self, label):
+        """Set col from label."""
+        self.mat = np.delete(self.mat, self.cols_labels_ix_mapping[:, self.cols_labels_ix_mapping[label]], 1)
+        self.cols_labels.remove(label)
+        self.update_ix_mappings()
 
     def set_cell_from_labels(self, row_label, col_label, x):
         """Set cell from labels."""
@@ -372,7 +381,7 @@ class Matrix:
 
         return mat_match
 
-    def match_missing_rows(self, reference_labels, missing_fill):
+    def match_missing_rows(self, reference_labels, missing_fill = 0):
         """Match method to set missing rows labels from reference labels with the missing_fill value."""
         if reference_labels == self.rows_labels:
             return self
@@ -391,6 +400,22 @@ class Matrix:
 
         return mat_match
 
+    def match_delete_rows(self, reference_labels):
+        """Match method to set missing rows labels from reference labels with the missing_fill value."""
+        if reference_labels == self.rows_labels:
+            return self
+
+        mat_match = self.__copy__()
+
+        over_labels = set(mat_match.rows_labels) - set(reference_labels)
+
+        for label in over_labels:
+            mat_match.delete_row_from_label(label)
+
+        mat_match.validate_labels_and_update_ix_mappings()
+
+        return mat_match
+
     def match_missing_cols(self, reference_labels, missing_fill):
         """Match method to set missing cols labels from reference labels with the missing_fill value."""
         if reference_labels == self.cols_labels:
@@ -402,7 +427,7 @@ class Matrix:
 
         mat_match.cols_labels.append(missing_labels)
 
-        missing_values = np.array([len(missing_labels), len(reference_labels.cols_labels)])
+        missing_values = np.array([len(self.rows_labels), len(reference_labels.cols_labels)])
         missing_values.fill(missing_fill)
 
         mat_match.mat = np.concatenate(mat_match.mat, missing_values, axis=1)
