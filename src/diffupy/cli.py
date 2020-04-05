@@ -96,7 +96,7 @@ def kernel(
 )
 @click.option(
     '-m', '--method',
-    help='Difussion method',
+    help='Diffusion method',
     type=click.Choice(METHODS),
     required=True,
 )
