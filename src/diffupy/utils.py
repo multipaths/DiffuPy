@@ -6,12 +6,13 @@ import json
 import logging
 import pickle
 import warnings
-from typing import List
+from typing import List, Tuple
 
 import networkx as nx
 import numpy as np
 import pandas as pd
 import pybel
+
 from networkx import DiGraph, read_graphml, read_gml, node_link_graph, read_edgelist
 
 from .constants import *
