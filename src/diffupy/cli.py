@@ -42,9 +42,9 @@ def main():
 )
 @click.option('-l', '--log', is_flag=True, help='Activate debug mode')
 def kernel(
-        network: str,
-        output: str = OUTPUT,
-        log: bool = None
+    network: str,
+    output: str = OUTPUT,
+    log: bool = None
 ):
     """Generate a kernel for a given network."""
     # Configure logging level
@@ -116,8 +116,8 @@ def kernel(
 )
 @click.option(
     '-a', '--absolute_value',
-    help='Codify node labels by applying threshold to |logFC| in input. If absolute_value is set to False, node labels '
-         'will be signed.',
+    help='Codify node labels by applying threshold to | logFC | in input. If absolute_value is set to False,'
+         'node labels will be signed.',
     type=bool,
     default=True,
     show_default=True,
@@ -130,14 +130,14 @@ def kernel(
     show_default=True,
 )
 def diffuse(
-        network: str,
-        data: str,
-        output: str,
-        method: str,
-        binarize: bool,
-        absolute_value: bool,
-        threshold: float,
-        p_value: float,
+    network: str,
+    data: str,
+    output: str,
+    method: str,
+    binarize: bool,
+    absolute_value: bool,
+    threshold: float,
+    p_value: float,
 ):
     """Run a diffusion method over a network or pre-generated kernel."""
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')

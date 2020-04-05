@@ -92,9 +92,9 @@ def _codify_non_quantitative_input_data(
     # LogFC provided in dataset and threshold given
     if LOG_FC in df.columns and threshold:
 
-        # Label nodes with 1 if |logFC| passes threshold
+        # Label nodes with 1 if | logFC | passes threshold
         df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = 1
-        # Label nodes with -1 if |logFC| below threshold
+        # Label nodes with -1 if | logFC | below threshold
         df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = -1
 
         # If adjusted p-values are provided in dataset, label nodes that are not statistically significant with -1
@@ -126,17 +126,17 @@ def _codify_quantitative_input_data(
         # Binarize labels with 1, 0 and/or -1
         if binning is True:
 
-            # Add binning labels where |logFC| values above threshold are 1 and below are 0
+            # Add binning labels where | logFC | values above threshold are 1 and below are 0
             if absolute_value is True:
                 return _bin_quantitative_input_by_abs_val(df, threshold, p_value)
 
-            # Add signed labels where |logFC| values above threshold are 1 or -1 (signed) and values below are 0
+            # Add signed labels where | logFC | values above threshold are 1 or -1 (signed) and values below are 0
 
             return _bin_quantitative_input_by_threshold(df, threshold, p_value)
 
         # Labels are 0s or logFC values rather than binary values
         else:
-            # Codify inputs with |logFC| if they pass threshold; otherwise assign label as 0
+            # Codify inputs with | logFC | if they pass threshold; otherwise assign label as 0
             if absolute_value is True:
                 return _codify_quantitative_input_by_abs_val(df, threshold, p_value)
 
@@ -156,9 +156,9 @@ def _bin_quantitative_input_by_abs_val(
         p_value: float,
 ) -> Dict[str, int]:
     """Process quantitative inputs and bin labels by absolute value."""
-    # Add label 1 if |logFC| is above threshold
+    # Add label 1 if | logFC | is above threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = 1
-    # Add label 0 if |logFC| below threshold
+    # Add label 0 if | logFC | below threshold
     df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = 0
 
     # logFC and adjusted p-values are provided in dataset
@@ -176,9 +176,9 @@ def _bin_quantitative_input_by_threshold(
     """Process quantitative inputs and bin labels by threshold."""
     # Add label 1 if logFC is above threshold
     df.loc[df[LOG_FC] >= threshold, LABEL] = 1
-    # Add label 0 if |logFC| below threshold
+    # Add label 0 if | logFC | below threshold
     df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = 0
-    # Replace remaining labels with -1 (i.e. |logFC| above threshold but sign is negative)
+    # Replace remaining labels with -1 (i.e. | logFC | above threshold but sign is negative)
     df = df.fillna(-1)
 
     if p_value:
@@ -198,8 +198,8 @@ def _codify_quantitative_input_by_abs_val(
         threshold: float,
         p_value: float,
 ) -> Dict[str, int]:
-    """Codify nodes with |logFC| if they pass threshold, otherwise label is 0."""
-    # Codify nodes with |logFC| if they pass threshold
+    """Codify nodes with | logFC | if they pass threshold, otherwise label is 0."""
+    # Codify nodes with | logFC | if they pass threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, LABEL] = (df[LOG_FC]).abs()
     # Codify nodes with label 0 if it falls below threshold
     df.loc[(df[LOG_FC]).abs() < threshold, LABEL] = 0
