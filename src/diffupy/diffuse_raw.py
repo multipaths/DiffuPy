@@ -20,11 +20,11 @@ __all__ = [
 
 
 def calculate_scores(
-        col_ind: int,
-        scores: np.array,
-        diff: np.array,
-        const_mean: np.array,
-        const_var: np.array
+    col_ind: int,
+    scores: np.array,
+    diff: np.array,
+    const_mean: np.array,
+    const_var: np.array
 ) -> float:
     """Help function for diffuse_raw, which operate the z-scores calculation given a whole column of the score matrix.
 
@@ -51,10 +51,10 @@ def calculate_scores(
 
 
 def diffuse_raw(
-        graph: nx.Graph,
-        scores: Matrix,
-        z: bool = False,
-        k: Matrix = None,
+    graph: nx.Graph,
+    scores: Matrix,
+    z: bool = False,
+    k: Matrix = None,
 ) -> Matrix:
     """Compute the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
 
@@ -103,9 +103,9 @@ def diffuse_raw(
     if not z:
         return Matrix(
             diff,
-            rows_labels = scores.rows_labels,
-            cols_labels = ['output diffusion scores'],
-            name = scores.name
+            rows_labels=scores.rows_labels,
+            cols_labels=['output diffusion scores'],
+            name=scores.name
         )
 
     logging.info('Normalization z-scores.')
@@ -140,7 +140,7 @@ def diffuse_raw(
             )
                 for i in range(diff.shape[1])
             ]),
-        rows_labels = scores.rows_labels,
-        cols_labels = ['output diffusion scores'],
-        name = scores.name
+        rows_labels=scores.rows_labels,
+        cols_labels=['output diffusion scores'],
+        name=scores.name
     )

@@ -23,15 +23,15 @@ class Matrix:
     """Matrix class."""
 
     def __init__(
-            self,
-            mat=None,
-            rows_labels=None,
-            cols_labels=None,
-            graph=None,
-            quadratic=False,
-            name='',
-            init_value=None,
-            **kwargs
+        self,
+        mat=None,
+        rows_labels=None,
+        cols_labels=None,
+        graph=None,
+        quadratic=False,
+        name='',
+        init_value=None,
+        **kwargs
     ):
         """Initialize matrix.
 
@@ -87,7 +87,7 @@ class Matrix:
         return f"\nmatrix {self.name} \n  {s} \n "
 
     def __iter__(self, **kargs):
-        """Helper method for the iteration of the Matrix."""
+        """Help method for the iteration of the Matrix."""
         self.i = -1
         self.j = 0
 
@@ -99,7 +99,7 @@ class Matrix:
         return self
 
     def __next__(self):
-        """Helper method for the iteration of the Matrix."""
+        """Help method for the iteration of the Matrix."""
         if self.i >= len(self.rows_labels) - 1 and self.j >= len(self.cols_labels) - 1:
             self.get_labels = True
             self.get_indices = False
@@ -381,7 +381,7 @@ class Matrix:
 
         return mat_match
 
-    def match_missing_rows(self, reference_labels, missing_fill = 0):
+    def match_missing_rows(self, reference_labels, missing_fill=0):
         """Match method to set missing rows labels from reference labels with the missing_fill value."""
         if reference_labels == self.rows_labels:
             return self
@@ -482,7 +482,7 @@ class Matrix:
 
     """Export"""
 
-    def to_dict(self, ordered = True):
+    def to_dict(self, ordered=True):
         """Export/convert matrix as a dictionary data structure."""
         if ordered:
             mat = self.order_rows()
@@ -496,15 +496,17 @@ class Matrix:
 
         return d
 
-    def to_csv(self, path, file_name = '_export.csv', index = False, ordered = True):
+    def to_csv(self, path, file_name='_export.csv', index=False, ordered=True):
         """Export matrix to csv file using the headers (row_labels, cols_labels) of the Matrix class."""
         # Generate dataframe
-        df = pd.DataFrame(data = self.to_dict(ordered))
+        df = pd.DataFrame(data=self.to_dict(ordered))
 
-        df.to_csv(os.path.join(path, self.name, file_name), index = index)
+        df.to_csv(os.path.join(path, self.name, file_name), index=index)
+
 
 class LaplacianMatrix(Matrix):
     """Laplacian matrix class."""
+
     def __init__(self, graph, normalized=False, name=''):
         """Initialize laplacian."""
         l_mat = get_laplacian(graph, normalized)

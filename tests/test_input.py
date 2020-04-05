@@ -10,6 +10,7 @@ from diffupy.matrix import Matrix
 from diffupy.process_input import process_input, map_nodes
 from diffupy.utils import process_network
 from diffupy.validate_input import _validate_scores
+
 from tests.constants import *
 
 log = logging.getLogger(__name__)
@@ -135,8 +136,7 @@ class ValidateTest(unittest.TestCase):
         })
 
     def test_node_mapping(self):
-        """Test mapping of nodes in label_input to nodes in network"""
-
+        """Test mapping of nodes in label_input to nodes in network."""
         input = NODE_LOGFC_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=False, absolute_value=True, p_value=0.05, threshold=0.5,

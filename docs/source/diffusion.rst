@@ -95,12 +95,12 @@ References
 .. [3] Mostafavi, S., *et al.* (2008). Genemania: a real-time multiple association network integration algorithm for
     predicting gene function.Genome Biology. (9), S4.
 
-.. [4] Harchaoui, Z., *et al.* (2013). Kernel-based methods for hypothesis testing: a unified view. IEEE Signal Processing
-    Magazine. (30), 87–97.
+.. [4] Harchaoui, Z., *et al.* (2013). Kernel-based methods for hypothesis testing: a unified view. IEEE Signal
+    Processing Magazine. (30), 87–97.
 
 .. [5] Bersanelli, M. *et al.* (2016). Network diffusion-based analysis of high-throughput data for the detection of
     differentially enriched modules. Scientific Reports. (6), 34841.
 
-.. [6] Tsuda, K., *et al.* (2005).  Fast  protein  classification  with  multiple  networks. Bioinformatics, (21), 59–65.
+.. [6] Tsuda, K., *et al.* (2005).  Fast  protein  classification  with  multiple  networks. Bioinformatics, (21), 59–65
 
 
