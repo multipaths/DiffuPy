@@ -17,7 +17,9 @@ the following columns to your dataset:
 - LogFC [*]_
 - p-value
 
-.. [*] log :sub:`2`  fold change
+.. [*] |Log| fold change
+
+.. |Log| replace:: Log\ :sub:`2`
 
 Input dataset examples
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +44,7 @@ entity type.
 +------------+--------------+
 
 2. You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
-their log :sub:`2` FC.
+their |LogFC|.
 
 +--------------+------------+
 | Node         |   LogFC    |
@@ -56,8 +58,10 @@ their log :sub:`2` FC.
 | Gene D       | 3          |
 +--------------+------------+
 
-3. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their log :sub:`2`
-FC and a column 'p-value' with adjusted p-values.
+.. |LogFC| replace:: Log\ :sub:`2`\ FC
+
+3. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their |LogFC| and
+a column 'p-value' with adjusted p-values.
 
 +--------------+------------+---------+
 | Node         |   LogFC    | p-value |
