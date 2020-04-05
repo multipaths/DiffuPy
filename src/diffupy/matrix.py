@@ -78,7 +78,7 @@ class Matrix:
         self.validate_labels()
 
     def __str__(self):
-        """Return string version of the matrix class."""
+        """Return a string representation of the Matrix."""
         s = f"        {self.cols_labels}"
 
         for i, row_label in enumerate(self.rows_labels):
@@ -87,7 +87,7 @@ class Matrix:
         return f"\nmatrix {self.name} \n  {s} \n "
 
     def __iter__(self, **kargs):
-        """Help method for the matrix class."""
+        """Helper method for the iteration of the Matrix."""
         self.i = -1
         self.j = 0
 
@@ -99,7 +99,7 @@ class Matrix:
         return self
 
     def __next__(self):
-        """Help method for the matrix class."""
+        """Helper method for the iteration of the Matrix."""
         if self.i >= len(self.rows_labels) - 1 and self.j >= len(self.cols_labels) - 1:
             self.get_labels = True
             self.get_indices = False
@@ -126,7 +126,7 @@ class Matrix:
         return nxt
 
     def __copy__(self):
-        """Return a copy of Matrix Object."""
+        """Return a copy of a Matrix object."""
         return Matrix(self.mat,
                       rows_labels=self.rows_labels,
                       cols_labels=self.cols_labels,
@@ -137,7 +137,7 @@ class Matrix:
     """Validators """
 
     def validate_labels(self):
-        """Return a copy of Matrix Object."""
+        """Sanity function to check the dimensionality of the Matrix."""
         if self.rows_labels:
             self.rows_labels = decode_labels(self.rows_labels)
             if len(self.rows_labels) != len(set(self.rows_labels)):
@@ -155,7 +155,7 @@ class Matrix:
                 raise Exception('Duplicate column labels in Matrix.')
 
     def update_ix_mappings(self):
-        """Return a copy of Matrix Object."""
+        """Update the index-label mapping."""
         if hasattr(self, '_rows_labels_ix_mapping') and self.rows_labels:
             self._rows_labels_ix_mapping = get_label_ix_mapping(self.rows_labels)
 
@@ -163,7 +163,7 @@ class Matrix:
             self._cols_labels_ix_mapping = get_label_ix_mapping(self._cols_labels)
 
     def validate_labels_and_update_ix_mappings(self):
-        """Return a copy of Matrix Object."""
+        """Update function, called when the Matrix mutates, combining the two previous functionalities."""
         self.validate_labels()
         self.update_ix_mappings()
 
