@@ -19,7 +19,7 @@ class ValidateTest(unittest.TestCase):
     """Test validation of results."""
 
     def test_quantitative_bin_id(self):
-        """Test codify input for quantitative scoring methods- only entity IDs given (binary labels)."""
+        """Test codify label_input for quantitative scoring methods- only entity IDs given (binary labels)."""
         input = NODE_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=True, absolute_value=True, p_value=0.05, threshold=None,
@@ -27,7 +27,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1})
 
     def test_quantitative_bin_fc_sign(self):
-        """Test codify input for quantitative scoring methods- logFC given (binary, signed labels)."""
+        """Test codify label_input for quantitative scoring methods- logFC given (binary, signed labels)."""
         input = NODE_LOGFC_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=True, absolute_value=False, p_value=0.05, threshold=0.5,
@@ -35,7 +35,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 1, 'B': 1, 'C': 0, 'D': 0, 'E': -1})
 
     def test_quantitative_bin_fc_abs(self):
-        """Test codify input for quantitative scoring methods- logFC given (binary, absolute values)."""
+        """Test codify label_input for quantitative scoring methods- logFC given (binary, absolute values)."""
         input = NODE_LOGFC_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=True, absolute_value=True, p_value=0.05, threshold=0.5,
@@ -43,7 +43,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 1, 'B': 1, 'C': 0, 'D': 0, 'E': 1})
 
     def test_quantitative_bin_fcp_sign(self):
-        """Test codify input for quantitative scoring methods- logFC and adj. p-value given (binary, signed labels)."""
+        """Test codify label_input for quantitative scoring methods- logFC and adj. p-value given (binary, signed labels)."""
         input = NODE_LOGFC_PVAL_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=True, absolute_value=False, p_value=0.05, threshold=0.5,
@@ -51,7 +51,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 0, 'B': 1, 'C': 0, 'D': 0, 'E': -1})
 
     def test_quantitative_bin_fcp_abs(self):
-        """Test codify input for quant. scoring methods- logFC and adj. p-value given (binary, absolute values)."""
+        """Test codify label_input for quant. scoring methods- logFC and adj. p-value given (binary, absolute values)."""
         input = NODE_LOGFC_PVAL_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=True, absolute_value=True, p_value=0.05, threshold=0.5,
@@ -59,7 +59,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 0, 'B': 1, 'C': 0, 'D': 0, 'E': 1})
 
     def test_quantitative_fc_sign(self):
-        """Test codify input for quantitative scoring methods- logFC given (quantitative, signed labels)."""
+        """Test codify label_input for quantitative scoring methods- logFC given (quantitative, signed labels)."""
         input = NODE_LOGFC_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=False, absolute_value=False, p_value=0.05, threshold=0.5,
@@ -67,7 +67,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 0.7, 'B': 1.2, 'C': 0, 'D': 0, 'E': -2.2})
 
     def test_quantitative_fc_abs(self):
-        """Test codify input for quantitative scoring methods- logFC given (quant., absolute values)."""
+        """Test codify label_input for quantitative scoring methods- logFC given (quant., absolute values)."""
         input = NODE_LOGFC_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=False, absolute_value=True, p_value=0.05, threshold=0.5,
@@ -75,7 +75,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 0.7, 'B': 1.2, 'C': 0, 'D': 0, 'E': 2.2})
 
     def test_quantitative_fcp_sign(self):
-        """Test codify input for quantitative scoring methods- logFC and adj. p-value given (quant., signed labels)."""
+        """Test codify label_input for quantitative scoring methods- logFC and adj. p-value given (quant., signed labels)."""
         input = NODE_LOGFC_PVAL_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=False, absolute_value=False, p_value=0.05, threshold=0.5,
@@ -83,7 +83,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 0, 'B': 1.2, 'C': 0, 'D': 0, 'E': -2.2})
 
     def test_quantitative_fcp_abs(self):
-        """Test codify input for quant. scoring methods- logFC and adj. p-value given (quant., absolute values)."""
+        """Test codify label_input for quant. scoring methods- logFC and adj. p-value given (quant., absolute values)."""
         input = NODE_LOGFC_PVAL_TEST_PATH
         input_labels_dict = process_input(
             input, method=RAW, binning=False, absolute_value=True, p_value=0.05, threshold=0.5,
@@ -91,7 +91,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 0, 'B': 1.2, 'C': 0, 'D': 0, 'E': 2.2})
 
     def test_non_quantitative_bin_id(self):
-        """Test codify input for non-quantitative scoring methods- only entity IDs given (binary labels)."""
+        """Test codify label_input for non-quantitative scoring methods- only entity IDs given (binary labels)."""
         input = NODE_TEST_PATH
         input_labels_dict = process_input(
             input, method=ML, binning=True, absolute_value=True, p_value=0.05, threshold=None,
@@ -99,7 +99,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1})
 
     def test_non_quantitative_bin_fc_abs(self):
-        """Test codify input for non-quantitative scoring methods- logFC given (binary, absolute values (sign))."""
+        """Test codify label_input for non-quantitative scoring methods- logFC given (binary, absolute values (sign))."""
         input = NODE_LOGFC_TEST_PATH
         input_labels_dict = process_input(
             input, method=ML, binning=True, absolute_value=True, p_value=0.05, threshold=0.5,
@@ -107,7 +107,7 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(input_labels_dict, {'A': 1, 'B': 1, 'C': -1, 'D': -1, 'E': 1})
 
     def test_non_quantitative_bin_fcp_abs(self):
-        """Test codify input for non-quant. scoring methods- logFC and adj. p-value given (binary, absolute values)."""
+        """Test codify label_input for non-quant. scoring methods- logFC and adj. p-value given (binary, absolute values)."""
         input = NODE_LOGFC_PVAL_TEST_PATH
         input_labels_dict = process_input(
             input, method=ML, binning=True, absolute_value=True, p_value=0.05, threshold=0.5,
@@ -135,7 +135,7 @@ class ValidateTest(unittest.TestCase):
         })
 
     def test_node_mapping(self):
-        """Test mapping of nodes in input to nodes in network"""
+        """Test mapping of nodes in label_input to nodes in network"""
 
         input = NODE_LOGFC_TEST_PATH
         input_labels_dict = process_input(

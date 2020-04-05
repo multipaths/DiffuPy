@@ -83,7 +83,7 @@ def kernel(
     type=click.Path(exists=True, dir_okay=False)
 )
 @click.option(
-    '-i', '--input',
+    '-i', '--data',
     help='Input data',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
@@ -131,7 +131,7 @@ def kernel(
 )
 def diffuse(
         network: str,
-        input: str,
+        data: str,
         output: str,
         method: str,
         binarize: bool,
@@ -150,9 +150,9 @@ def diffuse(
         f'{EMOJI}'
     )
 
-    click.secho(f'Codifying data from {input}.')
+    click.secho(f'Codifying data from {data}.')
 
-    input_scores_dict = process_input(input, method, binarize, absolute_value, p_value, threshold)
+    input_scores_dict = process_input(data, method, binarize, absolute_value, p_value, threshold)
 
     click.secho(f'Running the diffusion algorithm.')
 
