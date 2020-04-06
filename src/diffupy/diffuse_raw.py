@@ -14,29 +14,28 @@ from .validate_input import _validate_scores, _validate_graph, _validate_k
 logger = logging.getLogger()
 
 __all__ = [
-    'calculate_scores',
     'diffuse_raw',
 ]
 
 
-def calculate_scores(
+def _calculate_scores(
     col_ind: int,
     scores: np.array,
-    diff: np.array,
+    raw_diff_scores: np.array,
     const_mean: np.array,
     const_var: np.array
 ) -> float:
-    """Help function for diffuse_raw, which operate the z-scores calculation given a whole column of the score matrix.
+    """Operate a column of the z-scores for the input score and the raw scores precomputation, helper function for diffuse_raw.
 
-    :param col_ind: background object for the diffusion
-    :param scores: list of score matrices. For a single path with a single background, supply a list with a vector column
-    :param diff: bool to indicate if z-scores be computed instead of raw scores
-    :param const_mean: k optional matrix precomputed diffusion kernel
-    :param const_var: k optional matrix precomputed diffusion kernel
+    :param col_ind: index of the column to operate
+    :param scores: array of score matrices
+    :param raw_diff_scores: precomputatated raw diffusion scores
+    :param const_mean: precalculated constant mean over columns
+    :param const_var: precalculated constant variance over columns
     :return:  Calculated column z-score
     """
     col_in = scores[:, col_ind]
-    col_raw = diff[:, col_ind]
+    col_raw = raw_diff_scores[:, col_ind]
 
     s1 = np.sum(col_in)
     s2 = np.sum(col_in ** 2)
@@ -59,9 +58,9 @@ def diffuse_raw(
     """Compute the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
 
     :param graph: background network
-    :param scores: list of score matrices. For a single path with a single background, supply a list with a vector col
+    :param scores: array of score matrices. For a single path with a single background, supply a list with a vector col
     :param z: bool to indicate if z-scores be computed instead of raw scores
-    :param k: optional matrix precomputed diffusion kernel
+    :param k: optional precomputed diffusion kernel matrix
     :return: A list of scores, with the same length and dimensions as scores
     """
     # Sanity checks
@@ -96,13 +95,13 @@ def diffuse_raw(
     kernel = kernel.mat
 
     # raw scores
-    diff = np.matmul(kernel[:, :n], scores.mat)
+    raw_scores_diff = np.matmul(kernel[:, :n], scores.mat)
     logging.info('Matrix product for raw scores preformed.')
 
     # Return base matrix if it is raw. Continue if we want z-scores.
     if not z:
         return Matrix(
-            diff,
+            raw_scores_diff,
             rows_labels=scores.rows_labels,
             cols_labels=['output diffusion scores'],
             name=scores.name
@@ -130,15 +129,15 @@ def diffuse_raw(
     return Matrix(
         np.transpose(
             [np.array(
-                calculate_scores(
+                _calculate_scores(
                     i,
                     scores.mat,
-                    diff,
+                    raw_scores_diff,
                     const_mean,
                     const_var
                 )
             )
-                for i in range(diff.shape[1])
+                for i in range(raw_scores_diff.shape[1])
             ]),
         rows_labels=scores.rows_labels,
         cols_labels=['output diffusion scores'],
