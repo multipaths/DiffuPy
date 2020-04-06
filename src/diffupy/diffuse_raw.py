@@ -25,8 +25,7 @@ def _calculate_scores(
     const_mean: np.array,
     const_var: np.array
 ) -> float:
-    """Helper function for diffuse_raw, which operates a column of the z-scores for the input score matrix
-    and the raw scores precomputation.
+    """Operate a column of the z-scores for the input score and the raw scores precomputation, helper function for diffuse_raw.
 
     :param col_ind: index of the column to operate
     :param scores: array of score matrices
