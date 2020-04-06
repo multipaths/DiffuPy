@@ -14,12 +14,11 @@ from .validate_input import _validate_scores, _validate_graph, _validate_k
 logger = logging.getLogger()
 
 __all__ = [
-    'calculate_scores',
     'diffuse_raw',
 ]
 
 
-def calculate_scores(
+def _calculate_scores(
     col_ind: int,
     scores: np.array,
     raw_diff_scores: np.array,
@@ -131,7 +130,7 @@ def diffuse_raw(
     return Matrix(
         np.transpose(
             [np.array(
-                calculate_scores(
+                _calculate_scores(
                     i,
                     scores.mat,
                     raw_scores_diff,
