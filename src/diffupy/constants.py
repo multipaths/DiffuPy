@@ -66,22 +66,30 @@ GRAPHML = 'graphml'
 #: bel
 BEL = 'bel'
 #: node link json
-NODE_LINK_JSON = 'json'
+JSON = 'json'
 #: pickle
-BEL_PICKLE = 'pickle'
+PICKLE = 'pickle'
 #: gml
 GML = 'gml'
 #: edge list
 EDGE_LIST = '.lst'
 
-#: DiffuPath available network formats
-FORMATS = [
+#: DiffuPath available graph formats
+GRAPH_FORMATS = [
     CSV,
     TSV,
     GRAPHML,
     BEL,
-    NODE_LINK_JSON,
-    BEL_PICKLE,
+    JSON,
+    PICKLE,
+]
+
+#: DiffuPath available kernel formats
+KERNEL_FORMATS = [
+    CSV,
+    TSV,
+    JSON,
+    PICKLE,
 ]
 
 #: Separators
