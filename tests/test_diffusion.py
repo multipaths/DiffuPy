@@ -10,7 +10,7 @@ import numpy as np
 
 from diffupy.diffuse import diffuse
 from diffupy.matrix import Matrix
-from tests.constants import *
+from .constants import *
 
 log = logging.getLogger(__name__)
 

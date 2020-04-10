@@ -117,11 +117,23 @@ RELATION = 'Relation '
 
 #: Node name
 NODE = 'Node'
+LABEL = 'Label'
+ENTITY = 'Entity'
+GENE = 'Gene'
+
+NODE_LABELING= [
+    NODE,
+    LABEL,
+    ENTITY,
+    GENE
+]
+
 #: Node type
 NODE_TYPE = 'NodeType'
+#: Unspecified score type
+SCORE = 'Score'
 #: Log2 fold change (logFC)
 LOG_FC = 'LogFC'
 #: Statistical significance (p-value)
 P_VALUE = 'p-value'
-#: Label
-LABEL = 'Label'
+
