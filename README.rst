@@ -10,8 +10,8 @@ DiffuPy is a generalizable Python implementation of the numerous label propagati
 graph formats such as `JSON, CSV, GraphML, or GML <https://github.com/multipaths/DiffuPy/tree/master/examples>`_. Check
 out `DiffuPy's documentation here <https://diffupy.readthedocs.io/en/latest/>`_.
 
-Installation
-------------
+Installation |pypi_version| |python_versions| |pypi_license|
+------------------------------------------------------------
 The latest stable code can be installed from `PyPI <https://pypi.python.org/pypi/diffupy>`_ with:
 
 .. code-block:: sh
@@ -70,3 +70,12 @@ guarantee of maintenance, support, or back-up of data.
 .. |coverage| image:: https://codecov.io/gh/multipaths/diffupy/coverage.svg?branch=master
     :target: https://codecov.io/gh/multipaths/diffupy?branch=master
     :alt: Coverage Status
+
+.. |python_versions| image:: https://img.shields.io/pypi/pyversions/diffupy.svg
+    :alt: Stable Supported Python Versions
+
+.. |pypi_version| image:: https://img.shields.io/pypi/v/diffupy.svg
+    :alt: Current version on PyPI
+
+.. |pypi_license| image:: https://img.shields.io/pypi/l/diffupy.svg
+    :alt: Apache-2.0
