@@ -46,7 +46,7 @@ def process_input_data_for_diff(data_input: Union[str, pd.DataFrame, list, dict,
                                       )
 
 
-def process_data_input(data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
+def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
                        method: str = 'raw',
                        binning: bool = False,
                        absolute_value: bool = False,
@@ -485,22 +485,34 @@ def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, i
 
 
 def format_input_for_diffusion(processed_input: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
-                               kernel: Matrix) -> Matrix:
+                               kernel: Matrix,
+                               missing_value: int = -1) -> Matrix:
     """Format/generate input vector/matrix according the data structure of the processed_data_input."""
     if _label_list_data_struct_check(processed_input):
         return format_categorical_input_vector_from_label_list(rows_labeled=processed_input,
                                                                col_label='scores',
-                                                               kernel=kernel
+                                                               kernel=kernel,
+                                                               missing_value=missing_value
                                                                )
 
-    elif _scores_dict_data_struct_check(processed_input):
-        return format_input_vector_from_scores_dict(processed_input, kernel)
+    elif _type_dict_label_list_data_struct_check(processed_input):
+        return format_categorical_input_matrix_from_label_list(rows_labels=list(processed_input.values()),
+                                                               cols_labels=list(processed_input.keys()),
+                                                               kernel=kernel,
+                                                               missing_value=missing_value
+                                                               )
 
-    elif _type_label_list_data_struct_check(processed_input):
-        return format_categorical_input_matrix_from_label_list(processed_input, kernel)
+    elif _label_scores_dict_data_struct_check(processed_input):
+        return format_input_vector_from_label_score_dict(labels_scores_dict=processed_input,
+                                                         kernel=kernel,
+                                                         missing_value=missing_value
+                                                         )
 
-    elif _type_scores_dict_data_struct_check(processed_input):
-        return format_input_matrix_from_scores_dict(processed_input, kernel)
+    elif _type_dict_label_scores_dict_data_struct_check(processed_input):
+        return format_input_matrix_from_type_label_score_dict(type_dict_labels_scores_dict=processed_input,
+                                                              kernel=kernel,
+                                                              missing_value=missing_value
+                                                              )
 
     else:
         raise TypeError(
@@ -511,48 +523,57 @@ def format_input_for_diffusion(processed_input: Union[list, Dict[str, int], Dict
 """Generate categorical (non-quantitative) input vector matrix from raw input dataset labels"""
 
 
-def format_categorical_input_vector_from_label_list(rows_labeled,
-                                                    col_label,
-                                                    kernel,
-                                                    missing_value=-1,
-                                                    rows_unlabeled=None  # TODO: To discuss, to handle
+def format_categorical_input_vector_from_label_list(rows_labeled: Union[set, list],
+                                                    col_label: Union[str, set, list],
+                                                    kernel: Matrix,
+                                                    missing_value: int = -1,
+                                                    rows_unlabeled=None,
+                                                    i: int = None
                                                     ) -> Matrix:
     """Generate categoric input vector from labels."""
     if isinstance(col_label, str):
         col_label = [col_label]
 
     input_mat = Matrix(
-        rows_labels=list(rows_labeled),
+        rows_labels=list(set(rows_labeled)),
         cols_labels=col_label,
-        init_value=1)
+        init_value=1  # By default the categorical input value is 1
+    )
+
     if rows_unlabeled:
+        if i:
+            rows_unlabeled = rows_unlabeled[i]
+
         input_mat.row_bind(
             matrix=Matrix(
                 rows_labels=list(rows_unlabeled),
                 cols_labels=col_label,
-                init_value=0)
+                init_value=0  # By default the non labeled input value is 0
+            )
         )
 
     return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
 
 
-def format_categorical_input_matrix_from_label_list(rows_labels,
-                                                    cols_labels: list,
-                                                    kernel,
-                                                    missing_value=-1,
-                                                    rows_unlabeled=None  # TODO: To discuss, to handle
+def format_categorical_input_matrix_from_label_list(rows_labels: Union[set, list],
+                                                    cols_labels: Union[set, list],
+                                                    kernel: Matrix,
+                                                    missing_value: int = -1,
+                                                    rows_unlabeled=None
                                                     ) -> Matrix:
     """Generate input vector from labels."""
     if not isinstance(cols_labels, list):
         raise NotImplementedError('The column labels should be provided as a list.')
 
     if len(cols_labels) > 1:
+
         input_mat = format_categorical_input_vector_from_label_list(
             rows_labels[0],
             cols_labels[0],
             kernel,
             missing_value,
-            rows_unlabeled[0]
+            rows_unlabeled,
+            i=0
         )
 
         for idx, row_label in enumerate(rows_labels[1:]):
@@ -561,75 +582,85 @@ def format_categorical_input_matrix_from_label_list(rows_labels,
                 cols_labels[idx + 1],
                 kernel,
                 missing_value,
-                rows_unlabeled[idx + 1],
+                rows_unlabeled,
+                idx + 1
             )
             input_mat.col_bind(matrix=input_vector)
 
         return input_mat
 
-    elif isinstance(cols_labels, list):
-        return format_categorical_input_vector_from_label_list(
-            rows_labels,
-            cols_labels,
-            kernel,
-            missing_value,
-            rows_unlabeled
-        )
+    return format_categorical_input_vector_from_label_list(
+        rows_labels,
+        cols_labels,
+        kernel,
+        missing_value,
+        rows_unlabeled
+    )
 
 
 """Generate quantitative or binarized/categorical input vector matrix from preprocesed input dataset scores"""
 
 
-def format_input_vector_from_scores_dict(scores_dict: dict,
-                                         kernel,
-                                         col_label: str = 'scores',
-                                         missing_value=-1,
-                                         rows_unlabeled=None  # TODO: To discuss, to handle
-                                         ) -> Matrix:
+def format_input_vector_from_label_score_dict(labels_scores_dict: Dict[str, int],
+                                              kernel: Matrix,
+                                              col_label: str = 'scores',
+                                              missing_value: int = -1,
+                                              rows_unlabeled: dict = None,  # TODO: To discuss
+                                              type_k: bool = False
+                                              ) -> Matrix:
     """Generate scores input vector from labels scores dict."""
 
     input_mat = Matrix(
-        mat=np.array(list(scores_dict.values())),
-        rows_labels=list(scores_dict.keys()),
+        mat=np.transpose(np.array([list(labels_scores_dict.values())])),
+        rows_labels=list(labels_scores_dict.keys()),
         cols_labels=[col_label]
     )
 
     if rows_unlabeled:
+        if type_k:
+            rows_unlabeled = rows_unlabeled[col_label]
+
         input_mat.row_bind(
             matrix=Matrix(
-                rows_labels=list(rows_unlabeled),
-                cols_labels=col_label,
-                init_value=0)
+                mat=np.transpose(np.array([list(rows_unlabeled.values())])),
+                rows_labels=list(rows_unlabeled.keys()),
+                cols_labels=[col_label]
+            )
         )
 
     return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
 
 
-def format_input_matrix_from_scores_dict(scores_dicts: Union[Dict[str, Dict[str, int]],
-                                                             Dict[str, int]],
-                                         kernel,
-                                         rows_unlabeled=None,  # TODO: To discuss, to handle
-                                         ) -> Matrix:
+def format_input_matrix_from_type_label_score_dict(type_dict_labels_scores_dict: Union[Dict[str, Dict[str, int]],
+                                                                                       Dict[str, int]],
+                                                   kernel,
+                                                   missing_value: int = -1,
+                                                   rows_unlabeled=None,  # TODO: To discuss
+                                                   ) -> Matrix:
     """Generate input matrix from labels scores dict and/or handle type classification by columns."""
-    if _scores_dict_data_struct_check(scores_dicts):
-        scores_dicts.pop('node_types')
+    if _type_dict_label_scores_dict_data_struct_check(type_dict_labels_scores_dict):
 
-        init_k = get_random_key_from_dict(scores_dicts)
-        init_v = scores_dicts.pop(init_k)
-        input_mat = format_input_vector_from_scores_dict(scores_dicts,
-                                                         kernel,
-                                                         col_label=init_k,
-                                                         rows_unlabeled=init_v
-                                                         )
+        init_k = get_random_key_from_dict(type_dict_labels_scores_dict)
+        init_v = type_dict_labels_scores_dict.pop(init_k)
 
-        for node_type, scores_dict in scores_dicts.items():
-            input_vector = format_input_vector_from_scores_dict(scores_dict,
-                                                                kernel,
-                                                                col_label=node_type,
-                                                                rows_unlabeled=rows_unlabeled
-                                                                )
+        input_mat = format_input_vector_from_label_score_dict(init_v,
+                                                              kernel,
+                                                              init_k,
+                                                              missing_value,
+                                                              rows_unlabeled,
+                                                              True
+                                                              )
+
+        for node_type, scores_dict in type_dict_labels_scores_dict.items():
+            input_vector = format_input_vector_from_label_score_dict(scores_dict,
+                                                                     kernel,
+                                                                     node_type,
+                                                                     missing_value,
+                                                                     rows_unlabeled,
+                                                                     True
+                                                                     )
             input_mat.col_bind(matrix=input_vector)
 
         return input_mat
     else:
-        return format_input_vector_from_scores_dict(scores_dicts, kernel)
+        return format_input_vector_from_label_score_dict(type_dict_labels_scores_dict, kernel)
