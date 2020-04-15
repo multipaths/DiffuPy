@@ -383,18 +383,18 @@ def _remove_non_significant_entities(df: pd.DataFrame, p_value: float) -> Dict[s
 """Data structures format checkers"""
 
 
-def _scores_dict_data_struct_check(v: Union[dict, list]) -> bool:
+def _label_scores_dict_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type Dict[str, int]."""
     return (isinstance(v, dict) and
-            isinstance(get_random_value_from_dict(v), int)
+            isinstance(get_random_value_from_dict(v), (int, float))
             )
 
 
-def _type_scores_dict_data_struct_check(v: Union[dict, list]) -> bool:
+def _type_dict_label_scores_dict_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type Dict[str, Dict[str, int]]."""
     return (isinstance(v, dict) and
             isinstance(get_random_value_from_dict(v), dict) and
-            isinstance(get_random_value_from_dict(get_random_value_from_dict(v)), int)
+            isinstance(get_random_value_from_dict(get_random_value_from_dict(v)), (int, float))
             )
 
 
@@ -403,7 +403,7 @@ def _label_list_data_struct_check(v: Union[dict, list]) -> bool:
     return isinstance(v, list)
 
 
-def _type_label_list_data_struct_check(v: Union[dict, list]) -> bool:
+def _type_dict_label_list_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type Dict[str, list]."""
     return (isinstance(v, dict) and
             isinstance(get_random_value_from_dict(v), list)
@@ -415,7 +415,7 @@ def _type_label_list_data_struct_check(v: Union[dict, list]) -> bool:
 
 def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
                      background_labels: Union[Dict[str, list], list]) -> Union[Dict[str, int], list]:
-    """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
+    """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
     if isinstance(background_labels, list):
         return _map_labels_to_background(input_labels, background_labels)
 
@@ -436,8 +436,9 @@ def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]
                               background_labels_type: str = None
                               ) -> Union[Dict[str, Dict[str, int]],
                                          Dict[str, int]]:
-    """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
-    if _type_scores_dict_data_struct_check(input_labels) or _type_label_list_data_struct_check(input_labels):
+    """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
+    if _type_dict_label_scores_dict_data_struct_check(input_labels) or _type_dict_label_list_data_struct_check(
+            input_labels):
         if background_labels_type:
             if background_labels_type in input_labels.keys():
                 return _map_labels(input_labels[background_labels_type], background_labels)
@@ -451,29 +452,62 @@ def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]
     return _map_labels(input_labels, background_labels)
 
 
+def _map_label_list(input_labels: Union[str, Set[str], List[str]],
+                    background_labels: List[str]) -> List[str]:
+    mapped_list = []
+    for label in input_labels:
+        if isinstance(label, str):
+            if label in background_labels:
+                mapped_list.append(label)
+        elif isinstance(label, set) or isinstance(label, list):
+            for sublabel in set(label):
+                if sublabel in background_labels:
+                    mapped_list.append(label)
+        else:
+            raise TypeError(
+                f'{EMOJI} The input label {label}  data structure can not be processed for label mapping'
+            )
+    return mapped_list
+
+
+def _map_label_dict(input_labels: Dict[Union[str, set], Union[int, float]],
+                    background_labels: list) -> Dict[str, Union[int, float]]:
+    mapped_dict = {}
+    for label, v in input_labels.items():
+        if isinstance(label, str):
+            if label in background_labels:
+                mapped_dict[label] = v
+        elif isinstance(label, set) or isinstance(label, list):
+            for sublabel in set(label):
+                if sublabel in background_labels:
+                    mapped_dict[label] = v
+        else:
+            raise TypeError(
+                f'{EMOJI} The input label {label}  data structure can not be processed for label mapping'
+            )
+    return mapped_dict
+
+
 def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-                background_labels: list) -> Union[Dict[str, int], list]:
+                background_labels: list) -> Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
     """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
     if _label_list_data_struct_check(input_labels):
-        return list(set(input_labels).intersection(set(background_labels)))
+        return _map_label_list(input_labels, background_labels)
 
-    elif _scores_dict_data_struct_check(input_labels):
-        return {labels: input_labels[labels]
-                for labels in background_labels
-                if labels in input_labels
-                }
+    elif _label_scores_dict_data_struct_check(input_labels):
+        return _map_label_dict(input_labels, background_labels)
 
-    elif _type_label_list_data_struct_check(input_labels):
+    elif _type_dict_label_list_data_struct_check(input_labels):
         l = []
         for type, label_list in input_labels.items():
             l += _map_labels(label_list, background_labels)
         return l
 
-    elif _type_scores_dict_data_struct_check(input_labels):
-        l = {}
+    elif _type_dict_label_scores_dict_data_struct_check(input_labels):
+        d = {}
         for type, scores_dict in input_labels.items():
-            l.update(_map_labels(scores_dict, background_labels))
-        return l
+            d.update(_map_labels(scores_dict, background_labels))
+        return d
 
     else:
         raise TypeError(
