@@ -59,6 +59,10 @@ METHODS = {
 
 #: csv
 CSV = 'csv'
+#: xml
+XML = 'xml'
+#: xmls
+XMLS = 'xmls'
 #: tsv
 TSV = 'tsv'
 #: graphML
@@ -73,6 +77,11 @@ PICKLE = 'pickle'
 GML = 'gml'
 #: edge list
 EDGE_LIST = '.lst'
+
+XLS_FORMATS = [
+    XML,
+    XMLS
+]
 
 #: DiffuPath available graph formats
 GRAPH_FORMATS = [

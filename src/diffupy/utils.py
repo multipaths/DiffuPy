@@ -7,10 +7,12 @@ import logging
 import pickle
 import random
 import warnings
-from typing import List
+from collections import defaultdict
+from typing import List, Union, Dict, Optional
 
 import networkx as nx
 import numpy as np
+import openpyxl as opxl
 import pandas as pd
 import pybel
 from networkx import Graph
@@ -20,36 +22,7 @@ from .constants import CSV, TSV, GRAPH_FORMATS
 
 log = logging.getLogger(__name__)
 
-
-def from_dataframe_file(path: str, fmt: str) -> pd.DataFrame:
-    """Read network file."""
-    format_checker(fmt)
-
-    return pd.read_csv(
-        path,
-        header=0,
-        sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
-    )
-
-
-def from_json(path: str):
-    """Read from json file."""
-    with open(path) as f:
-        return json.load(f)
-
-
-def from_pickle(input_path):
-    """Read from pickle file."""
-    with open(input_path, 'rb') as f:
-        unpickler = pickle.Unpickler(f)
-        return unpickler.load()
-
-
-def from_nparray_to_df(nparray: np.ndarray) -> pd.DataFrame:
-    """Convert numpy array to data frame."""
-    return pd.DataFrame(data=nparray[1:, 1:],
-                        index=nparray[1:, 0],
-                        columns=nparray[0, 1:])
+"""Matrix/graph handling utils."""
 
 
 def get_laplacian(graph: Graph, normalized: bool = False) -> np.ndarray:
@@ -151,23 +124,6 @@ def get_idx_scores_mapping(scores):
     return {i: score for i, score in enumerate(scores)}
 
 
-def decode_labels(labels):
-    """Validate labels."""
-    labels_decode = []
-
-    for label in labels:
-        if not isinstance(label, str):
-
-            if isinstance(label, int):
-                label = str(label)
-            else:
-                label = label.decode('utf-8').replace('"', '')
-
-        labels_decode.append(label)
-
-    return labels_decode
-
-
 def print_dict_dimensions(entities_db, title):
     """Print dimension of the dictionary."""
     total = 0
@@ -187,6 +143,17 @@ def print_dict_dimensions(entities_db, title):
     print(f'Total: {total} ')
 
 
+def get_random_key_from_dict(d):
+    return random.choice(list(d.keys()))
+
+
+def get_random_value_from_dict(d):
+    return d[get_random_key_from_dict(d)]
+
+
+"""File loading utils."""
+
+
 def format_checker(fmt: str, fmt_list: list = GRAPH_FORMATS) -> None:
     """Check formats."""
     if fmt not in fmt_list:
@@ -196,9 +163,169 @@ def format_checker(fmt: str, fmt_list: list = GRAPH_FORMATS) -> None:
         )
 
 
-def get_random_key_from_dict(d):
-    return random.choice(list(d.keys()))
+def from_dataframe_file(path: str, fmt: str) -> pd.DataFrame:
+    """Read network file."""
+    format_checker(fmt)
+
+    return pd.read_csv(
+        path,
+        header=0,
+        sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
+    )
 
 
-def get_random_value_from_dict(d):
-    return d[get_random_key_from_dict(d)]
+def from_json(path: str):
+    """Read from json file."""
+    with open(path) as f:
+        return json.load(f)
+
+
+def from_pickle(input_path):
+    """Read from pickle file."""
+    with open(input_path, 'rb') as f:
+        unpickler = pickle.Unpickler(f)
+        return unpickler.load()
+
+
+def from_nparray_to_df(nparray: np.ndarray) -> pd.DataFrame:
+    """Convert numpy array to data frame."""
+    return pd.DataFrame(data=nparray[1:, 1:],
+                        index=nparray[1:, 0],
+                        columns=nparray[0, 1:])
+
+
+"""Data parsing utils."""
+
+
+def decode_labels(labels):
+    """Validate labels."""
+    labels_decode = []
+
+    for label in labels:
+        if not isinstance(label, str):
+
+            if isinstance(label, int):
+                label = str(label)
+            else:
+                label = label.decode('utf-8').replace('"', '')
+
+        labels_decode.append(label)
+
+    return labels_decode
+
+
+def munge_label(label: Union[str, int, float]) -> str:
+    """Munge label strings."""
+    remove_set = ['*', ' ', '|', '-', '"', "'", "↑", "↓", "\n"]
+    split_set = ['/']
+
+    label = str(label).lower()
+
+    for symb in remove_set:
+        if symb in label:
+            label = label.replace(symb, '')
+
+    for symb in split_set:
+        if symb in label:
+            label = tuple(set(label.split(symb)))
+            if len(label) == 1:
+                label = label[0]
+
+    return label
+
+
+def munge_label_list(labels: list):
+    """Munge labels list."""
+    return list(set([munge_label(label) for label in labels]))
+
+
+def munge_label_scores_dict(labels: dict) -> Dict[str, Union[list, int, str]]:
+    """Munge labels dict."""
+    return {munge_label(label): v for label, v in labels.items()}
+
+
+def munge_label_type_dict(label_dict: Dict[str, Union[list, int, str, dict]]) -> Dict[str, Union[list, int, str, dict]]:
+    """Munge labels type dict."""
+    type_label_dict = {}
+
+    for type_label, labels in label_dict.items():
+        if isinstance(labels, dict):
+            type_label_dict[type_label] = munge_label_scores_dict(labels)
+
+        elif isinstance(labels, dict):
+            type_label_dict[type_label] = munge_label_scores_dict(labels)
+
+    return type_label_dict
+
+
+def munge_cell(cell):
+    """Munge cell."""
+    if isinstance(cell, str):
+        if cell.replace(',', '').replace('.', '').replace('-', '').isnumeric():
+            return float(cell)
+        else:
+            return munge_label(cell)
+
+    elif isinstance(cell, float) or isinstance(cell, int):
+        return cell
+
+    else:
+        raise TypeError('The cell type could not be processed.')
+
+
+def parse_xls_sheet_to_df(sheet: opxl.workbook,
+                          min_row: Optional[int] = 1,
+                          relevant_cols: Optional[list] = None,
+                          irrelevant_cols: Optional[list] = None) -> pd.DataFrame:
+    """Process/format excel sheets to DataFrame."""
+    parsed_sheet_dict = defaultdict(list)
+
+    for col in sheet.iter_cols(min_row=min_row):
+        col_label = col[0].value
+
+        if relevant_cols is None and irrelevant_cols is None:
+            relevant_cols = [col_label]
+            irrelevant_cols = []
+        elif relevant_cols is None:
+            relevant_cols = []
+        elif irrelevant_cols is None:
+            irrelevant_cols = []
+
+        parsed_sheet_dict[col_label].append([munge_cell(cell.value)
+                                             for cell in col[1:]
+                                             if (col_label in relevant_cols or col_label not in irrelevant_cols) and
+                                             munge_cell(cell.value) != ''
+                                             ])
+
+    return pd.DataFrame.from_dict(parsed_sheet_dict)
+
+
+def parse_xls_to_df(path: str,
+                    min_row: Optional[int] = 1,
+                    relevant_sheets: Optional[list] = None,
+                    irrelevant_sheets: Optional[list] = None,
+                    relevant_cols: Optional[list] = None,
+                    irrelevant_cols: Optional[list] = None,
+                    ) -> Union[pd.DataFrame, Dict[str, pd.DataFrame]]:
+    """Process excel file as a set (if several excel sheets) or a single dataframe."""
+    wb = opxl.load_workbook(filename=path)
+
+    sheets = wb.sheetnames
+    df_dict = {}
+
+    if relevant_sheets is None and irrelevant_sheets is None:
+        relevant_sheets = sheets
+        irrelevant_sheets = []
+    elif relevant_sheets is None:
+        relevant_sheets = []
+    elif irrelevant_sheets is None:
+        irrelevant_sheets = []
+
+    if len(sheets) > 1:
+        return {df_dict[sheets[ix].lower()]: parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
+                for ix, sheet in enumerate(wb)
+                if sheets[ix] in relevant_sheets or sheets[ix] not in irrelevant_sheets
+                }
+
+    else:
+        return parse_xls_sheet_to_df(wb[sheets[0]])

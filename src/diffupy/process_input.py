@@ -127,10 +127,19 @@ def _process_data_input_format(raw_data_input: Union[str, list, dict, np.ndarray
         )
 
 
-def _load_data_input_from_file(path: str) -> Union[pd.DataFrame, list]:
+def _load_data_input_from_file(path: str, **further_parse_args) -> Union[pd.DataFrame, list]:
     """Load and process the input data according the input file format."""
     if path.endswith(CSV):
         return from_dataframe_file(path, CSV)
+
+    elif path.endswith(XLS_FORMATS):
+        return parse_xls_to_df(path,
+                               further_parse_args.get('min_row'),
+                               further_parse_args.get('relevant_sheets'),
+                               further_parse_args.get('irrelevant_sheets'),
+                               further_parse_args.get('relevant_cols'),
+                               further_parse_args.get('irrelevant_cols')
+                               )
 
     elif path.endswith(TSV):
         return from_dataframe_file(path, TSV)
