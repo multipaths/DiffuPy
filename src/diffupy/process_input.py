@@ -2,7 +2,7 @@
 
 """Main matrix class and processing of input data."""
 
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, List, Set
 
 import numpy as np
 import pandas as pd
@@ -10,35 +10,49 @@ import pandas as pd
 from .constants import *
 from .matrix import Matrix
 from .utils import from_pickle, from_json, from_dataframe_file, from_nparray_to_df, get_random_value_from_dict, \
-    get_random_key_from_dict
+    get_random_key_from_dict, parse_xls_to_df
 
 """Process input data"""
 
 
 def process_input_data_for_diff(data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
                                 kernel: Matrix,
-                                background_labels: Union[list, dict] = None,
-                                method: Optional[str] = 'raw',
+                                method: str = 'raw',
                                 binning: Optional[bool] = False,
                                 absolute_value: Optional[bool] = False,
                                 p_value: Optional[float] = None,
                                 threshold: Optional[float] = None,
-                                separator_str: Optional[str] = ', '
+                                background_labels: Optional[Union[list, Dict[str, list]]] = None,
+                                **further_parse_args
                                 ) -> Matrix:
-    """Process miscellaneous input data and format it for the diffusion computation function."""
+    """Process miscellaneous data input, perform the mapping to the diffusion background network (as a kernel) and
+    format it for the diffusion computation function.
+
+    :param data_input: A miscellaneous data input to be processed/formatted for the diffuPy diffusion computation.
+    :param kernel: A pre-computed kernel to perform the label mapping and the matching for the input formatting.
+    :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"].
+    :param binning: If logFC provided in dataset, convert logFC to binary.
+    :param absolute_value: Codify node labels by applying threshold to | logFC | in input.
+    :param p_value: Statistical significance.
+    :param threshold: Codify node labels by applying a threshold to logFC in input.
+    :param background_labels: Labels set to map the input labels, which can provide label classification by type dict.
+    :param further_parse_args: Arguments to refine the data input parsing, among which:
+                                for string list parsing: separ_str
+                                for excel/csv parsing: min_row, cols_mapping, relevant_cols, irrelevant_cols
+                                for excel: relevant_sheets, irrelevant_sheets
+    """
     # If specific label background not provided, get a list from kernel labels.
     if not background_labels:
         background_labels = list(kernel.rows_labels)
-        # TODO: Discuss store label classification (mapping or as a column argument) in kernel
 
     # Pipeline the input, first preprocessing it, then mapping it to the background labels and finally formatting it.
-    return format_input_for_diffusion(map_labels_input(process_data_input(data_input,
+    return format_input_for_diffusion(map_labels_input(process_input_data(data_input,
                                                                           method,
                                                                           binning,
                                                                           absolute_value,
                                                                           p_value,
                                                                           threshold,
-                                                                          separator_str
+                                                                          **further_parse_args
                                                                           ),
                                                        background_labels
                                                        ),
@@ -52,14 +66,27 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
                        absolute_value: bool = False,
                        p_value: float = None,
                        threshold: Optional[float] = None,
-                       separator_str: Optional[str] = ', ',
+                       **further_parse_args
                        ) -> Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]]:
-    """Process and pipeline the provided miscellaneous data input in standardized data structures for further processing."""
-    # Preprocess the raw input according is format types.
-    preprocessed_data = _process_data_input_format(data_input, separator_str)
+    """Pipeline the provided miscellaneous data input for further processing, in the following standardized data structures:
+    label list, type_dict label lists, label-scores dict or type_dict label-scores dicts.
 
-    # If the preprocessed input is a list or a label type dict (Dict[str, list]) of lists return it for categorical input generation.
-    if _label_list_data_struct_check(preprocessed_data) or _type_label_list_data_struct_check(preprocessed_data):
+    :param data_input: A miscellaneous data input to be processed.
+    :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
+    :param binning: If logFC provided in dataset, convert logFC to binary.
+    :param absolute_value: Codify node labels by applying threshold to | logFC | in input.
+    :param p_value: Statistical significance.
+    :param threshold: Codify node labels by applying a threshold to logFC in input.
+    :param further_parse_args: Arguments to refine the data input parsing, among which:
+                                for string list parsing: separ_str
+                                for excel/csv parsing: min_row, cols_mapping, relevant_cols, irrelevant_cols
+                                for excel: relevant_sheets, irrelevant_sheets
+    """
+    # Preprocess the raw input according its data structure types.
+    preprocessed_data = _process_data_input_format(data_input, **further_parse_args)
+
+    # If the preprocessed input is a list or a label type dict (Dict[str, list]) return it for latter categorical input generation.
+    if _label_list_data_struct_check(preprocessed_data) or _type_dict_label_list_data_struct_check(preprocessed_data):
         return preprocessed_data
 
     # If the preprocessed input is a label type label-scores dict (Dict[str, pd.DataFrame]) pipeline it for scores codifying.
@@ -88,34 +115,38 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
 
 
 def _process_data_input_format(raw_data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
-                               separ_str: str = ',') -> Union[pd.DataFrame, list, Dict[str, Union[pd.DataFrame, list]]]:
+                               separ_str: str = ', ',
+                               **further_parse_args) -> Union[pd.DataFrame, list, Dict[str, Union[pd.DataFrame, list]]]:
     """Format the input as a label-score dataframe, a list or a labels or a type dict for latter input processing."""
     if isinstance(raw_data_input, str):
         # If the data input type is a string, mostly will be a path to the dataset file.
         if os.path.isfile(raw_data_input):
-            return _process_data_input_format(_load_data_input_from_file(raw_data_input))
+            return _process_data_input_format(_load_data_input_from_file(raw_data_input, **further_parse_args))
         elif '/' in raw_data_input and separ_str not in ['/', ' /', '/ ']:
             raise IOError(
                 f'{EMOJI} The file could not have been located in the provided data input path,.'
             )
-        # If it is not a path, will be treated as a label list with separator.
+        # If the data input is not identified as a path, it will be treated as a label list with an indicated separator.
         else:
-            return _process_data_input_format(raw_data_input.split(raw_data_input))
-
-    if isinstance(raw_data_input, pd.DataFrame):
-        return raw_data_input
+            return _process_data_input_format(raw_data_input.split(separ_str))
 
     elif isinstance(raw_data_input, list) or isinstance(raw_data_input, set):
         return list(set(raw_data_input))
 
-    elif isinstance(raw_data_input, np.ndarray):
-        return from_nparray_to_df(raw_data_input)
+    if isinstance(raw_data_input, pd.DataFrame):
+        return raw_data_input
 
     elif isinstance(raw_data_input, dict):
-        if _scores_dict_data_struct_check(raw_data_input):
+        # If the data input type dict is a label-scores dict, codify it as a Panda's dataframe for latter processing.
+        if _label_scores_dict_data_struct_check(raw_data_input):
             return pd.DataFrame.from_dict(raw_data_input, orient='index')
+        # Else it will be treated as a label_type dict, calling recursively the process input format for each type subset (key).
         else:
+            # It is assumed that the all the dict values match the same data type.
             return {label_type: _process_data_input_format(data_i) for label_type, data_i in raw_data_input.items()}
+
+    elif isinstance(raw_data_input, np.ndarray):
+        return from_nparray_to_df(raw_data_input)
 
     elif isinstance(raw_data_input, Matrix):
         return raw_data_input.to_df()
@@ -168,13 +199,13 @@ def _codify_input_data(df: pd.DataFrame,
                        threshold: Optional[float],
                        ) -> Union[Dict[str, Dict[str, int]],
                                   Dict[str, int]]:
-    """Process the input scores for the codifying process."""
+    """Process the input scores dataframe for the codifying process."""
     # Ensure that node labeling is in the provided dataset.
     if not any(n in df.columns for n in NODE_LABELING):
         raise ValueError(
             f'Ensure that your file contains a column {NODE_LABELING} with node IDs.'
         )
-    # Standardize the title of the node column labeling column to 'label', for later processing.
+    # Standardize the title of the node column labeling column to 'Label', for later processing.
     elif LABEL not in df.columns:
         for l in list(df.columns):
             if l in NODE_LABELING:
@@ -230,10 +261,10 @@ def _codify_method_check(df: pd.DataFrame,
 
     else:
         # TODO: ber_s, ber_p, mc
-        raise NotImplementedError('This diffusion method has not yet been implemented.')
+        raise NotImplementedError('This diffusion method has not been yet implemented.')
 
 
-"""Assign binary labels to input for scoring methods that accept non-quantitative values"""
+"""Assign binary scores to input for scoring methods that ONLY accept non-quantitative values"""
 
 
 def _codify_non_quantitative_input_data(
@@ -241,7 +272,7 @@ def _codify_non_quantitative_input_data(
         p_value: float,
         threshold: Optional[float]
 ) -> Dict[str, int]:
-    """Codify input data to get a set of labelled nodes for scoring methods that accept non-quantitative values."""
+    """Codify input data to get a set of scored nodes for scoring methods that accept non-quantitative values."""
     # LogFC provided in dataset and threshold given
     if LOG_FC in df.columns and threshold:
 
@@ -250,19 +281,19 @@ def _codify_non_quantitative_input_data(
         # Label nodes with -1 if | logFC | below threshold
         df.loc[(df[LOG_FC]).abs() < threshold, SCORE] = -1
 
-        # If adjusted p-values are provided in dataset, label nodes that are not statistically significant with -1
+        # If adjusted p-values are provided in dataset, score nodes that are not statistically significant with -1
         if P_VALUE in df.columns:
             df.loc[df[P_VALUE] > p_value, SCORE] = -1
 
-        return df.set_index(NODE)[SCORE].to_dict()
+        return df.set_index(LABEL)[SCORE].to_dict()
 
-    # If input dataset exclusively contains IDs and no logFC, or if threshold is not given, then assign labels as 1
+    # If input dataset exclusively contains IDs and no logFC, or if threshold is not given, then assign scores as 1
     df[SCORE] = 1
 
-    return df.set_index(NODE)[SCORE].to_dict()
+    return df.set_index(LABEL)[SCORE].to_dict()
 
 
-"""Assign binary labels to input for scoring methods that accept quantitative values"""
+"""Assign binary scores to input for scoring methods that accept quantitative values"""
 
 
 def _codify_quantitative_input_data(
@@ -272,34 +303,34 @@ def _codify_quantitative_input_data(
         p_value: float,
         threshold: Optional[float],
 ) -> Dict[str, int]:
-    """Codify input data to get a set of labelled nodes for scoring methods that accept quantitative values."""
+    """Codify input data to get a set of scored nodes for scoring methods that accept quantitative values."""
     # LogFC provided in dataset and threshold given
     if LOG_FC in df.columns and threshold:
 
-        # Binarize labels with 1, 0 and/or -1
+        # Binarize scores with 1, 0 and/or -1
         if binning is True:
 
-            # Add binning labels where | logFC | values above threshold are 1 and below are 0
+            # Add binning scores where | logFC | values above threshold are 1 and below are 0
             if absolute_value is True:
                 return _bin_quantitative_input_by_abs_val(df, threshold, p_value)
 
-            # Add signed labels where | logFC | values above threshold are 1 or -1 (signed) and values below are 0
+            # Add signed scores where | logFC | values above threshold are 1 or -1 (signed) and values below are 0
 
             return _bin_quantitative_input_by_threshold(df, threshold, p_value)
 
         # Labels are 0s or logFC values rather than binary values
         else:
-            # Codify inputs with | logFC | if they pass threshold; otherwise assign label as 0
+            # Codify inputs with | logFC | if they pass threshold; otherwise assign score as 0
             if absolute_value is True:
                 return _codify_quantitative_input_by_abs_val(df, threshold, p_value)
 
-            # Codify inputs with logFC if they pass threshold; otherwise assign label as 0
+            # Codify inputs with logFC if they pass threshold; otherwise assign score as 0
             return _codify_quantitative_input_by_threshold(df, threshold, p_value)
 
-    # If input dataset exclusively contains IDs and no logFC, or if threshold is not given, then assign labels as 1
+    # If input dataset exclusively contains IDs and no logFC, or if threshold is not given, then assign scores as 1
     df[SCORE] = 1
 
-    return df.set_index(NODE)[SCORE].to_dict()
+    return df.set_index(LABEL)[SCORE].to_dict()
 
 
 def _bin_quantitative_input_by_abs_val(
@@ -307,17 +338,17 @@ def _bin_quantitative_input_by_abs_val(
         threshold: float,
         p_value: float,
 ) -> Dict[str, int]:
-    """Process quantitative inputs and bin labels by absolute value."""
-    # Add label 1 if | logFC | is above threshold
+    """Process quantitative inputs and bin scores by absolute value."""
+    # Add score 1 if | logFC | is above threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, SCORE] = 1
-    # Add label 0 if | logFC | below threshold
+    # Add score 0 if | logFC | below threshold
     df.loc[(df[LOG_FC]).abs() < threshold, SCORE] = 0
 
     # logFC and adjusted p-values are provided in dataset
     if P_VALUE in df.columns:
         return _remove_non_significant_entities(df, p_value)
 
-    return df.set_index(NODE)[SCORE].to_dict()
+    return df.set_index(LABEL)[SCORE].to_dict()
 
 
 def _bin_quantitative_input_by_threshold(
@@ -325,12 +356,12 @@ def _bin_quantitative_input_by_threshold(
         threshold: float,
         p_value: float,
 ) -> Dict[str, int]:
-    """Process quantitative inputs and bin labels by threshold."""
-    # Add label 1 if logFC is above threshold
+    """Process quantitative inputs and bin scores by threshold."""
+    # Add score 1 if logFC is above threshold
     df.loc[df[LOG_FC] >= threshold, SCORE] = 1
-    # Add label 0 if | logFC | below threshold
+    # Add score 0 if | logFC | below threshold
     df.loc[(df[LOG_FC]).abs() < threshold, SCORE] = 0
-    # Replace remaining labels with -1 (i.e. | logFC | above threshold but sign is negative)
+    # Replace remaining score with -1 (i.e. | logFC | above threshold but sign is negative)
     df = df.fillna(-1)
 
     if p_value:
@@ -339,10 +370,10 @@ def _bin_quantitative_input_by_threshold(
             # Disregard entities if logFC adjusted p-value is not significant
             return _remove_non_significant_entities(df, p_value)
 
-    return df.set_index(NODE)[SCORE].to_dict()
+    return df.set_index(LABEL)[SCORE].to_dict()
 
 
-"""Assign logFC as labels for input for scoring methods that accept quantitative values"""
+"""Assign logFC as score for input for scoring methods that accept quantitative values"""
 
 
 def _codify_quantitative_input_by_abs_val(
@@ -350,10 +381,10 @@ def _codify_quantitative_input_by_abs_val(
         threshold: float,
         p_value: float,
 ) -> Dict[str, int]:
-    """Codify nodes with | logFC | if they pass threshold, otherwise label is 0."""
+    """Codify nodes with | logFC | if they pass threshold, otherwise score is 0."""
     # Codify nodes with | logFC | if they pass threshold
     df.loc[(df[LOG_FC]).abs() >= threshold, SCORE] = (df[LOG_FC]).abs()
-    # Codify nodes with label 0 if it falls below threshold
+    # Codify nodes with score 0 if it falls below threshold
     df.loc[(df[LOG_FC]).abs() < threshold, SCORE] = 0
 
     # LogFC and adjusted p-values are provided in dataset
@@ -361,7 +392,7 @@ def _codify_quantitative_input_by_abs_val(
         # Disregard entities if logFC adjusted p-value is not significant
         return _remove_non_significant_entities(df, p_value)
 
-    return df.set_index(NODE)[SCORE].to_dict()
+    return df.set_index(LABEL)[SCORE].to_dict()
 
 
 def _codify_quantitative_input_by_threshold(
@@ -379,14 +410,14 @@ def _codify_quantitative_input_by_threshold(
         # Disregard entities if logFC adjusted p-value is not significant
         return _remove_non_significant_entities(df, p_value)
 
-    return df.set_index(NODE)[SCORE].to_dict()
+    return df.set_index(LABEL)[SCORE].to_dict()
 
 
 def _remove_non_significant_entities(df: pd.DataFrame, p_value: float) -> Dict[str, int]:
     # Label entity 0 if adjusted p-value for logFC is not significant
     df.loc[df[P_VALUE] > p_value, SCORE] = 0
 
-    return df.set_index(NODE)[SCORE].to_dict()
+    return df.set_index(LABEL)[SCORE].to_dict()
 
 
 """Data structures format checkers"""
