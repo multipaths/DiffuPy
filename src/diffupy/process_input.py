@@ -96,7 +96,8 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
                                                binning,
                                                absolute_value,
                                                p_value,
-                                               threshold
+                                               threshold,
+                                               further_parse_args.get('cols_titles_mapping')
                                                )
                 for label_type, preprocessed_data_i in preprocessed_data.items()
                 }
@@ -107,7 +108,8 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
                               binning,
                               absolute_value,
                               p_value,
-                              threshold
+                              threshold,
+                              further_parse_args.get('cols_titles_mapping')
                               )
 
 
@@ -197,6 +199,7 @@ def _codify_input_data(df: pd.DataFrame,
                        absolute_value: bool,
                        p_value: float,
                        threshold: Optional[float],
+                       cols_titles_mapping: Optional[Dict[str:str]] = None
                        ) -> Union[Dict[str, Dict[str, int]],
                                   Dict[str, int]]:
     """Process the input scores dataframe for the codifying process."""
@@ -205,8 +208,15 @@ def _codify_input_data(df: pd.DataFrame,
         raise ValueError(
             f'Ensure that your file contains a column {NODE_LABELING} with node IDs.'
         )
+
+    # Rename dataframe column titles according (if) provided label_mapping.
+    if cols_titles_mapping is not None:
+        for label_to_rename, new_name in cols_titles_mapping.items():
+            if label_to_rename in df.columns:
+                df = df.rename(columns={label_to_rename: new_name})
+
     # Standardize the title of the node column labeling column to 'Label', for later processing.
-    elif LABEL not in df.columns:
+    if LABEL not in df.columns:
         for l in list(df.columns):
             if l in NODE_LABELING:
                 df = df.rename(columns={l: LABEL})
