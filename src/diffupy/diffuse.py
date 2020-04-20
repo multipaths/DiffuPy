@@ -28,7 +28,7 @@ def diffuse(
 ) -> Matrix:
     """Run diffusion on a network given an input and a diffusion method.
 
-    :param input_scores: score collection, supplied as n-dimensional array. Could be 1-dimensional (List) or n-dimensional (Matrix).
+    :param input_scores: score collection, supplied as n-dimensional array. Could be 1-dimensional (Vector) or n-dimensional (Matrix).
     :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
     :param graph: A network as a graph. It could be optional if a Kernel is provided
     :param kwargs: Optional arguments:

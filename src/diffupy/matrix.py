@@ -80,7 +80,7 @@ class Matrix:
 
     def __str__(self):
         """Return a string representation of the Matrix."""
-        s = f"        {self.cols_labels}"
+        s = f"  {self.cols_labels}"
 
         for i, row_label in enumerate(self.rows_labels):
             s += f"\n {row_label}  {self.mat[i]} "
@@ -589,7 +589,7 @@ class MatrixFromCSV(Matrix):
 class MatrixFromGraph(Matrix):
     """Constructor matrix class for nx.Graph to Matrix conversion."""
 
-    # TODO : move instances initalization from global argument graph to here
+    # TODO : move instances initialization from global argument graph to here
 
     def __init__(self, graph, node_argument='name', name=''):
         # This initialization would make a matrix representing the graph (taking a graph argument as label)

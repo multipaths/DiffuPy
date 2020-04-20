@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 """Process network as undefined format (could represented as a graph or as a kernel)"""
 
 
-def get_kernel_and_graph_from_network_file(path: str) -> Tuple[Matrix, Graph]:
+def get_kernel_and_graph_from_network_path(path: str) -> Tuple[Matrix, Graph]:
     """Load network provided in cli as a kernel and as a graph."""
     graph = None
     kernel = None
@@ -52,7 +52,7 @@ def get_kernel_and_graph_from_network_file(path: str) -> Tuple[Matrix, Graph]:
     return kernel, graph
 
 
-def get_kernel_from_network_file(path: str) -> Matrix:
+def get_kernel_from_network_path(path: str) -> Matrix:
     """Load network provided in cli as a kernel."""
     if path.endswith(KERNEL_FORMATS):
         try:
@@ -73,7 +73,7 @@ def get_kernel_from_network_file(path: str) -> Matrix:
     return regularised_laplacian_kernel(graph)
 
 
-def get_graph_from_network_file(path: str) -> Graph:
+def get_graph_from_network_path(path: str) -> Graph:
     """Load network provided in cli as a graph."""
     if path.endswith(KERNEL_FORMATS):
         try:
