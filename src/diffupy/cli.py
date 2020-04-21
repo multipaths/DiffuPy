@@ -15,7 +15,7 @@ from diffupy.process_network import get_kernel_from_network_path
 from .constants import OUTPUT, METHODS, EMOJI, RAW
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
-from .process_input import process_input_data_for_diff
+from .process_input import process_map_and_format_input_data_for_diff
 from .process_network import process_graph_from_file
 
 logger = logging.getLogger(__name__)
@@ -62,14 +62,14 @@ def kernel(
 
     click.secho(f'{EMOJI} Generating regularized Laplacian kernel from graph. This might take a while... {EMOJI}')
     exe_t_0 = time.time()
-    background_mat = regularised_laplacian_kernel(graph)
+    kernel = regularised_laplacian_kernel(graph)
     exe_t_f = time.time()
 
     output_file = os.path.join(output, f'{graph.split("/")[-1]}.pickle')
 
     # Export numpy array
     with open(output_file, 'wb') as file:
-        pickle.dump(background_mat, file, protocol=4)
+        pickle.dump(kernel, file, protocol=4)
 
     running_time = exe_t_f - exe_t_0
 
@@ -148,14 +148,14 @@ def diffuse(
 
     click.secho(f'Codifying data from {input_data}.')
 
-    input_scores_dict = process_input_data_for_diff(input_data,
-                                                    kernel,
-                                                    method,
-                                                    binarize,
-                                                    absolute_value,
-                                                    p_value,
-                                                    threshold,
-                                                    )
+    input_scores_dict = process_map_and_format_input_data_for_diff(input_data,
+                                                                   kernel,
+                                                                   method,
+                                                                   binarize,
+                                                                   absolute_value,
+                                                                   p_value,
+                                                                   threshold,
+                                                                   )
 
     click.secho(f'Running the diffusion algorithm.')
 

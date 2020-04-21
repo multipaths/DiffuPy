@@ -60,9 +60,9 @@ METHODS = {
 #: csv
 CSV = 'csv'
 #: xml
-XML = 'xml'
+XLS = 'xls'
 #: xmls
-XMLS = 'xmls'
+XLSX = 'xlsx'
 #: tsv
 TSV = 'tsv'
 #: graphML
@@ -78,28 +78,28 @@ GML = 'gml'
 #: edge list
 EDGE_LIST = '.lst'
 
-XLS_FORMATS = [
-    XML,
-    XMLS
-]
+XLS_FORMATS = (
+    XLS,
+    XLSX
+)
 
-#: DiffuPath available graph formats
-GRAPH_FORMATS = [
+#: Available graph formats
+GRAPH_FORMATS = (
     CSV,
     TSV,
     GRAPHML,
     BEL,
     JSON,
     PICKLE,
-]
+)
 
-#: DiffuPath available kernel formats
-KERNEL_FORMATS = [
+#: Available kernel formats
+KERNEL_FORMATS = (
     CSV,
     TSV,
     JSON,
     PICKLE,
-]
+)
 
 #: Separators
 FORMAT_SEPARATOR_MAPPING = {

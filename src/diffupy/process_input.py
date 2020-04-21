@@ -2,7 +2,7 @@
 
 """Main matrix class and processing of input data."""
 
-from typing import Dict, Optional, Union, List, Set
+from typing import Dict, Optional, Union, List, Set, Tuple
 
 import numpy as np
 import pandas as pd
@@ -15,16 +15,16 @@ from .utils import from_pickle, from_json, from_dataframe_file, from_nparray_to_
 """Process input data"""
 
 
-def process_input_data_for_diff(data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
-                                kernel: Matrix,
-                                method: str = 'raw',
-                                binning: Optional[bool] = False,
-                                absolute_value: Optional[bool] = False,
-                                p_value: Optional[float] = None,
-                                threshold: Optional[float] = None,
-                                background_labels: Optional[Union[list, Dict[str, list]]] = None,
-                                **further_parse_args
-                                ) -> Matrix:
+def process_map_and_format_input_data_for_diff(data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
+                                               kernel: Matrix,
+                                               method: str = 'raw',
+                                               binning: Optional[bool] = False,
+                                               absolute_value: Optional[bool] = False,
+                                               p_value: Optional[float] = None,
+                                               threshold: Optional[float] = None,
+                                               background_labels: Optional[Union[list, Dict[str, list]]] = None,
+                                               **further_parse_args
+                                               ) -> Matrix:
     """Process miscellaneous data input, perform the mapping to the diffusion background network (as a kernel) and
     format it for the diffusion computation function.
 
@@ -40,6 +40,7 @@ def process_input_data_for_diff(data_input: Union[str, pd.DataFrame, list, dict,
                                 for string list parsing: separ_str
                                 for excel/csv parsing: min_row, cols_mapping, relevant_cols, irrelevant_cols
                                 for excel: relevant_sheets, irrelevant_sheets
+                                for mapping: check_substrings (as a bool if input list or list of labels types if input dict)
     """
     # If specific label background not provided, get a list from kernel labels.
     if not background_labels:
@@ -54,7 +55,8 @@ def process_input_data_for_diff(data_input: Union[str, pd.DataFrame, list, dict,
                                                                           threshold,
                                                                           **further_parse_args
                                                                           ),
-                                                       background_labels
+                                                       background_labels,
+                                                       check_substrings=further_parse_args.get('check_substrings')
                                                        ),
                                       kernel
                                       )
@@ -64,8 +66,8 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
                        method: str = 'raw',
                        binning: bool = False,
                        absolute_value: bool = False,
-                       p_value: float = None,
-                       threshold: Optional[float] = None,
+                       p_value: float = 0.05,
+                       threshold: Optional[float] = 0.5,
                        **further_parse_args
                        ) -> Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]]:
     """Pipeline the provided miscellaneous data input for further processing, in the following standardized data structures:
@@ -199,21 +201,21 @@ def _codify_input_data(df: pd.DataFrame,
                        absolute_value: bool,
                        p_value: float,
                        threshold: Optional[float],
-                       cols_titles_mapping: Optional[Dict[str:str]] = None
+                       cols_titles_mapping: Optional[Dict[str, str]] = None
                        ) -> Union[Dict[str, Dict[str, int]],
                                   Dict[str, int]]:
     """Process the input scores dataframe for the codifying process."""
-    # Ensure that node labeling is in the provided dataset.
-    if not any(n in df.columns for n in NODE_LABELING):
-        raise ValueError(
-            f'Ensure that your file contains a column {NODE_LABELING} with node IDs.'
-        )
-
     # Rename dataframe column titles according (if) provided label_mapping.
     if cols_titles_mapping is not None:
         for label_to_rename, new_name in cols_titles_mapping.items():
             if label_to_rename in df.columns:
                 df = df.rename(columns={label_to_rename: new_name})
+
+    # Ensure that node labeling is in the provided dataset.
+    if not any(n in df.columns for n in NODE_LABELING):
+        raise ValueError(
+            f'Ensure that your file contains a column {NODE_LABELING} with node IDs.'
+        )
 
     # Standardize the title of the node column labeling column to 'Label', for later processing.
     if LABEL not in df.columns:
@@ -464,16 +466,25 @@ def _type_dict_label_list_data_struct_check(v: Union[dict, list]) -> bool:
 
 
 def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
-                     background_labels: Union[Dict[str, list], list]) -> Union[Dict[str, int], list]:
+                     background_labels: Union[Dict[str, list], list],
+                     check_substrings: Union[List, bool] = None) -> Union[Dict[str, int], list]:
     """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
     if isinstance(background_labels, list):
-        return _map_labels_to_background(input_labels, background_labels)
+        return _map_labels_to_background(input_labels,
+                                         background_labels,
+                                         check_substring=check_substrings)
 
     elif isinstance(background_labels, dict):
-        return {node_type: _map_labels_to_background(input_labels, node_set, node_type)
+        return {node_type: _map_labels_to_background(input_labels,
+                                                     node_set,
+                                                     background_labels_type=node_type,
+                                                     check_substring=check_substrings)
                 for node_type, node_set
                 in background_labels.items()
-                if _map_labels_to_background(input_labels, node_set, node_type) not in [[], {}]
+                if _map_labels_to_background(input_labels,
+                                             node_set,
+                                             background_labels_type=node_type,
+                                             check_substring=check_substrings) not in [[], {}]
                 }
     else:
         raise IOError(
@@ -481,88 +492,126 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
         )
 
 
-def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-                              background_labels: list,
-                              background_labels_type: str = None
-                              ) -> Union[Dict[str, Dict[str, int]],
-                                         Dict[str, int]]:
-    """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
-    if _type_dict_label_scores_dict_data_struct_check(input_labels) or _type_dict_label_list_data_struct_check(
-            input_labels):
-        if background_labels_type:
-            if background_labels_type in input_labels.keys():
-                return _map_labels(input_labels[background_labels_type], background_labels)
-        else:
-            return {
-                type: _map_labels(label_list, background_labels)
-                for type, label_list in input_labels.items()
-                if _map_labels(label_list, background_labels) not in [[], {}]
-            }
-
-    return _map_labels(input_labels, background_labels)
-
-
-def _map_label_list(input_labels: Union[str, Set[str], List[str]],
-                    background_labels: List[str]) -> List[str]:
-    mapped_list = []
-    for label in input_labels:
-        if isinstance(label, str):
-            if label in background_labels:
-                mapped_list.append(label)
-        elif isinstance(label, set) or isinstance(label, list):
-            for sublabel in set(label):
-                if sublabel in background_labels:
-                    mapped_list.append(label)
-        else:
-            raise TypeError(
-                f'{EMOJI} The input label {label}  data structure can not be processed for label mapping'
-            )
-    return mapped_list
-
-
-def _map_label_dict(input_labels: Dict[Union[str, set], Union[int, float]],
-                    background_labels: list) -> Dict[str, Union[int, float]]:
-    mapped_dict = {}
-    for label, v in input_labels.items():
-        if isinstance(label, str):
-            if label in background_labels:
-                mapped_dict[label] = v
-        elif isinstance(label, set) or isinstance(label, list):
-            for sublabel in set(label):
-                if sublabel in background_labels:
-                    mapped_dict[label] = v
-        else:
-            raise TypeError(
-                f'{EMOJI} The input label {label}  data structure can not be processed for label mapping'
-            )
-    return mapped_dict
-
-
 def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-                background_labels: list) -> Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
+                background_labels: list,
+                check_substrings: bool = False) -> Union[
+    list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
     """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
     if _label_list_data_struct_check(input_labels):
-        return _map_label_list(input_labels, background_labels)
+        return _map_label_list(input_labels, background_labels, check_substrings)
 
     elif _label_scores_dict_data_struct_check(input_labels):
-        return _map_label_dict(input_labels, background_labels)
+        return _map_label_dict(input_labels, background_labels, check_substrings)
 
     elif _type_dict_label_list_data_struct_check(input_labels):
         l = []
         for type, label_list in input_labels.items():
-            l += _map_labels(label_list, background_labels)
+            l += _map_labels(label_list, background_labels, check_substrings)
         return l
 
     elif _type_dict_label_scores_dict_data_struct_check(input_labels):
         d = {}
         for type, scores_dict in input_labels.items():
-            d.update(_map_labels(scores_dict, background_labels))
+            d.update(_map_labels(scores_dict, background_labels, check_substrings))
         return d
 
     else:
         raise TypeError(
             f'{EMOJI} The input labels data structure can not be processed for label mapping'
         )
+
+
+def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
+                              background_labels: list,
+                              background_labels_type: str = None,
+                              check_substring: Union[List, bool] = None
+                              ) -> Union[Dict[str, Dict[str, int]],
+                                         Dict[str, int]]:
+    """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
+    if _type_dict_label_scores_dict_data_struct_check(input_labels) or \
+            _type_dict_label_list_data_struct_check(input_labels):
+
+        if background_labels_type and background_labels_type in input_labels.keys():
+            return _map_labels(input_labels[background_labels_type], background_labels,
+                               check_substring is not None and background_labels_type in check_substring)
+        return {
+            type: _map_labels(label_list, background_labels,
+                              check_substring is not None and type in check_substring)
+            for type, label_list in input_labels.items()
+            if _map_labels(label_list, background_labels,
+                           check_substring is not None and type in check_substring) not in [[], {}]
+        }
+
+    return _map_labels(input_labels, background_labels, check_substring)
+
+
+def _check_label_to_background_labels(label: str,
+                                      label_list: List[Union[str, Tuple[str]]],
+                                      substring: bool = False) -> Union[str, None]:
+    if label in label_list:
+        return label
+
+    # If the first fast mapping check do not match, perform further mapping iteration
+    for entity in label_list:
+
+        if isinstance(entity, set) or isinstance(entity, tuple) or isinstance(entity, list):
+            for subentity in entity:
+                if not substring:
+                    if str(subentity) == label: return subentity
+                elif str(subentity) in label or label in str(subentity):
+                    return subentity
+
+        elif substring and (str(entity) in label or label in str(entity)):
+            return entity
+
+    return None
+
+
+def _map_label_list(input_labels: Union[str, Set[str], List[str]],
+                    background_labels: List[str],
+                    check_substrings: bool = False) -> List[str]:
+    mapped_list = []
+    for label in input_labels:
+        if isinstance(label, str):
+            label_bck = _check_label_to_background_labels(label, background_labels, check_substrings)
+            if label_bck is not None:
+                mapped_list.append(label_bck)
+        elif isinstance(label, set) or isinstance(label, tuple) or isinstance(label, list):
+            for sublabel in set(label):
+                label_bck = _check_label_to_background_labels(sublabel, background_labels, check_substrings)
+                if label_bck is not None:
+                    mapped_list.append(label_bck)
+        else:
+            raise TypeError(
+                f'{EMOJI} The input label "{label}" "{type(label)}" data type can not be processed for label mapping'
+            )
+    return mapped_list
+
+
+def _map_label_dict(input_labels: Dict[Union[str, set], Union[int, float]],
+                    background_labels: list,
+                    check_substrings: bool = False) -> Dict[str, Union[int, float]]:
+    mapped_dict = {}
+
+    for label, v in input_labels.items():
+        if isinstance(label, int) or isinstance(label, float):
+            label = str(label)
+
+        if isinstance(label, str):
+            label_bck = _check_label_to_background_labels(label, background_labels, check_substrings)
+            if label_bck is not None:
+                mapped_dict[label_bck] = v
+        elif isinstance(label, set) or isinstance(label, tuple) or isinstance(label, list):
+            for sublabel in set(label):
+                label_bck = _check_label_to_background_labels(sublabel, background_labels, check_substrings)
+                if label_bck is not None:
+                    mapped_dict[label_bck] = v
+        else:
+            raise TypeError(
+                f'{EMOJI} The input label "{label}" "{type(label)}" data type can not be processed for label mapping'
+            )
+
+    return mapped_dict
 
 
 """Generate/format data input as a vector/matrix for the diffusion computation matching the kernel rows"""
