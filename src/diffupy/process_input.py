@@ -2,6 +2,7 @@
 
 """Main matrix class and processing of input data."""
 
+import logging
 from typing import Dict, Optional, Union, List, Set, Tuple
 
 import numpy as np
@@ -10,7 +11,9 @@ import pandas as pd
 from .constants import *
 from .matrix import Matrix
 from .utils import from_pickle, from_json, from_dataframe_file, from_nparray_to_df, get_random_value_from_dict, \
-    get_random_key_from_dict, parse_xls_to_df
+    get_random_key_from_dict, parse_xls_to_df, log_dict
+
+log = logging.getLogger(__name__)
 
 """Process input data"""
 
@@ -23,6 +26,7 @@ def process_map_and_format_input_data_for_diff(data_input: Union[str, pd.DataFra
                                                p_value: Optional[float] = None,
                                                threshold: Optional[float] = None,
                                                background_labels: Optional[Union[list, Dict[str, list]]] = None,
+                                               show_statistics: bool = True,
                                                **further_parse_args
                                                ) -> Matrix:
     """Process miscellaneous data input, perform the mapping to the diffusion background network (as a kernel) and
@@ -46,17 +50,19 @@ def process_map_and_format_input_data_for_diff(data_input: Union[str, pd.DataFra
     if not background_labels:
         background_labels = list(kernel.rows_labels)
 
-    # Pipeline the input, first preprocessing it, then mapping it to the background labels and finally formatting it.
-    return format_input_for_diffusion(map_labels_input(process_input_data(data_input,
-                                                                          method,
-                                                                          binning,
-                                                                          absolute_value,
-                                                                          p_value,
-                                                                          threshold,
-                                                                          **further_parse_args
-                                                                          ),
-                                                       background_labels,
-                                                       check_substrings=further_parse_args.get('check_substrings')
+    # Pipeline the input, first preprocessing it, then mapping it to the background labels
+    # and finally formatting it with the kernel reference.
+    return format_input_for_diffusion(map_labels_input(input_labels=process_input_data(data_input,
+                                                                                       method,
+                                                                                       binning,
+                                                                                       absolute_value,
+                                                                                       p_value,
+                                                                                       threshold,
+                                                                                       **further_parse_args
+                                                                                       ),
+                                                       background_labels=background_labels,
+                                                       check_substrings=further_parse_args.get('check_substrings'),
+                                                       show_statistics=show_statistics
                                                        ),
                                       kernel
                                       )
@@ -84,6 +90,8 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
                                 for excel/csv parsing: min_row, cols_mapping, relevant_cols, irrelevant_cols
                                 for excel: relevant_sheets, irrelevant_sheets
     """
+    log.info("Processing the data input.")
+
     # Preprocess the raw input according its data structure types.
     preprocessed_data = _process_data_input_format(data_input, **further_parse_args)
 
@@ -467,7 +475,10 @@ def _type_dict_label_list_data_struct_check(v: Union[dict, list]) -> bool:
 
 def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
                      background_labels: Union[Dict[str, list], list],
-                     check_substrings: Union[List, bool] = None) -> Union[Dict[str, int], list]:
+                     check_substrings: Union[List, bool] = None,
+                     show_statistics: bool = False) -> Union[Dict[str, int], list]:
+    log.info("Mapping the input labels to the background labels reference.")
+
     """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
     if isinstance(background_labels, list):
         return _map_labels_to_background(input_labels,
@@ -490,6 +501,38 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
         raise IOError(
             f'{EMOJI} The background mapping labels should be provided as a label list or as a type dict of label list.'
         )
+
+    if show_statistics: log_dict(mapping_statistics(mapped_labels, input_labels))
+
+    return mapped_labels
+
+
+def mapping_statistics(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
+                       mapped_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]) -> Dict:
+    percentage_dict = {}
+    total_mapping = 0
+    total_labels = 0
+
+    if _label_list_data_struct_check(input_labels) or _label_scores_dict_data_struct_check(input_labels):
+        total_mapping = len(input_labels)
+        total_labels = len(mapped_labels)
+
+    elif _type_dict_label_list_data_struct_check(input_labels) or _type_dict_label_scores_dict_data_struct_check(
+            input_labels):
+        for input_type, mapping in input_labels.items():
+            if input_type in mapped_labels:
+                percentage_dict[input_type] = len(mapping) / len(mapped_labels[input_type])
+                total_mapping += len(mapping)
+                total_labels += len(mapped_labels[input_type])
+
+    else:
+        raise TypeError(
+            f'{EMOJI} The input labels data structure can not be processed for label mapping'
+        )
+
+    percentage_dict['General mapping'] = total_mapping / total_labels
+
+    return percentage_dict
 
 
 def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
@@ -621,6 +664,8 @@ def format_input_for_diffusion(processed_input: Union[list, Dict[str, int], Dict
                                kernel: Matrix,
                                missing_value: int = -1) -> Matrix:
     """Format/generate input vector/matrix according the data structure of the processed_data_input."""
+    log.info("Formatting the processed to the reference kernel Matrix.")
+
     if _label_list_data_struct_check(processed_input):
         return format_categorical_input_vector_from_label_list(rows_labeled=processed_input,
                                                                col_label='scores',
