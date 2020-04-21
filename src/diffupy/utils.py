@@ -278,24 +278,14 @@ def parse_xls_sheet_to_df(sheet: opxl.workbook,
                           relevant_cols: Optional[list] = None,
                           irrelevant_cols: Optional[list] = None) -> pd.DataFrame:
     """Process/format excel sheets to DataFrame."""
-    parsed_sheet_dict = defaultdict(list)
+    parsed_sheet_dict = {}
 
     for col in sheet.iter_cols(min_row=min_row):
         col_label = col[0].value
 
-        if relevant_cols is None and irrelevant_cols is None:
-            relevant_cols = [col_label]
-            irrelevant_cols = []
-        elif relevant_cols is None:
-            relevant_cols = []
-        elif irrelevant_cols is None:
-            irrelevant_cols = []
-
-        parsed_sheet_dict[col_label].append([munge_cell(cell.value)
-                                             for cell in col[1:]
-                                             if (col_label in relevant_cols or col_label not in irrelevant_cols) and
-                                             munge_cell(cell.value) != ''
-                                             ])
+        if ((relevant_cols is not None and col_label in relevant_cols) or
+                (irrelevant_cols is not None and col_label not in irrelevant_cols)):
+            parsed_sheet_dict[col_label] = [munge_cell(cell.value) for cell in col[1:]]
 
     return pd.DataFrame.from_dict(parsed_sheet_dict)
 
@@ -311,20 +301,12 @@ def parse_xls_to_df(path: str,
     wb = opxl.load_workbook(filename=path)
 
     sheets = wb.sheetnames
-    df_dict = {}
-
-    if relevant_sheets is None and irrelevant_sheets is None:
-        relevant_sheets = sheets
-        irrelevant_sheets = []
-    elif relevant_sheets is None:
-        relevant_sheets = []
-    elif irrelevant_sheets is None:
-        irrelevant_sheets = []
 
     if len(sheets) > 1:
-        return {df_dict[sheets[ix].lower()]: parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
+        return {sheets[ix].lower(): parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
                 for ix, sheet in enumerate(wb)
-                if sheets[ix] in relevant_sheets or sheets[ix] not in irrelevant_sheets
+                if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or
+                (irrelevant_sheets is not None and sheets[ix] in irrelevant_sheets)
                 }
 
     else:
