@@ -109,8 +109,6 @@ RELATION = 'Relation '
 
 #: Node name
 NODE = 'Node'
-#: Node type
-NODE_TYPE = 'NodeType'
 #: Log2 fold change (logFC)
 LOG_FC = 'LogFC'
 #: Statistical significance (p-value)
