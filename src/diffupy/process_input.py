@@ -229,7 +229,6 @@ def _remove_non_significant_entities(df: pd.DataFrame, p_value: float) -> pd.Dat
     return df.set_index(NODE)[LABEL].to_dict()
 
 
-
 """Generate input vector from dataset labels"""
 
 
