@@ -29,10 +29,10 @@ def _calculate_scores(
 
     :param col_ind: index of the column to operate
     :param scores: array of score matrices
-    :param raw_diff_scores: precomputatated raw diffusion scores
-    :param const_mean: precalculated constant mean over columns
-    :param const_var: precalculated constant variance over columns
-    :return:  Calculated column z-score
+    :param raw_diff_scores: pre-computed raw diffusion scores
+    :param const_mean: pre-calculated constant mean over columns
+    :param const_var: pre-calculated constant variance over columns
+    :return: Calculated column z-score
     """
     col_in = scores[:, col_ind]
     col_raw = raw_diff_scores[:, col_ind]
@@ -55,7 +55,7 @@ def diffuse_raw(
     z: bool = False,
     k: Matrix = None,
 ) -> Matrix:
-    """Compute the score diffusion procedure, given an initial state as a set of scores and a network where diffuse it.
+    """Compute the score diffusion procedure, given an initial state as a set of scores and a network to diffuse over.
 
     :param graph: background network
     :param scores: array of score matrices. For a single path with a single background, supply a list with a vector col
@@ -64,7 +64,7 @@ def diffuse_raw(
     :return: A list of scores, with the same length and dimensions as scores
     """
     # Sanity checks
-    _validate_scores(scores)
+    # _validate_scores(scores)
     logging.info('Scores validated.')
 
     # Get the Kernel
@@ -119,7 +119,7 @@ def diffuse_raw(
          for row in kernel[:, :n] ** 2]
     )
 
-    logging.info('Rowmeans and rowmeans2 computatated.')
+    logging.info('Rowmeans and rowmeans2 computed.')
 
     # Constant terms over columns
     const_mean = row_sums / n
