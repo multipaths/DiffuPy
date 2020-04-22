@@ -5,6 +5,7 @@
 import copy
 import logging
 from typing import Dict
+
 import networkx as nx
 import numpy as np
 
@@ -21,8 +22,6 @@ __all__ = [
 ]
 
 """Map nodes from input to network"""
-
-
 
 
 def run_diffusion_algorithm(
@@ -44,7 +43,6 @@ def run_diffusion_algorithm(
         return diffuse_raw(network, label_vector)
 
 
-
 def diffuse(
         input_scores,
         method: str = 'raw',
@@ -64,7 +62,6 @@ def diffuse(
     """
     # Sanity checks; create copy of input labels
     scores = copy.copy(input_scores)
-
 
     _validate_scores(scores)
 

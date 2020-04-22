@@ -13,7 +13,7 @@ from .matrix import Matrix
 from .utils import get_label_list_graph
 
 
-#TODO: unused method
+# TODO: unused method
 def _validate_method(method: str) -> None:
     """Ensure that a valid method in supplied."""
     if not isinstance(method, str):
@@ -24,6 +24,7 @@ def _validate_method(method: str) -> None:
 
     if method not in METHODS:
         raise ValueError(f"The available methods are {METHODS} but you supplied {method}.")
+
 
 def _validate_scores(scores: Matrix) -> None:
     """Check score's sanity; ensure that scores are suitable for diffusion."""
