@@ -13,10 +13,11 @@ from .matrix import Matrix
 from .utils import get_label_list_graph
 
 
+#TODO: unused method
 def _validate_method(method: str) -> None:
-    """Ensure that 'method' is a valid character."""
+    """Ensure that a valid method in supplied."""
     if not isinstance(method, str):
-        raise ValueError(f"The supplied 'method' must be a string. The given argument is a {type(method)}")
+        raise ValueError(f"The supplied method must be a string. The given argument is a {type(method)}")
 
     if len(method.split(' ')) > 1:
         raise ValueError(f"Only one method can be supplied, but you supplied {len(method.split(' '))}")
@@ -24,9 +25,8 @@ def _validate_method(method: str) -> None:
     if method not in METHODS:
         raise ValueError(f"The available methods are {METHODS} but you supplied {method}.")
 
-
 def _validate_scores(scores: Matrix) -> None:
-    """Check scores sanity: Ensures that scores are suitable for diffusion."""
+    """Check score's sanity; ensure that scores are suitable for diffusion."""
     #  Check labels list
     if not scores.cols_labels:
         raise ValueError("Scores must be a named list but supplied list contains no names.")
@@ -90,8 +90,8 @@ def _validate_graph(graph: nx.Graph) -> None:
     if len(np.unique(nodes_names)) != len(nodes_names):
         raise ValueError("'graph' has non-unique names! Please check that the names are unique.")
 
-    if nx.is_directed(graph):
-        raise Warning("graph' should be an undirected NetworkX graph object.")
+    # if nx.is_directed(graph):
+    #     raise Warning("graph' should be an undirected NetworkX graph object.")
 
     edge_weights = nx.get_edge_attributes(graph, 'weight')
     if edge_weights:
