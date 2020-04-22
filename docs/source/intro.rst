@@ -2,6 +2,7 @@ First Steps
 ===========
 The first step before running diffusion algorithms on your network using DiffuPy is to learn about the graph and data
 formats are supported. Next, you can find samples of input datasets and networks to run diffusion methods over.
+
 Input Data
 ----------
 
@@ -10,9 +11,8 @@ You can submit your dataset in any of the following formats:
 - CSV (.csv)
 - TSV (.tsv)
 
-Please ensure that the dataset has a column 'Node' containing node IDs. If you only provide the node IDs, you can
-also include a column in your dataset 'NodeType' indicating the entity type for each node. You can also optionally add
-the following columns to your dataset:
+Please ensure that the dataset minimally has a column 'Node' containing node IDs. You can also optionally add the
+following columns to your dataset:
 
 - LogFC [*]_
 - p-value
@@ -28,20 +28,19 @@ DiffuPath accepts several input formats which can be codified in different ways.
 `diffusion scores <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_ summary for more
 details.
 
-1. You can provide a dataset with a column 'Node' containing node IDs along with a column 'NodeType' indicating the
-entity type.
+1. You can provide a dataset with a column 'Node' containing node IDs.
 
-+------------+--------------+
-|     Node   |   NodeType   |
-+============+==============+
-|      A     |     Gene     |
-+------------+--------------+
-|      B     |     Gene     |
-+------------+--------------+
-|      C     |  Metabolite  |
-+------------+--------------+
-|      D     |    Gene      |
-+------------+--------------+
++------------+
+|     Node   |
++============+
+|      A     |
++------------+
+|      B     |
++------------+
+|      C     |
++------------+
+|      D     |
++------------+
 
 2. You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
 their abs(LogFC).

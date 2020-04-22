@@ -25,7 +25,7 @@ Methods without statistical normalisation
   a graph kernel, see :doc:`kernels <kernels>`. These scores treat negative and unlabelled nodes equivalently.
 
 - **ml**: Same as raw, but negative nodes introduce a negative unit of flow. Therefore not equivalent to unlabelled
-  nodes. [2]_
+  nodes [2]_.
 
 - **gl**: Same as ml, but the unlabelled nodes are assigned a (generally non-null) bias term based on the total number
   of positives, negatives and unlabelled nodes [3]_.
