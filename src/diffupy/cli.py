@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Command line interface for diffuPy."""
+"""Command line interface for DiffuPy."""
 
 import json
 import logging
@@ -152,17 +152,23 @@ def diffuse(
 
     click.secho(f'Codifying data from {data}.')
 
-    input_scores_dict = process_input(data, method, binarize, absolute_value, p_value, threshold)
+    label_dict = process_input(data, method, binarize, absolute_value, p_value, threshold)
 
     click.secho(f'Running the diffusion algorithm.')
 
     results = run_diffusion(
-        input_scores_dict,
+        label_dict,
         method,
         graph,
     )
 
-    json.dump(results, output, indent=2)
+    # results = run_diffusion(
+    #     label_dict,
+    #     method,
+    #     graph,
+    # )
+
+    # json.dump(results, output, indent=2)
 
     click.secho(f'Finished!')
 
