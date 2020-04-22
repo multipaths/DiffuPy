@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """Main matrix class and processing of input data."""
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
-import networkx as nx
 import pandas as pd
 
 from .constants import *
@@ -39,18 +38,11 @@ def process_input(
         sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
     )
 
-    # Ensure that column Node is in dataset
+    # Ensure that minimally column Node is in dataset
     if NODE not in df.columns:
         raise ValueError(
             f'Ensure that your file contains a column {NODE} with node IDs.'
         )
-
-    # If logFC column not in dataFrame, ensure node type column is at least given
-    elif LOG_FC not in df.columns:
-        if NODE_TYPE not in df.columns:
-            raise ValueError(
-                f'Ensure that your file contains a column, {NODE_TYPE}, indicating node types.'
-            )
 
     return _codify_input_data(df, method, binning, absolute_value, p_value, threshold)
 
@@ -236,16 +228,6 @@ def _remove_non_significant_entities(df: pd.DataFrame, p_value: float) -> pd.Dat
 
     return df.set_index(NODE)[LABEL].to_dict()
 
-
-"""Map nodes from input to network"""
-
-
-def map_nodes(input_node_dict: Dict[str, int], network: nx.Graph) -> List:
-    """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
-    # List of nodes in network
-    network_nodes = list(network.nodes)
-
-    return [input_node_dict[node] if node in input_node_dict else None for node in network_nodes]
 
 
 """Generate input vector from dataset labels"""
