@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Command line interface for DiffuPy."""
+"""Command line interface for diffuPy."""
 
 import json
 import logging
@@ -12,7 +12,7 @@ import time
 import click
 from diffupy.process_network import get_kernel_from_network_path
 
-from .constants import OUTPUT, METHODS, EMOJI, RAW
+from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
 from .process_input import process_map_and_format_input_data_for_diff
@@ -78,14 +78,14 @@ def kernel(
 
 @main.command()
 @click.option(
-    '-n', '--network',
-    help='Path to the network graph or kernel',
+    '-i', '--input',
+    help='Input data',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
 )
 @click.option(
-    '-i', '--data',
-    help='Input data',
+    '-n', '--network',
+    help='Path to the network graph or kernel',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
 )
@@ -131,8 +131,15 @@ def kernel(
     default=0.05,
     show_default=True,
 )
+@click.option(
+    '-f', '--output_format',
+    help='Statistical significance (p-value).',
+    type=float,
+    default=CSV,
+    show_default=True,
+)
 def diffuse(
-        input_data: str,
+        input: str,
         network: str,
         output: str = sys.stdout,
         method: str = RAW,
@@ -140,15 +147,16 @@ def diffuse(
         threshold: float = None,
         absolute_value: bool = True,
         p_value: float = 0.05,
+        output_format: str = CSV
 ):
     """Run a diffusion method over a network or pre-generated kernel."""
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
 
     kernel = get_kernel_from_network_path(network)
 
-    click.secho(f'Codifying data from {input_data}.')
+    click.secho(f'Processing data input from {input}.')
 
-    input_scores_dict = process_map_and_format_input_data_for_diff(input_data,
+    input_scores_dict = process_map_and_format_input_data_for_diff(input,
                                                                    kernel,
                                                                    method,
                                                                    binarize,
@@ -157,24 +165,21 @@ def diffuse(
                                                                    threshold,
                                                                    )
 
-
-    click.secho(f'Running the diffusion algorithm.')
+    click.secho(f'Computing the diffusion algorithm.')
 
     results = run_diffusion(
-        label_dict,
+        input_scores_dict,
         method,
         k=kernel
     )
 
-    # results = run_diffusion(
-    #     label_dict,
-    #     method,
-    #     graph,
-    # )
+    if output_format is CSV:
+        results.to_csv(output)
 
-    # json.dump(results, output, indent=2)
+    elif output_format is JSON:
+        json.dump(results, output, indent=2)
 
-    click.secho(f'Finished!')
+    click.secho(f'{EMOJI} Diffusion performed with success. Output located at {output} {EMOJI}')
 
 
 if __name__ == '__main__':
