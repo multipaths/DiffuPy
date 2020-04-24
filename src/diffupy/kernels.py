@@ -18,14 +18,14 @@ log = logging.getLogger(__name__)
 
 __all__ = [
     'diffusion_kernel',
-    'commute_time_kernel',
+    'compute_time_kernel',
     'inverse_cosine_kernel',
     'regularised_laplacian_kernel',
     'p_step_kernel',
 ]
 
 
-def commute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
+def compute_time_kernel(graph: nx.Graph, normalized: bool = False) -> Matrix:
     """Compute the commute-time kernel, which is the expected time of going back and forth between a couple of nodes.
 
     If the network is connected, then the commuted time kernel will be totally dense, therefore reflecting global
@@ -97,7 +97,7 @@ def p_step_kernel(graph: nx.Graph, a: int = 2, p: int = 5) -> Matrix:
     :param graph: A graph
     :param a: regularising summed to the spectrum. Spectrum of the normalised Laplacian matrix.
     :param p: p-step kernels can be cheaper to compute and have been successful in biological tasks.
-    :return: Laplacian repr'esentation of the graph.
+    :return: Laplacian representation of the graph.
     """
     laplacian = LaplacianMatrix(graph, normalized=True)
     laplacian.mat = -laplacian.mat

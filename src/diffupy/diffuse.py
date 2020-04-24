@@ -4,10 +4,12 @@
 
 import copy
 import logging
+from typing import Dict
 
 import networkx as nx
 import numpy as np
 
+from .constants import *
 from .diffuse_raw import diffuse_raw
 from .matrix import Matrix
 from .utils import get_label_list_graph
@@ -18,6 +20,27 @@ log = logging.getLogger(__name__)
 __all__ = [
     'diffuse',
 ]
+
+"""Map nodes from input to network"""
+
+
+def run_diffusion_algorithm(
+        input_labels: Dict[str, int],
+        method: str,
+        network: nx.Graph
+):
+    """Run diffusion algorithm."""
+    # List of nodes in network
+    network_nodes = list(network.nodes)
+    print(f'input_labels: {input_labels}')
+
+    print(f'network_nodes:{network_nodes}')
+    # Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes
+    label_vector = [input_labels[node] if node in input_labels else None for node in network_nodes]
+    print(f'label_vector: {label_vector}')
+
+    if method == RAW:
+        return diffuse_raw(network, label_vector)
 
 
 def diffuse(
@@ -32,12 +55,12 @@ def diffuse(
     :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
     :param graph: A network as a graph. It could be optional if a Kernel is provided
     :param kwargs: Optional arguments:
-                    - k: a  kernel [matrix] steaming from a graph, thus sparing the graph transformation process
+                    - k: a  kernel [matrix] stemming from a graph, thus sparing the graph transformation process
                     - Other arguments which would differ depending on the chosen method
     :return: The diffused scores within the matrix transformation of the network, with the diffusion operation
              [k x input_vector] performed
     """
-    # Sanity checks
+    # Sanity checks; create copy of input labels
     scores = copy.copy(input_scores)
 
     _validate_scores(scores)
@@ -50,13 +73,13 @@ def diffuse(
             raise ValueError("Neither a graph 'graph' or a kernel 'k' has been provided.")
         format_network = 'kernel'
 
-    if method == 'raw':
+    if method == RAW:
         return diffuse_raw(graph, scores, **kwargs)
 
-    elif method == 'z':
+    elif method == Z:
         return diffuse_raw(graph, scores, z=True, **kwargs)
 
-    elif method == 'ml':
+    elif method == ML:
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
             if score not in [-1, 0, 1]:
                 raise ValueError("Input scores must be binary.")
@@ -65,7 +88,7 @@ def diffuse(
 
         return diffuse_raw(graph, scores, **kwargs)
 
-    elif method == 'gm':
+    elif method == GM:
         for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
             if score not in [0, 1]:
                 raise ValueError("Input scores must be binary.")

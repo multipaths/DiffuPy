@@ -21,7 +21,7 @@ project = 'diffupy'
 copyright = '2020,  Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 author = ' Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 
-release = '0.0.4-dev'
+release = '0.0.5-dev'
 
 parsed_version = re.match(
     '(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?:-(?P<release>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+(?P<build>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?',
@@ -56,8 +56,8 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'networkx': ('https://networkx.github.io/', None),
-    'sqlalchemy': ('https://docs.sqlalchemy.org/en/latest', None),
+    'networkx': ('https://networkx.github.io/documentation/stable', None),
+    'sqlalchemy': ('https://docs.sqlalchemy.org/en/13/', None),
     'pybel': ('https://pybel.readthedocs.io/en/latest/', None),
 }
 
