@@ -445,17 +445,13 @@ def _remove_non_significant_entities(df: pd.DataFrame, p_value: float) -> Dict[s
 
 def _label_scores_dict_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type Dict[str, int]."""
-    return (isinstance(v, dict) and
-            isinstance(get_random_value_from_dict(v), (int, float))
-            )
+    return isinstance(v, dict) and isinstance(get_random_value_from_dict(v), (int, float))
 
 
 def _type_dict_label_scores_dict_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type Dict[str, Dict[str, int]]."""
-    return (isinstance(v, dict) and
-            isinstance(get_random_value_from_dict(v), dict) and
-            isinstance(get_random_value_from_dict(get_random_value_from_dict(v)), (int, float))
-            )
+    return isinstance(v, dict) and isinstance(get_random_value_from_dict(v), dict) and isinstance(
+        get_random_value_from_dict(get_random_value_from_dict(v)), (int, float))
 
 
 def _label_list_data_struct_check(v: Union[dict, list]) -> bool:
@@ -465,9 +461,7 @@ def _label_list_data_struct_check(v: Union[dict, list]) -> bool:
 
 def _type_dict_label_list_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type Dict[str, list]."""
-    return (isinstance(v, dict) and
-            isinstance(get_random_value_from_dict(v), list)
-            )
+    return isinstance(v, dict) and isinstance(get_random_value_from_dict(v), list)
 
 
 """Mappers from input to network background"""
@@ -481,28 +475,29 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
 
     """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
     if isinstance(background_labels, list):
-        return _map_labels_to_background(input_labels,
-                                         background_labels,
-                                         check_substring=check_substrings)
+        mapped_labels = _map_labels_to_background(input_labels,
+                                                  background_labels,
+                                                  check_substring=check_substrings)
 
     elif isinstance(background_labels, dict):
-        return {node_type: _map_labels_to_background(input_labels,
-                                                     node_set,
-                                                     background_labels_type=node_type,
-                                                     check_substring=check_substrings)
-                for node_type, node_set
-                in background_labels.items()
-                if _map_labels_to_background(input_labels,
-                                             node_set,
-                                             background_labels_type=node_type,
-                                             check_substring=check_substrings) not in [[], {}]
-                }
+        mapped_labels = {node_type: _map_labels_to_background(input_labels,
+                                                              node_set,
+                                                              background_labels_type=node_type,
+                                                              check_substring=check_substrings)
+                         for node_type, node_set
+                         in background_labels.items()
+                         if _map_labels_to_background(input_labels,
+                                                      node_set,
+                                                      background_labels_type=node_type,
+                                                      check_substring=check_substrings) not in [[], {}]
+                         }
     else:
         raise IOError(
             f'{EMOJI} The background mapping labels should be provided as a label list or as a type dict of label list.'
         )
 
-    if show_statistics: log_dict(mapping_statistics(mapped_labels, input_labels))
+    if show_statistics:
+        log_dict(mapping_statistics(mapped_labels, input_labels))
 
     return mapped_labels
 
@@ -537,8 +532,8 @@ def mapping_statistics(input_labels: Union[list, Dict[str, Dict[str, int]], Dict
 
 def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
                 background_labels: list,
-                check_substrings: bool = False) -> Union[
-    list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
+                check_substrings: bool = False
+                ) -> Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
     """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
     if _label_list_data_struct_check(input_labels):
         return _map_label_list(input_labels, background_labels, check_substrings)
@@ -547,16 +542,16 @@ def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, i
         return _map_label_dict(input_labels, background_labels, check_substrings)
 
     elif _type_dict_label_list_data_struct_check(input_labels):
-        l = []
+        map_list = []
         for type, label_list in input_labels.items():
-            l += _map_labels(label_list, background_labels, check_substrings)
-        return l
+            map_list += _map_labels(label_list, background_labels, check_substrings)
+        return map_list
 
     elif _type_dict_label_scores_dict_data_struct_check(input_labels):
-        d = {}
+        map_dict = {}
         for type, scores_dict in input_labels.items():
-            d.update(_map_labels(scores_dict, background_labels, check_substrings))
-        return d
+            map_dict.update(_map_labels(scores_dict, background_labels, check_substrings))
+        return map_dict
 
     else:
         raise TypeError(
@@ -600,7 +595,8 @@ def _check_label_to_background_labels(label: str,
         if isinstance(entity, set) or isinstance(entity, tuple) or isinstance(entity, list):
             for subentity in entity:
                 if not substring:
-                    if str(subentity) == label: return subentity
+                    if str(subentity) == label:
+                        return subentity
                 elif str(subentity) in label or label in str(subentity):
                     return subentity
 

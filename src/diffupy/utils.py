@@ -7,7 +7,6 @@ import logging
 import pickle
 import random
 import warnings
-from collections import defaultdict
 from typing import List, Union, Dict, Optional
 
 import networkx as nx
@@ -124,10 +123,10 @@ def get_idx_scores_mapping(scores):
     return {i: score for i, score in enumerate(scores)}
 
 
-def print_dict_dimensions(entities_db, title):
-    """Print dimension of the dictionary."""
+def print_dict_dimensions(entities_db, message='Total number of '):
+    """Print dimension of the dictionary"""
     total = 0
-    print(title)
+
     for k1, v1 in entities_db.items():
         m = ''
         if isinstance(v1, dict):
@@ -138,9 +137,17 @@ def print_dict_dimensions(entities_db, title):
             m += f'{len(v1)} '
             total += len(v1)
 
-        print(f'Total number of {k1}: {m} ')
+        log_dict({k1: m}, message)
 
     print(f'Total: {total} ')
+
+
+def log_dict(dict_to_print: dict, message: str = ''):
+    """Print dictionary as list with a message"""
+
+    for k1, v1 in dict_to_print.items():
+        log.info(f'{message} {k1}: {v1} ')
+        print(f'{message} {k1}: {v1} ')
 
 
 def get_random_key_from_dict(d):
@@ -283,8 +290,8 @@ def parse_xls_sheet_to_df(sheet: opxl.workbook,
     for col in sheet.iter_cols(min_row=min_row):
         col_label = col[0].value
 
-        if ((relevant_cols is not None and col_label in relevant_cols) or
-                (irrelevant_cols is not None and col_label not in irrelevant_cols)):
+        if ((relevant_cols is not None and col_label in relevant_cols) or (
+                irrelevant_cols is not None and col_label not in irrelevant_cols)):
             parsed_sheet_dict[col_label] = [munge_cell(cell.value) for cell in col[1:]]
 
     return pd.DataFrame.from_dict(parsed_sheet_dict)
@@ -305,8 +312,8 @@ def parse_xls_to_df(path: str,
     if len(sheets) > 1:
         return {sheets[ix].lower(): parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
                 for ix, sheet in enumerate(wb)
-                if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or
-                (irrelevant_sheets is not None and sheets[ix] in irrelevant_sheets)
+                if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or (
+                    irrelevant_sheets is not None and sheets[ix] in irrelevant_sheets)
                 }
 
     else:

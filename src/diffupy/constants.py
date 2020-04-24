@@ -130,7 +130,7 @@ LABEL = 'Label'
 ENTITY = 'Entity'
 GENE = 'Gene'
 
-NODE_LABELING= [
+NODE_LABELING = [
     NODE,
     LABEL,
     ENTITY,
@@ -145,4 +145,3 @@ SCORE = 'Score'
 LOG_FC = 'LogFC'
 #: Statistical significance (p-value)
 P_VALUE = 'p-value'
-
