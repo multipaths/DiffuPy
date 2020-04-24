@@ -29,8 +29,7 @@ def process_map_and_format_input_data_for_diff(data_input: Union[str, pd.DataFra
                                                show_statistics: bool = True,
                                                **further_parse_args
                                                ) -> Matrix:
-    """Process miscellaneous data input, perform the mapping to the diffusion background network (as a kernel) and
-    format it for the diffusion computation function.
+    """Process miscellaneous data input, perform the mapping to the diffusion background network (as a kernel) and format it for the diffusion computation function.
 
     :param data_input: A miscellaneous data input to be processed/formatted for the diffuPy diffusion computation.
     :param kernel: A pre-computed kernel to perform the label mapping and the matching for the input formatting.
@@ -76,8 +75,7 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
                        threshold: Optional[float] = 0.5,
                        **further_parse_args
                        ) -> Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]]:
-    """Pipeline the provided miscellaneous data input for further processing, in the following standardized data structures:
-    label list, type_dict label lists, label-scores dict or type_dict label-scores dicts.
+    """Pipeline the provided miscellaneous data input for further processing, in the following standardized data structures: label list, type_dict label lists, label-scores dict or type_dict label-scores dicts.
 
     :param data_input: A miscellaneous data input to be processed.
     :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
@@ -471,6 +469,7 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
                      background_labels: Union[Dict[str, list], list],
                      check_substrings: Union[List, bool] = None,
                      show_statistics: bool = False) -> Union[Dict[str, int], list]:
+    """Get the mappings from preprocessed input_labels."""
     log.info("Mapping the input labels to the background labels reference.")
 
     """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
@@ -504,6 +503,7 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
 
 def mapping_statistics(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
                        mapped_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]) -> Dict:
+    """Get the mapping statistics."""
     percentage_dict = {}
     total_mapping = 0
     total_labels = 0
@@ -565,7 +565,7 @@ def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]
                               check_substring: Union[List, bool] = None
                               ) -> Union[Dict[str, Dict[str, int]],
                                          Dict[str, int]]:
-    """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
+    """Map labels from preprocessed input to background_labels to get a set of matched labels."""
     if _type_dict_label_scores_dict_data_struct_check(input_labels) or \
             _type_dict_label_list_data_struct_check(input_labels):
 
@@ -586,6 +586,7 @@ def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]
 def _check_label_to_background_labels(label: str,
                                       label_list: List[Union[str, Tuple[str]]],
                                       substring: bool = False) -> Union[str, None]:
+    """Check if label string in a label list, also check further if substring checking."""
     if label in label_list:
         return label
 
@@ -609,6 +610,7 @@ def _check_label_to_background_labels(label: str,
 def _map_label_list(input_labels: Union[str, Set[str], List[str]],
                     background_labels: List[str],
                     check_substrings: bool = False) -> List[str]:
+    """Map labels from preprocessed input to background_labels LIST to get a set of matched labels."""
     mapped_list = []
     for label in input_labels:
         if isinstance(label, str):
@@ -630,6 +632,7 @@ def _map_label_list(input_labels: Union[str, Set[str], List[str]],
 def _map_label_dict(input_labels: Dict[Union[str, set], Union[int, float]],
                     background_labels: list,
                     check_substrings: bool = False) -> Dict[str, Union[int, float]]:
+    """Map labels from preprocessed input to background_labels DICT to get a set of matched labels."""
     mapped_dict = {}
 
     for label, v in input_labels.items():
@@ -783,7 +786,6 @@ def format_input_vector_from_label_score_dict(labels_scores_dict: Dict[str, int]
                                               type_k: bool = False
                                               ) -> Matrix:
     """Generate scores input vector from labels scores dict."""
-
     input_mat = Matrix(
         mat=np.transpose(np.array([list(labels_scores_dict.values())])),
         rows_labels=list(labels_scores_dict.keys()),

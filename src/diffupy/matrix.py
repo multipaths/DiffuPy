@@ -551,7 +551,6 @@ class MatrixFromNumpyArray(Matrix):
 
     def __init__(self, nparray, name=''):
         """Initialize laplacian."""
-
         df = from_nparray_to_df(nparray)
 
         rows = list(df.rows.values)
