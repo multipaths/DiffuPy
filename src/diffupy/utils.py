@@ -124,7 +124,7 @@ def get_idx_scores_mapping(scores):
 
 
 def print_dict_dimensions(entities_db, message='Total number of '):
-    """Print dimension of the dictionary"""
+    """Print dimension of the dictionary."""
     total = 0
 
     for k1, v1 in entities_db.items():
@@ -143,18 +143,19 @@ def print_dict_dimensions(entities_db, message='Total number of '):
 
 
 def log_dict(dict_to_print: dict, message: str = ''):
-    """Print dictionary as list with a message"""
-
+    """Print dictionary as list with a message."""
     for k1, v1 in dict_to_print.items():
         log.info(f'{message} {k1}: {v1} ')
         print(f'{message} {k1}: {v1} ')
 
 
-def get_random_key_from_dict(d):
+def get_random_key_from_dict(d: dict) -> [Union[str, int, tuple]]:
+    """Return random key from provided dict."""
     return random.choice(list(d.keys()))
 
 
-def get_random_value_from_dict(d):
+def get_random_value_from_dict(d: dict):
+    """Return random value from provided dict."""
     return d[get_random_key_from_dict(d)]
 
 

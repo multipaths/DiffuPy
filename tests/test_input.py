@@ -5,7 +5,6 @@
 import logging
 import unittest
 
-import numpy as np
 from diffupy.constants import *
 from diffupy.matrix import Matrix
 from diffupy.process_input import process_input_data, map_labels_input, \
@@ -271,7 +270,6 @@ class ValidateTest(unittest.TestCase):
 
     def test_format_input_for_diffusion_label_list(self):
         """Test empty matrix."""
-
         processed_mapped_nodes_list = format_input_for_diffusion(
             map_labels_input({'Metabolite': {'C': -1}, 'Gene': {'A': 2, 'B': 1}, 'mirnas': {'A': 1, 'T': 1}},
                              self.kernel_test_1.rows_labels),
@@ -279,7 +277,7 @@ class ValidateTest(unittest.TestCase):
         )
 
         # TODO: Implement in Matrix equal, now if the col order is mixed it raises error
-        #assert(np.allclose(processed_mapped_nodes_list.mat,
+        # assert(np.allclose(processed_mapped_nodes_list.mat,
         #                    np.array([[-1, 2, 1],
         #                              [-1, 1, -1],
         #                              [-1, -1, -1],
@@ -287,9 +285,9 @@ class ValidateTest(unittest.TestCase):
         #                             )
         #                    )
         #        )
-        #self.assertEqual(processed_mapped_nodes_list.cols_labels,
+        # self.assertEqual(processed_mapped_nodes_list.cols_labels,
         #                 ['Metabolite', 'Gene', 'mirnas']
         #                 )
-        #self.assertEqual(processed_mapped_nodes_list.rows_labels,
+        # self.assertEqual(processed_mapped_nodes_list.rows_labels,
         #                 ['A', 'B', 'C', 'D']
         #                 )
