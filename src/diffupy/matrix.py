@@ -7,9 +7,11 @@ import os
 
 import numpy as np
 import pandas as pd
+from diffupy.constants import CSV
+from networkx import DiGraph
 
 from .utils import get_label_ix_mapping, get_label_list_graph, get_laplacian, decode_labels, get_idx_scores_mapping, \
-    get_repeated_labels
+    get_repeated_labels, from_dataframe_file, from_nparray_to_df
 
 log = logging.getLogger(__name__)
 
@@ -23,15 +25,14 @@ class Matrix:
     """Matrix class."""
 
     def __init__(
-        self,
-        mat=None,
-        rows_labels=None,
-        cols_labels=None,
-        graph=None,
-        quadratic=False,
-        name='',
-        init_value=None,
-        **kwargs
+            self,
+            mat=None,
+            rows_labels=None,
+            cols_labels=None,
+            graph=None,
+            quadratic=False,
+            name='',
+            init_value=None,
     ):
         """Initialize matrix.
 
@@ -79,22 +80,22 @@ class Matrix:
 
     def __str__(self):
         """Return a string representation of the Matrix."""
-        s = f"        {self.cols_labels}"
+        s = f"  {self.cols_labels}"
 
         for i, row_label in enumerate(self.rows_labels):
             s += f"\n {row_label}  {self.mat[i]} "
 
         return f"\nmatrix {self.name} \n  {s} \n "
 
-    def __iter__(self, **kargs):
+    def __iter__(self, **attr):
         """Help method for the iteration of the Matrix."""
         self.i = -1
         self.j = 0
 
-        if 'get_indices' in kargs:
-            self.get_indices = kargs['get_indices']
-        if 'get_labels' in kargs:
-            self.get_labels = kargs['get_labels']
+        if 'get_indices' in attr:
+            self.get_indices = attr['get_indices']
+        if 'get_labels' in attr:
+            self.get_labels = attr['get_labels']
 
         return self
 
@@ -463,23 +464,6 @@ class Matrix:
 
         return ordered_mat
 
-    """Import"""
-
-    def from_csv(self, csv_path):
-        """Import matrix from csv file using the headers as a Matrix class."""
-        m = np.genfromtxt(csv_path, dtype=None, delimiter=',')
-        return Matrix(
-            mat=np.array(
-                [
-                    [float(x)
-                     for x in a[1:]]
-                    for a in m[1:]
-                ]),
-            rows_labels=list(m[1:, 0]),
-            cols_labels=list(m[0, 1:]),
-            name=str(os.path.basename(csv_path).replace('.csv', ''))
-        )
-
     """Export"""
 
     def to_dict(self, ordered=True):
@@ -496,19 +480,137 @@ class Matrix:
 
         return d
 
+    def to_df(self, ordered=True):
+        """Export matrix as a data frame using the headers (row_labels, cols_labels) of the Matrix class."""
+        d = self.to_dict(ordered)
+
+        rows_labels = d.pop('rows_labels')
+
+        df = pd.DataFrame(d)
+        df.rows.values = rows_labels
+
+        return df
+
     def to_csv(self, path, file_name='_export.csv', index=False, ordered=True):
         """Export matrix to csv file using the headers (row_labels, cols_labels) of the Matrix class."""
         # Generate dataframe
-        df = pd.DataFrame(data=self.to_dict(ordered))
 
-        df.to_csv(os.path.join(path, self.name, file_name), index=index)
+        self.to_df(ordered).to_csv(os.path.join(path, self.name, file_name), index=index)
+
+    def to_nx_graph(self):
+        """Export matrix as a Graph using the headers (row_labels, cols_labels) of the Matrix class."""
+        if len(self.cols_labels) != len(self.rows_labels) or not self.quadratic:
+            raise ValueError('The matrix cannot be converted as a graph since it is not quadratic, which '
+                             'it is the used representation of a network (usually a kernel) as a Matrix.')
+
+        graph = DiGraph()
+
+        for score, sub_name, obj_name in self.__iter__(get_labels=True, get_indices=False):
+            if score != 0:
+                graph.add_edge(
+                    sub_name, obj_name,
+                )
+
+        return graph
+
+
+class MatrixFromDict(Matrix):
+    """Constructor matrix class for Dictionary data structure to Matrix conversion."""
+
+    def __init__(self, d, name=''):
+        """Initialize laplacian."""
+        rows = list(d.pop('rows_labels'))
+        cols = list(d.keys())
+
+        Matrix.__init__(self, mat=np.array(list(d.values())),
+                        rows_labels=rows,
+                        cols_labels=cols,
+                        quadratic=len(cols) == len(rows),
+                        name=name
+                        )
+
+
+class MatrixFromDataFrame(Matrix):
+    """Constructor matrix class for DataFrame to Matrix conversion."""
+
+    def __init__(self, df, name=''):
+        """Initialize laplacian."""
+        rows = list(df.rows.values)
+        cols = list(df.cols.values)
+
+        Matrix.__init__(self, mat=df.to_numpy(),
+                        rows_labels=rows,
+                        cols_labels=cols,
+                        quadratic=len(cols) == len(rows),
+                        name=name
+                        )
+
+
+class MatrixFromNumpyArray(Matrix):
+    """Constructor matrix class for DataFrame to Matrix conversion."""
+
+    def __init__(self, nparray, name=''):
+        """Initialize laplacian."""
+        df = from_nparray_to_df(nparray)
+
+        rows = list(df.rows.values)
+        cols = list(df.cols.values)
+
+        Matrix.__init__(self, mat=df.to_numpy(),
+                        rows_labels=rows,
+                        cols_labels=cols,
+                        quadratic=len(cols) == len(rows),
+                        name=name
+                        )
+
+
+class MatrixFromCSV(Matrix):
+    """Constructor matrix class for CSV to Matrix conversion."""
+
+    def __init__(self, csv_path, fmt=CSV, name=None):
+        """Initialize laplacian."""
+        df = from_dataframe_file(csv_path, fmt)
+
+        if name is None:
+            name = str(os.path.basename(csv_path).replace('.csv', ''))
+
+        rows = list(df.rows.values)
+        cols = list(df.cols.values)
+
+        Matrix.__init__(self, mat=df.to_numpy(),
+                        rows_labels=rows,
+                        cols_labels=cols,
+                        quadratic=len(cols) == len(rows),
+                        name=name
+                        )
+
+
+class MatrixFromGraph(Matrix):
+    """Constructor matrix class for nx.Graph to Matrix conversion."""
+
+    # TODO : move instances initialization from global argument graph to here
+
+    def __init__(self, graph, node_argument='name', name=''):
+        # This initialization would make a matrix representing the graph (taking a graph argument as label)
+        rows = list(get_label_list_graph(graph, node_argument))
+
+        Matrix.__init__(self, rows_labels=rows,
+                        init_value=1,
+                        quadratic=True,
+                        name=name,
+                        )
 
 
 class LaplacianMatrix(Matrix):
     """Laplacian matrix class."""
 
-    def __init__(self, graph, normalized=False, name=''):
+    def __init__(self, graph, normalized=False, node_argument='name', name=''):
         """Initialize laplacian."""
         l_mat = get_laplacian(graph, normalized)
+        rows = list(get_label_list_graph(graph, node_argument))
 
-        Matrix.__init__(self, mat=l_mat, quadratic=True, name=name, graph=graph)
+        Matrix.__init__(self, mat=l_mat,
+                        rows_labels=rows,
+                        quadratic=True,
+                        name=name
+                        )

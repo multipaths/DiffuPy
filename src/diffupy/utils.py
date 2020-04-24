@@ -5,24 +5,26 @@
 import json
 import logging
 import pickle
+import random
 import warnings
-from typing import List, Tuple
+from typing import List, Union, Dict, Optional
 
 import networkx as nx
 import numpy as np
+import openpyxl as opxl
 import pandas as pd
 import pybel
-
-from networkx import DiGraph, read_graphml, read_gml, node_link_graph, read_edgelist
+from networkx import Graph
 
 from .constants import *
-from .constants import CSV, TSV, GRAPHML, GML, BEL, BEL_PICKLE, NODE_LINK_JSON, EMOJI, FORMATS
-
+from .constants import CSV, TSV, GRAPH_FORMATS
 
 log = logging.getLogger(__name__)
 
+"""Matrix/graph handling utils."""
 
-def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
+
+def get_laplacian(graph: Graph, normalized: bool = False) -> np.ndarray:
     """Return Laplacian matrix."""
     if nx.is_directed(graph):
         warnings.warn('Since graph is directed, it will be converted to an undirected graph.')
@@ -35,7 +37,7 @@ def get_laplacian(graph: nx.Graph, normalized: bool = False) -> np.ndarray:
     return nx.laplacian_matrix(graph).toarray()
 
 
-def set_diagonal_matrix(matrix, d):
+def set_diagonal_matrix(matrix: np.ndarray, d: list) -> np.ndarray:
     """Set diagonal matrix."""
     for j, row in enumerate(matrix):
         for i, x in enumerate(row):
@@ -121,6 +123,88 @@ def get_idx_scores_mapping(scores):
     return {i: score for i, score in enumerate(scores)}
 
 
+def print_dict_dimensions(entities_db, message='Total number of '):
+    """Print dimension of the dictionary."""
+    total = 0
+
+    for k1, v1 in entities_db.items():
+        m = ''
+        if isinstance(v1, dict):
+            for k2, v2 in v1.items():
+                m += f'{k2}({len(v2)}), '
+                total += len(v2)
+        else:
+            m += f'{len(v1)} '
+            total += len(v1)
+
+        log_dict({k1: m}, message)
+
+    print(f'Total: {total} ')
+
+
+def log_dict(dict_to_print: dict, message: str = ''):
+    """Print dictionary as list with a message."""
+    for k1, v1 in dict_to_print.items():
+        log.info(f'{message} {k1}: {v1} ')
+        print(f'{message} {k1}: {v1} ')
+
+
+def get_random_key_from_dict(d: dict) -> [Union[str, int, tuple]]:
+    """Return random key from provided dict."""
+    return random.choice(list(d.keys()))
+
+
+def get_random_value_from_dict(d: dict):
+    """Return random value from provided dict."""
+    return d[get_random_key_from_dict(d)]
+
+
+"""File loading utils."""
+
+
+def format_checker(fmt: str, fmt_list: list = GRAPH_FORMATS) -> None:
+    """Check formats."""
+    if fmt not in fmt_list:
+        raise ValueError(
+            f'The selected sep {fmt} is not valid. Please ensure you use one of the following formats: '
+            f'{fmt_list}'
+        )
+
+
+def from_dataframe_file(path: str, fmt: str) -> pd.DataFrame:
+    """Read network file."""
+    format_checker(fmt)
+
+    return pd.read_csv(
+        path,
+        header=0,
+        sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
+    )
+
+
+def from_json(path: str):
+    """Read from json file."""
+    with open(path) as f:
+        return json.load(f)
+
+
+def from_pickle(input_path):
+    """Read from pickle file."""
+    with open(input_path, 'rb') as f:
+        unpickler = pickle.Unpickler(f)
+        return unpickler.load()
+
+
+def from_nparray_to_df(nparray: np.ndarray) -> pd.DataFrame:
+    """Convert numpy array to data frame."""
+    return pd.DataFrame(data=nparray[1:, 1:],
+                        index=nparray[1:, 0],
+                        columns=nparray[0, 1:])
+
+
+"""Data parsing utils."""
+
+
 def decode_labels(labels):
     """Validate labels."""
     labels_decode = []
@@ -138,156 +222,100 @@ def decode_labels(labels):
     return labels_decode
 
 
-def print_dict_dimensions(entities_db, title):
-    """Print dimension of the dictionary."""
-    total = 0
-    print(title)
-    for k1, v1 in entities_db.items():
-        m = ''
-        if isinstance(v1, dict):
-            for k2, v2 in v1.items():
-                m += f'{k2}({len(v2)}), '
-                total += len(v2)
+def munge_label(label: Union[str, int, float]) -> str:
+    """Munge label strings."""
+    remove_set = ['*', ' ', '|', '-', '"', "'", "↑", "↓", "\n"]
+    split_set = ['/']
+
+    label = str(label).lower()
+
+    for symb in remove_set:
+        if symb in label:
+            label = label.replace(symb, '')
+
+    for symb in split_set:
+        if symb in label:
+            label = tuple(set(label.split(symb)))
+            if len(label) == 1:
+                label = label[0]
+
+    return label
+
+
+def munge_label_list(labels: list):
+    """Munge labels list."""
+    return list(set([munge_label(label) for label in labels]))
+
+
+def munge_label_scores_dict(labels: dict) -> Dict[str, Union[list, int, str]]:
+    """Munge labels dict."""
+    return {munge_label(label): v for label, v in labels.items()}
+
+
+def munge_label_type_dict(label_dict: Dict[str, Union[list, int, str, dict]]) -> Dict[str, Union[list, int, str, dict]]:
+    """Munge labels type dict."""
+    type_label_dict = {}
+
+    for type_label, labels in label_dict.items():
+        if isinstance(labels, dict):
+            type_label_dict[type_label] = munge_label_scores_dict(labels)
+
+        elif isinstance(labels, dict):
+            type_label_dict[type_label] = munge_label_scores_dict(labels)
+
+    return type_label_dict
+
+
+def munge_cell(cell):
+    """Munge cell."""
+    if isinstance(cell, str):
+        if cell.replace(',', '').replace('.', '').replace('-', '').isnumeric():
+            return float(cell)
         else:
-            m += f'{len(v1)} '
-            total += len(v1)
+            return munge_label(cell)
 
-        print(f'Total number of {k1}: {m} ')
-
-    print(f'Total: {total} ')
-
-
-def get_simple_graph_from_multigraph(multigraph):
-    """Convert undirected graph from multigraph."""
-    graph = nx.Graph()
-    for u, v, data in multigraph.edges(data=True):
-        u = get_label_node(u)
-        v = get_label_node(v)
-
-        w = data['weight'] if 'weight' in data else 1.0
-        if graph.has_edge(u, v):
-            graph[u][v]['weight'] += w
-        else:
-            graph.add_edge(u, v, weight=w)
-
-    return graph
-
-
-"""Check formats of networks """
-
-
-def _format_checker(fmt: str) -> None:
-    """Check column sep."""
-    if fmt not in FORMATS:
-        raise ValueError(
-            f'The selected sep {fmt} is not valid. Please ensure you use one of the following formats: '
-            f'{FORMATS}'
-        )
-
-
-"""Process networks"""
-
-
-def _read_network_file(path: str, fmt: str) -> pd.DataFrame:
-    """Read network file."""
-    _format_checker(fmt)
-
-    df = pd.read_csv(
-        path,
-        header=0,
-        sep=FORMAT_SEPARATOR_MAPPING[CSV] if fmt == CSV else FORMAT_SEPARATOR_MAPPING[TSV]
-    )
-
-    if SOURCE not in df.columns or TARGET not in df.columns:
-        raise ValueError(
-            f'Ensure that your file contains columns for {SOURCE} and {TARGET}. The column for {RELATION} is optional'
-            f'and can be omitted.'
-        )
-
-    return df
-
-
-def process_network(path: str, sep: str) -> DiGraph:
-    """Return network from dataFrame."""
-    _format_checker(sep)
-
-    df = _read_network_file(path, sep)
-
-    graph = DiGraph()
-
-    for index, row in df.iterrows():
-
-        # Get node names from data frame
-        sub_name = row[SOURCE]
-        obj_name = row[TARGET]
-
-        if RELATION in df.columns:
-
-            relation = row[RELATION]
-
-            # Store edge in the graph
-            graph.add_edge(
-                sub_name, obj_name,
-                relation=relation,
-            )
-
-        else:
-            graph.add_edge(
-                sub_name, obj_name,
-            )
-
-    return graph
-
-
-def load_json_file(path: str) -> DiGraph:
-    """Read json file."""
-    with open(path) as f:
-        return json.load(f)
-
-
-def from_pickle(input_path):
-    """Read from pickle file."""
-    with open(input_path, 'rb') as f:
-        unpickler = pickle.Unpickler(f)
-        return unpickler.load()
-
-
-def process_network_from_cli(path: str) -> nx.Graph:
-    """Load network from path."""
-    if path.endswith(CSV):
-        graph = process_network(path, CSV)
-
-    elif path.endswith(TSV):
-        graph = process_network(path, TSV)
-
-    elif path.endswith(GRAPHML):
-        graph = read_graphml(path)
-
-    elif path.endswith(GML):
-        graph = read_gml(path)
-
-    elif path.endswith(BEL):
-        graph = pybel.from_path(path)
-
-    elif path.endswith(BEL_PICKLE):
-        graph = pybel.from_pickle(path)
-
-    elif path.endswith(EDGE_LIST):
-        graph = read_edgelist(path)
-
-    elif path.endswith(NODE_LINK_JSON):
-        data = load_json_file(path)
-        graph = node_link_graph(data)
+    elif isinstance(cell, float) or isinstance(cell, int):
+        return cell
 
     else:
-        raise IOError(
-            f'{EMOJI} The selected format is not valid. Please ensure you use one of the following formats: '
-            f'{FORMATS}'
-        )
-    return graph
+        raise TypeError('The cell type could not be processed.')
 
 
-def process_kernel_from_cli(path: str):
-    """Process kernel from cli."""
-    # TODO process different kinds of input format kernel
-    return from_pickle(path)
+def parse_xls_sheet_to_df(sheet: opxl.workbook,
+                          min_row: Optional[int] = 1,
+                          relevant_cols: Optional[list] = None,
+                          irrelevant_cols: Optional[list] = None) -> pd.DataFrame:
+    """Process/format excel sheets to DataFrame."""
+    parsed_sheet_dict = {}
+
+    for col in sheet.iter_cols(min_row=min_row):
+        col_label = col[0].value
+
+        if ((relevant_cols is not None and col_label in relevant_cols) or (
+                irrelevant_cols is not None and col_label not in irrelevant_cols)):
+            parsed_sheet_dict[col_label] = [munge_cell(cell.value) for cell in col[1:]]
+
+    return pd.DataFrame.from_dict(parsed_sheet_dict)
+
+
+def parse_xls_to_df(path: str,
+                    min_row: Optional[int] = 1,
+                    relevant_sheets: Optional[list] = None,
+                    irrelevant_sheets: Optional[list] = None,
+                    relevant_cols: Optional[list] = None,
+                    irrelevant_cols: Optional[list] = None,
+                    ) -> Union[pd.DataFrame, Dict[str, pd.DataFrame]]:
+    """Process excel file as a set (if several excel sheets) or a single dataframe."""
+    wb = opxl.load_workbook(filename=path)
+
+    sheets = wb.sheetnames
+
+    if len(sheets) > 1:
+        return {sheets[ix].lower(): parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
+                for ix, sheet in enumerate(wb)
+                if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or (
+                    irrelevant_sheets is not None and sheets[ix] in irrelevant_sheets)
+                }
+
+    else:
+        return parse_xls_sheet_to_df(wb[sheets[0]])
