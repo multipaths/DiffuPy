@@ -14,6 +14,7 @@ You can submit your dataset in any of the following formats:
 Please ensure that the dataset minimally has a column 'Node' containing node IDs. You can also optionally add the
 following columns to your dataset:
 
+- NodeType
 - LogFC [*]_
 - p-value
 
@@ -42,39 +43,55 @@ details.
 |      D     |
 +------------+
 
-2. You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
-their abs(LogFC).
+2. You can also provide a dataset with a column 'Node' containing node IDs as well as a column 'NodeType', indicating
+the entity type of the node to run diffusion by entity type.
+
++------------+--------------+
+|     Node   |   NodeType   |
++============+==============+
+|      A     |     Gene     |
++------------+--------------+
+|      B     |     Gene     |
++------------+--------------+
+|      C     |  Metabolite  |
++------------+--------------+
+|      D     |    Gene      |
++------------+--------------+
+
+3. You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
+their | logFC | . You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+
 | Node         |   LogFC    |
 +==============+============+
-| Gene A       | 4          |
+|      A       | 4          |
 +--------------+------------+
-| Gene  B      | -1         |
+|      B       | -1         |
 +--------------+------------+
-| Metabolite C | 1.5        |
+|      C       | 1.5        |
 +--------------+------------+
-| Gene D       | 3          |
+|      D       | 3          |
 +--------------+------------+
 
-3. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their abs(LogFC)
-and a column 'p-value' with adjusted p-values.
+.. | logFC | replace:: Log\ :sub:`2`\ FC
+
+4. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their | logFC |
+and a column 'p-value' with adjusted p-values. You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+---------+
 | Node         |   LogFC    | p-value |
 +==============+============+=========+
-| Gene A       | 4          | 0.03    |
+|      A       | 4          | 0.03    |
 +--------------+------------+---------+
-| Gene  B      | -1         | 0.05    |
+|      B       | -1         | 0.05    |
 +--------------+------------+---------+
-| Metabolite C | 1.5        | 0.001   |
+|      C       | 1.5        | 0.001   |
 +--------------+------------+---------+
-| Gene D       | 3          | 0.07    |
+|      D       | 3          | 0.07    |
 +--------------+------------+---------+
 
-You can also take a look at our `sample datasets <https://github.com/multipaths/DiffuPy/tree/master/examples/datasets>`_
-folder for some examples files.
-
+See the `sample datasets <https://github.com/multipaths/DiffuPy/tree/master/examples/datasets>`_ directory for example
+files.
 
 Networks
 --------
@@ -119,13 +136,13 @@ Custom-network example
 ~~~~~~~~~~~~~~~~~~~~~~
 
 +-----------+--------------+-------------+
-|  Source   |   Target     | Relation    |
+|  Source   |   Target     |  Relation   |
 +===========+==============+=============+
-| Gene A    | Gene B       | Increase    |
+|     A     |      B       | Increase    |
 +-----------+--------------+-------------+
-| Gene B    | Metabolite C | Association |
+|     B     |      C       | Association |
 +-----------+--------------+-------------+
-| Gene A    | Pathology D  | Association |
+|     A     |      D       | Association |
 +-----------+--------------+-------------+
 
 You can also take a look at our `sample networks <https://github.com/multipaths/DiffuPy/tree/master/examples/networks>`_
