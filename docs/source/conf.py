@@ -57,8 +57,6 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'networkx': ('https://networkx.github.io/documentation/stable', None),
-    'sqlalchemy': ('https://docs.sqlalchemy.org/en/13/', None),
-    'pybel': ('https://pybel.readthedocs.io/en/latest/', None),
 }
 
 autodoc_member_order = 'bysource'

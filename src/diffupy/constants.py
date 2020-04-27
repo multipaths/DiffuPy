@@ -59,6 +59,10 @@ METHODS = {
 
 #: csv
 CSV = 'csv'
+#: xml
+XLS = 'xls'
+#: xmls
+XLSX = 'xlsx'
 #: tsv
 TSV = 'tsv'
 #: graphML
@@ -66,23 +70,36 @@ GRAPHML = 'graphml'
 #: bel
 BEL = 'bel'
 #: node link json
-NODE_LINK_JSON = 'json'
+JSON = 'json'
 #: pickle
-BEL_PICKLE = 'pickle'
+PICKLE = 'pickle'
 #: gml
 GML = 'gml'
 #: edge list
 EDGE_LIST = '.lst'
 
-#: DiffuPath available network formats
-FORMATS = [
+XLS_FORMATS = (
+    XLS,
+    XLSX
+)
+
+#: Available graph formats
+GRAPH_FORMATS = (
     CSV,
     TSV,
     GRAPHML,
     BEL,
-    NODE_LINK_JSON,
-    BEL_PICKLE,
-]
+    JSON,
+    PICKLE,
+)
+
+#: Available kernel formats
+KERNEL_FORMATS = (
+    CSV,
+    TSV,
+    JSON,
+    PICKLE,
+)
 
 #: Separators
 FORMAT_SEPARATOR_MAPPING = {
@@ -109,9 +126,22 @@ RELATION = 'Relation '
 
 #: Node name
 NODE = 'Node'
+LABEL = 'Label'
+ENTITY = 'Entity'
+GENE = 'Gene'
+
+NODE_LABELING = [
+    NODE,
+    LABEL,
+    ENTITY,
+    GENE
+]
+
+#: Node type
+NODE_TYPE = 'NodeType'
+#: Unspecified score type
+SCORE = 'Score'
 #: Log2 fold change (logFC)
 LOG_FC = 'LogFC'
 #: Statistical significance (p-value)
 P_VALUE = 'p-value'
-#: Label
-LABEL = 'Label'

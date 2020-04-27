@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Command line interface for DiffuPy."""
+"""Command line interface for diffuPy."""
 
 import json
 import logging
@@ -10,12 +10,13 @@ import sys
 import time
 
 import click
+from diffupy.process_network import get_kernel_from_network_path
 
-from .constants import OUTPUT, METHODS, EMOJI
+from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
-from .process_input import process_input
-from .utils import process_network_from_cli
+from .process_input import process_map_and_format_input_data_for_diff
+from .process_network import process_graph_from_file
 
 logger = logging.getLogger(__name__)
 
@@ -42,9 +43,9 @@ def main():
 )
 @click.option('-l', '--log', is_flag=True, help='Activate debug mode')
 def kernel(
-    network: str,
-    output: str = OUTPUT,
-    log: bool = None
+        graph: str,
+        output: str = OUTPUT,
+        log: bool = None
 ):
     """Generate a kernel for a given network."""
     # Configure logging level
@@ -55,20 +56,20 @@ def kernel(
         logging.basicConfig(level=logging.INFO)
         logger.setLevel(logging.INFO)
 
-    click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
+    click.secho(f'{EMOJI} Loading graph from {graph} {EMOJI}')
 
-    graph = process_network_from_cli(network)
+    graph = process_graph_from_file(graph)
 
-    click.secho(f'{EMOJI} Calculating regularized Laplacian kernel. This might take a while... {EMOJI}')
+    click.secho(f'{EMOJI} Generating regularized Laplacian kernel from graph. This might take a while... {EMOJI}')
     exe_t_0 = time.time()
-    background_mat = regularised_laplacian_kernel(graph)
+    kernel = regularised_laplacian_kernel(graph)
     exe_t_f = time.time()
 
-    output_file = os.path.join(output, f'{network.split("/")[-1]}.pickle')
+    output_file = os.path.join(output, f'{graph.split("/")[-1]}.pickle')
 
     # Export numpy array
     with open(output_file, 'wb') as file:
-        pickle.dump(background_mat, file, protocol=4)
+        pickle.dump(kernel, file, protocol=4)
 
     running_time = exe_t_f - exe_t_0
 
@@ -77,14 +78,14 @@ def kernel(
 
 @main.command()
 @click.option(
-    '-n', '--network',
-    help='Path to the network graph or kernel',
+    '-i', '--input',
+    help='Input data',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
 )
 @click.option(
-    '-i', '--data',
-    help='Input data',
+    '-n', '--network',
+    help='Path to the network graph or kernel',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
 )
@@ -98,7 +99,7 @@ def kernel(
     '-m', '--method',
     help='Diffusion method',
     type=click.Choice(METHODS),
-    required=True,
+    default=RAW,
 )
 @click.option(
     '-b', '--binarize',
@@ -112,6 +113,7 @@ def kernel(
 @click.option(
     '-t', '--threshold',
     help='Codify node labels by applying a threshold to logFC in input.',
+    default=None,
     type=float,
 )
 @click.option(
@@ -129,48 +131,55 @@ def kernel(
     default=0.05,
     show_default=True,
 )
+@click.option(
+    '-f', '--output_format',
+    help='Statistical significance (p-value).',
+    type=float,
+    default=CSV,
+    show_default=True,
+)
 def diffuse(
-    network: str,
-    data: str,
-    output: str,
-    method: str,
-    binarize: bool,
-    absolute_value: bool,
-    threshold: float,
-    p_value: float,
+        input: str,
+        network: str,
+        output: str = sys.stdout,
+        method: str = RAW,
+        binarize: bool = True,
+        threshold: float = None,
+        absolute_value: bool = True,
+        p_value: float = 0.05,
+        output_format: str = CSV
 ):
     """Run a diffusion method over a network or pre-generated kernel."""
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
-    graph = process_network_from_cli(network)
 
-    click.secho(
-        f'{EMOJI} Graph loaded with: \n'
-        f'{graph.number_of_nodes()} nodes\n'
-        f'{graph.number_of_edges()} edges\n'
-        f'{EMOJI}'
-    )
+    kernel = get_kernel_from_network_path(network)
 
-    click.secho(f'Codifying data from {data}.')
+    click.secho(f'Processing data input from {input}.')
 
-    label_dict = process_input(data, method, binarize, absolute_value, p_value, threshold)
+    input_scores_dict = process_map_and_format_input_data_for_diff(input,
+                                                                   kernel,
+                                                                   method,
+                                                                   binarize,
+                                                                   absolute_value,
+                                                                   p_value,
+                                                                   threshold,
+                                                                   )
 
-    click.secho(f'Running the diffusion algorithm.')
+    click.secho(f'Computing the diffusion algorithm.')
 
     results = run_diffusion(
-        label_dict,
+        input_scores_dict,
         method,
-        graph,
+        k=kernel
     )
 
-    # results = run_diffusion(
-    #     label_dict,
-    #     method,
-    #     graph,
-    # )
+    if output_format is CSV:
+        results.to_csv(output)
 
-    # json.dump(results, output, indent=2)
+    elif output_format is JSON:
+        json.dump(results, output, indent=2)
 
-    click.secho(f'Finished!')
+    click.secho(f'{EMOJI} Diffusion performed with success. Output located at {output} {EMOJI}')
 
 
 if __name__ == '__main__':

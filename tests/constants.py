@@ -14,7 +14,7 @@ P_STEP_KERNEL = os.path.join(RESOURCES_FOLDER, 'pStepKernel.csv')
 REGULARISED_LAPLACIAN_KERNEL = os.path.join(RESOURCES_FOLDER, 'regularisedLaplacianKernel.csv')
 
 DATASETS_FOLDER = os.path.join(RESOURCES_FOLDER, 'datasets')
-NODE_TEST_PATH = os.path.join(DATASETS_FOLDER, 'node.csv')
+NODE_TYPE_COL_TEST_PATH = os.path.join(DATASETS_FOLDER, 'node_type_col.csv')
 NODE_LOGFC_TEST_PATH = os.path.join(DATASETS_FOLDER, 'node_logfc.csv')
 NODE_LOGFC_PVAL_TEST_PATH = os.path.join(DATASETS_FOLDER, 'node_logfc_pval.csv')
 INPUT_SCORES = os.path.join(RESOURCES_FOLDER, 'input_scores.csv')
