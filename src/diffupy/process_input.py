@@ -453,14 +453,27 @@ def _type_dict_label_scores_dict_data_struct_check(v: Union[dict, list]) -> bool
         get_random_value_from_dict(get_random_value_from_dict(v)), (int, float))
 
 
+def _two_dimensional_type_dict_label_scores_dict_data_struct_check(v: Union[dict, list]) -> bool:
+    """Check data structure type Dict[str, Dict[str, Dict[str, int]]]."""
+    return isinstance(v, dict) and isinstance(get_random_value_from_dict(v), dict) and isinstance(
+        get_random_value_from_dict(get_random_value_from_dict(v)), dict) and isinstance(
+        get_random_value_from_dict(get_random_value_from_dict(get_random_value_from_dict(v))), (int, float))
+
+
 def _label_list_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type list."""
-    return isinstance(v, list)
+    return isinstance(v, list) or isinstance(v, set)
 
 
 def _type_dict_label_list_data_struct_check(v: Union[dict, list]) -> bool:
     """Check data structure type Dict[str, list]."""
-    return isinstance(v, dict) and isinstance(get_random_value_from_dict(v), list)
+    return isinstance(v, dict) and _label_list_data_struct_check(get_random_value_from_dict(v))
+
+
+def _two_dimensional_type_dict_label_list_data_struct_check(v: Union[dict, list]) -> bool:
+    """Check data structure type Dict[str, Dict[str, list]]."""
+    return isinstance(v, dict) and isinstance(get_random_value_from_dict(v), dict) and _label_list_data_struct_check(
+        get_random_value_from_dict(get_random_value_from_dict(v)))
 
 
 """Mappers from input to network background"""
