@@ -486,13 +486,14 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
     """Get the mappings from preprocessed input_labels."""
     log.info("Mapping the input labels to the background labels reference.")
 
-    """Map nodes from input dataset to nodes in network to get a set of labelled nodes."""
-    if isinstance(background_labels, list):
+    if _label_list_data_struct_check(background_labels):
         mapped_labels = _map_labels_to_background(input_labels,
                                                   background_labels,
                                                   check_substring=check_substrings)
 
-    elif isinstance(background_labels, dict):
+    # If type dict _map_labels_to_background for each classified input_labels.
+    elif _type_dict_label_list_data_struct_check(background_labels) or _type_dict_label_scores_dict_data_struct_check(
+            background_labels):
         mapped_labels = {node_type: _map_labels_to_background(input_labels,
                                                               node_set,
                                                               background_labels_type=node_type,
@@ -504,6 +505,24 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
                                                       background_labels_type=node_type,
                                                       check_substring=check_substrings) not in [[], {}]
                          }
+
+    # If two-dimensional type dict call recursively map_labels_input.
+    elif _two_dimensional_type_dict_label_list_data_struct_check(
+            background_labels) or _two_dimensional_type_dict_label_scores_dict_data_struct_check(background_labels):
+        mapped_labels = {node_type: map_labels_input(input_labels,
+                                                     node_set,
+                                                     check_substrings,
+                                                     show_descriptive_stat=False
+                                                     )
+                         for node_type, node_set
+                         in background_labels.items()
+                         if map_labels_input(input_labels,
+                                             node_set,
+                                             check_substrings,
+                                             show_descriptive_stat=False
+                                             ) not in [[], {}]
+                         }
+
     else:
         raise IOError(
             f'{EMOJI} The background mapping labels should be provided as a label list or as a type dict of label list.'
