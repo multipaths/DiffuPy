@@ -3,33 +3,34 @@
 """Main matrix class and processing of input data."""
 
 import logging
+from collections import defaultdict
 from typing import Dict, Optional, Union, List, Set, Tuple
 
 import numpy as np
-
 import pandas as pd
 
 from .constants import *
 from .matrix import Matrix
 from .utils import from_pickle, from_json, from_dataframe_file, from_nparray_to_df, get_random_value_from_dict, \
-    get_random_key_from_dict, parse_xls_to_df, log_dict
+    get_random_key_from_dict, parse_xls_to_df, print_dict_dimensions
 
 log = logging.getLogger(__name__)
 
 """Process input data"""
 
 
-def process_map_and_format_input_data_for_diff(data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
-                                               kernel: Matrix,
-                                               method: str = 'raw',
-                                               binning: Optional[bool] = False,
-                                               absolute_value: Optional[bool] = False,
-                                               p_value: Optional[float] = None,
-                                               threshold: Optional[float] = None,
-                                               background_labels: Optional[Union[list, Dict[str, list]]] = None,
-                                               show_statistics: bool = True,
-                                               **further_parse_args
-                                               ) -> Matrix:
+def process_map_and_format_input_data_for_diff(
+        data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
+        kernel: Matrix,
+        method: str = 'raw',
+        binning: Optional[bool] = False,
+        absolute_value: Optional[bool] = False,
+        p_value: Optional[float] = None,
+        threshold: Optional[float] = None,
+        background_labels: Optional[Union[list, Dict[str, list]]] = None,
+        show_statistics: bool = True,
+        **further_parse_args
+) -> Matrix:
     """Process miscellaneous data input, perform the mapping to the diffusion background network (as a kernel) and format it for the diffusion computation function.
 
     :param data_input: A miscellaneous data input to be processed/formatted for the diffuPy diffusion computation.
@@ -62,20 +63,21 @@ def process_map_and_format_input_data_for_diff(data_input: Union[str, pd.DataFra
                                                                                        ),
                                                        background_labels=background_labels,
                                                        check_substrings=further_parse_args.get('check_substrings'),
-                                                       show_statistics=show_statistics
+                                                       show_descriptive_stat=show_statistics
                                                        ),
                                       kernel
                                       )
 
 
-def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
-                       method: str = 'raw',
-                       binning: bool = False,
-                       absolute_value: bool = False,
-                       p_value: float = 0.05,
-                       threshold: Optional[float] = 0.5,
-                       **further_parse_args
-                       ) -> Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]]:
+def process_input_data(
+        data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
+        method: str = RAW,
+        binning: bool = False,
+        absolute_value: bool = False,
+        p_value: float = 0.05,
+        threshold: Optional[float] = 0.5,
+        **further_parse_args
+) -> Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]]:
     """Pipeline the provided miscellaneous data input for further processing, in the following standardized data structures: label list, type_dict label lists, label-scores dict or type_dict label-scores dicts.
 
     :param data_input: A miscellaneous data input to be processed.
@@ -125,9 +127,11 @@ def process_input_data(data_input: Union[str, list, dict, np.ndarray, pd.DataFra
 """Process input formats"""
 
 
-def _process_data_input_format(raw_data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
-                               separ_str: str = ', ',
-                               **further_parse_args) -> Union[pd.DataFrame, list, Dict[str, Union[pd.DataFrame, list]]]:
+def _process_data_input_format(
+        raw_data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
+        separ_str: str = ', ',
+        **further_parse_args
+) -> Union[pd.DataFrame, list, Dict[str, Union[pd.DataFrame, list]]]:
     """Format the input as a label-score dataframe, a list or a labels or a type dict for latter input processing."""
     if isinstance(raw_data_input, str):
         # If the data input type is a string, mostly will be a path to the dataset file.
@@ -150,7 +154,8 @@ def _process_data_input_format(raw_data_input: Union[str, list, dict, np.ndarray
     elif isinstance(raw_data_input, dict):
         # If the data input type dict is a label-scores dict, codify it as a Panda's dataframe for latter processing.
         if _label_scores_dict_data_struct_check(raw_data_input):
-            return pd.DataFrame.from_dict(raw_data_input, orient='index')
+            df = pd.DataFrame.from_dict({NODE: list(raw_data_input.keys()), LOG_FC: list(raw_data_input.values())})
+            return df
         # Else it will be treated as a label_type dict, calling recursively the process input format for each type subset (key).
         else:
             # It is assumed that the all the dict values match the same data type.
@@ -202,15 +207,15 @@ def _load_data_input_from_file(path: str, **further_parse_args) -> Union[pd.Data
 """Pipeline input scores"""
 
 
-def _codify_input_data(df: pd.DataFrame,
-                       method: str,
-                       binning: bool,
-                       absolute_value: bool,
-                       p_value: float,
-                       threshold: Optional[float],
-                       cols_titles_mapping: Optional[Dict[str, str]] = None
-                       ) -> Union[Dict[str, Dict[str, int]],
-                                  Dict[str, int]]:
+def _codify_input_data(
+        df: pd.DataFrame,
+        method: str,
+        binning: bool,
+        absolute_value: bool,
+        p_value: float,
+        threshold: Optional[float],
+        cols_titles_mapping: Optional[Dict[str, str]] = None
+) -> Union[Dict[str, Dict[str, int]], Dict[str, int]]:
     """Process the input scores dataframe for the codifying process."""
     # Rename dataframe column titles according (if) provided label_mapping.
     if cols_titles_mapping is not None:
@@ -262,13 +267,14 @@ def _codify_input_data(df: pd.DataFrame,
                                     )
 
 
-def _codify_method_check(df: pd.DataFrame,
-                         method: str,
-                         binning: bool,
-                         absolute_value: bool,
-                         p_value: float,
-                         threshold: Optional[float],
-                         ) -> Dict[str, int]:
+def _codify_method_check(
+        df: pd.DataFrame,
+        method: str,
+        binning: bool,
+        absolute_value: bool,
+        p_value: float,
+        threshold: Optional[float],
+) -> Dict[str, int]:
     """Classify the input data codification according the diffusion method."""
     # Prepare input data for quantitative diffusion scoring methods
     if method == RAW or method == Z:
@@ -479,10 +485,12 @@ def _two_dimensional_type_dict_label_list_data_struct_check(v: Union[dict, list]
 """Mappers from input to network background"""
 
 
-def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
-                     background_labels: Union[Dict[str, list], list],
-                     check_substrings: Union[List, bool] = None,
-                     show_statistics: bool = False) -> Union[Dict[str, int], list]:
+def map_labels_input(
+        input_labels: Union[list, Dict[str, int], Dict[str, list], Dict[str, Dict[str, int]]],
+        background_labels: Union[list, Dict[str, list], Dict[str, Dict[str, list]]],
+        check_substrings: Union[List, bool] = None,
+        show_descriptive_stat: bool = False
+) -> Union[Dict[str, int], list]:
     """Get the mappings from preprocessed input_labels."""
     log.info("Mapping the input labels to the background labels reference.")
 
@@ -627,10 +635,11 @@ def mapping_statistics(
     return statistics_dict
 
 
-def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-                background_labels: list,
-                check_substrings: bool = False
-                ) -> Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
+def _map_labels(
+        input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
+        background_labels: list,
+        check_substrings: bool = False
+) -> Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
     """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
     if _label_list_data_struct_check(input_labels):
         return _map_label_list(input_labels, background_labels, check_substrings)
@@ -656,12 +665,12 @@ def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, i
         )
 
 
-def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-                              background_labels: list,
-                              background_labels_type: str = None,
-                              check_substring: Union[List, bool] = None
-                              ) -> Union[Dict[str, Dict[str, int]],
-                                         Dict[str, int]]:
+def _map_labels_to_background(
+        input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
+        background_labels: list,
+        background_labels_type: str = None,
+        check_substring: Union[List, bool] = None
+) -> Union[Dict[str, Dict[str, int]], Dict[str, int]]:
     """Map labels from preprocessed input to background_labels to get a set of matched labels."""
     if _type_dict_label_scores_dict_data_struct_check(input_labels) or \
             _type_dict_label_list_data_struct_check(input_labels):
@@ -680,9 +689,11 @@ def _map_labels_to_background(input_labels: Union[list, Dict[str, Dict[str, int]
     return _map_labels(input_labels, background_labels, check_substring)
 
 
-def _check_label_to_background_labels(label: str,
-                                      label_list: List[Union[str, Tuple[str]]],
-                                      substring: bool = False) -> Union[str, None]:
+def _check_label_to_background_labels(
+        label: str,
+        label_list: List[Union[str, Tuple[str]]],
+        substring: bool = False
+) -> Union[str, None]:
     """Check if label string in a label list, also check further if substring checking."""
     if label in label_list:
         return label
@@ -704,9 +715,11 @@ def _check_label_to_background_labels(label: str,
     return None
 
 
-def _map_label_list(input_labels: Union[str, Set[str], List[str]],
-                    background_labels: List[str],
-                    check_substrings: bool = False) -> List[str]:
+def _map_label_list(
+        input_labels: Union[str, Set[str], List[str]],
+        background_labels: List[str],
+        check_substrings: bool = False
+) -> List[str]:
     """Map labels from preprocessed input to background_labels LIST to get a set of matched labels."""
     mapped_list = []
     for label in input_labels:
@@ -726,9 +739,11 @@ def _map_label_list(input_labels: Union[str, Set[str], List[str]],
     return mapped_list
 
 
-def _map_label_dict(input_labels: Dict[Union[str, set], Union[int, float]],
-                    background_labels: list,
-                    check_substrings: bool = False) -> Dict[str, Union[int, float]]:
+def _map_label_dict(
+        input_labels: Dict[Union[str, set], Union[int, float]],
+        background_labels: list,
+        check_substrings: bool = False
+) -> Dict[str, Union[int, float]]:
     """Map labels from preprocessed input to background_labels DICT to get a set of matched labels."""
     mapped_dict = {}
 
@@ -740,6 +755,7 @@ def _map_label_dict(input_labels: Dict[Union[str, set], Union[int, float]],
             label_bck = _check_label_to_background_labels(label, background_labels, check_substrings)
             if label_bck is not None:
                 mapped_dict[label_bck] = v
+
         elif isinstance(label, set) or isinstance(label, tuple) or isinstance(label, list):
             for sublabel in set(label):
                 label_bck = _check_label_to_background_labels(sublabel, background_labels, check_substrings)
@@ -756,9 +772,12 @@ def _map_label_dict(input_labels: Dict[Union[str, set], Union[int, float]],
 """Generate/format data input as a vector/matrix for the diffusion computation matching the kernel rows"""
 
 
-def format_input_for_diffusion(processed_input: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
-                               kernel: Matrix,
-                               missing_value: int = -1) -> Matrix:
+def format_input_for_diffusion(
+        processed_input: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
+        kernel: Matrix,
+        missing_value: int = -1,
+        title=''
+) -> Matrix:
     """Format/generate input vector/matrix according the data structure of the processed_data_input."""
     log.info("Formatting the processed to the reference kernel Matrix.")
 
@@ -766,26 +785,30 @@ def format_input_for_diffusion(processed_input: Union[list, Dict[str, int], Dict
         return format_categorical_input_vector_from_label_list(rows_labeled=processed_input,
                                                                col_label='scores',
                                                                kernel=kernel,
-                                                               missing_value=missing_value
+                                                               missing_value=missing_value,
+                                                               title=title
                                                                )
 
     elif _type_dict_label_list_data_struct_check(processed_input):
         return format_categorical_input_matrix_from_label_list(rows_labels=list(processed_input.values()),
                                                                cols_labels=list(processed_input.keys()),
                                                                kernel=kernel,
-                                                               missing_value=missing_value
+                                                               missing_value=missing_value,
+                                                               title=title
                                                                )
 
     elif _label_scores_dict_data_struct_check(processed_input):
         return format_input_vector_from_label_score_dict(labels_scores_dict=processed_input,
                                                          kernel=kernel,
-                                                         missing_value=missing_value
+                                                         missing_value=missing_value,
+                                                         title=title
                                                          )
 
     elif _type_dict_label_scores_dict_data_struct_check(processed_input):
         return format_input_matrix_from_type_label_score_dict(type_dict_labels_scores_dict=processed_input,
                                                               kernel=kernel,
-                                                              missing_value=missing_value
+                                                              missing_value=missing_value,
+                                                              title=title
                                                               )
 
     else:
@@ -797,13 +820,15 @@ def format_input_for_diffusion(processed_input: Union[list, Dict[str, int], Dict
 """Generate categorical (non-quantitative) input vector matrix from raw input dataset labels"""
 
 
-def format_categorical_input_vector_from_label_list(rows_labeled: Union[set, list],
-                                                    col_label: Union[str, set, list],
-                                                    kernel: Matrix,
-                                                    missing_value: int = -1,
-                                                    rows_unlabeled=None,
-                                                    i: int = None
-                                                    ) -> Matrix:
+def format_categorical_input_vector_from_label_list(
+        rows_labeled: Union[set, list],
+        col_label: Union[str, set, list],
+        kernel: Matrix,
+        missing_value: int = -1,
+        rows_unlabeled=None,
+        i: int = None,
+        title=''
+) -> Matrix:
     """Generate categoric input vector from labels."""
     if isinstance(col_label, str):
         col_label = [col_label]
@@ -811,7 +836,8 @@ def format_categorical_input_vector_from_label_list(rows_labeled: Union[set, lis
     input_mat = Matrix(
         rows_labels=list(set(rows_labeled)),
         cols_labels=col_label,
-        init_value=1  # By default the categorical input value is 1
+        init_value=1,  # By default the categorical labeled input value is 1
+        name=title
     )
 
     if rows_unlabeled:
@@ -822,19 +848,21 @@ def format_categorical_input_vector_from_label_list(rows_labeled: Union[set, lis
             matrix=Matrix(
                 rows_labels=list(rows_unlabeled),
                 cols_labels=col_label,
-                init_value=0  # By default the non labeled input value is 0
+                init_value=0,  # By default the non labeled input value is 0
             )
         )
 
     return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
 
 
-def format_categorical_input_matrix_from_label_list(rows_labels: Union[set, list],
-                                                    cols_labels: Union[set, list],
-                                                    kernel: Matrix,
-                                                    missing_value: int = -1,
-                                                    rows_unlabeled=None
-                                                    ) -> Matrix:
+def format_categorical_input_matrix_from_label_list(
+        rows_labels: Union[set, list],
+        cols_labels: Union[set, list],
+        kernel: Matrix,
+        missing_value: int = -1,
+        rows_unlabeled=None,
+        title=''
+) -> Matrix:
     """Generate input vector from labels."""
     if not isinstance(cols_labels, list):
         raise NotImplementedError('The column labels should be provided as a list.')
@@ -847,7 +875,8 @@ def format_categorical_input_matrix_from_label_list(rows_labels: Union[set, list
             kernel,
             missing_value,
             rows_unlabeled,
-            i=0
+            i=0,
+            title=title
         )
 
         for idx, row_label in enumerate(rows_labels[1:]):
@@ -868,25 +897,29 @@ def format_categorical_input_matrix_from_label_list(rows_labels: Union[set, list
         cols_labels,
         kernel,
         missing_value,
-        rows_unlabeled
+        rows_unlabeled,
+        title=title
     )
 
 
 """Generate quantitative or binarized/categorical input vector matrix from preprocesed input dataset scores"""
 
 
-def format_input_vector_from_label_score_dict(labels_scores_dict: Dict[str, int],
-                                              kernel: Matrix,
-                                              col_label: str = 'scores',
-                                              missing_value: int = -1,
-                                              rows_unlabeled: dict = None,  # TODO: To discuss
-                                              type_k: bool = False
-                                              ) -> Matrix:
+def format_input_vector_from_label_score_dict(
+        labels_scores_dict: Dict[str, int],
+        kernel: Matrix,
+        col_label: str = 'scores',
+        missing_value: int = -1,
+        rows_unlabeled: dict = None,  # TODO: To discuss
+        type_k: bool = False,
+        title=''
+) -> Matrix:
     """Generate scores input vector from labels scores dict."""
     input_mat = Matrix(
         mat=np.transpose(np.array([list(labels_scores_dict.values())])),
         rows_labels=list(labels_scores_dict.keys()),
-        cols_labels=[col_label]
+        cols_labels=[col_label],
+        name=title
     )
 
     if rows_unlabeled:
@@ -897,19 +930,21 @@ def format_input_vector_from_label_score_dict(labels_scores_dict: Dict[str, int]
             matrix=Matrix(
                 mat=np.transpose(np.array([list(rows_unlabeled.values())])),
                 rows_labels=list(rows_unlabeled.keys()),
-                cols_labels=[col_label]
+                cols_labels=[col_label],
+                name=title
             )
         )
 
     return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
 
 
-def format_input_matrix_from_type_label_score_dict(type_dict_labels_scores_dict: Union[Dict[str, Dict[str, int]],
-                                                                                       Dict[str, int]],
-                                                   kernel,
-                                                   missing_value: int = -1,
-                                                   rows_unlabeled=None,  # TODO: To discuss
-                                                   ) -> Matrix:
+def format_input_matrix_from_type_label_score_dict(
+        type_dict_labels_scores_dict: Union[Dict[str, Dict[str, int]], Dict[str, int]],
+        kernel,
+        missing_value: int = -1,
+        rows_unlabeled=None,  # TODO: To discuss
+        title=''
+) -> Matrix:
     """Generate input matrix from labels scores dict and/or handle type classification by columns."""
     if _type_dict_label_scores_dict_data_struct_check(type_dict_labels_scores_dict):
 
@@ -921,7 +956,8 @@ def format_input_matrix_from_type_label_score_dict(type_dict_labels_scores_dict:
                                                               init_k,
                                                               missing_value,
                                                               rows_unlabeled,
-                                                              True
+                                                              True,
+                                                              title=title
                                                               )
 
         for node_type, scores_dict in type_dict_labels_scores_dict.items():
