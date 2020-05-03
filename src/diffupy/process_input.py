@@ -528,39 +528,103 @@ def map_labels_input(input_labels: Union[list, Dict[str, int], Dict[str, Dict[st
             f'{EMOJI} The background mapping labels should be provided as a label list or as a type dict of label list.'
         )
 
-    if show_statistics:
-        log_dict(mapping_statistics(mapped_labels, input_labels))
+    if show_descriptive_stat:
+        print_dict_dimensions(mapping_statistics(input_labels, mapped_labels), title='Mapping descriptive statistics')
 
     return mapped_labels
 
 
-def mapping_statistics(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-                       mapped_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]) -> Dict:
-    """Get the mapping statistics."""
-    percentage_dict = {}
-    total_mapping = 0
-    total_labels = 0
+def mapping_statistics(
+        input_labels: Union[list, Dict[str, Dict[str, list]], Dict[str, list]],
+        mapped_labels: Union[list, Dict[str, Dict[str, list]], Dict[str, list]],
+        subtotals: Dict[str, int] = None
+) -> Dict:
+    """Calculate mapping descriptive statistics."""
+    statistics_dict = {}
 
-    if _label_list_data_struct_check(input_labels) or _label_scores_dict_data_struct_check(input_labels):
-        total_mapping = len(input_labels)
-        total_labels = len(mapped_labels)
+    total_mapping = set()
+    total_input = set()
 
-    elif _type_dict_label_list_data_struct_check(input_labels) or _type_dict_label_scores_dict_data_struct_check(
-            input_labels):
-        for input_type, mapping in input_labels.items():
-            if input_type in mapped_labels:
-                percentage_dict[input_type] = len(mapping) / len(mapped_labels[input_type])
-                total_mapping += len(mapping)
-                total_labels += len(mapped_labels[input_type])
+    if _label_list_data_struct_check(mapped_labels) or _label_scores_dict_data_struct_check(mapped_labels):
+        total_mapping = mapped_labels
+        total_input = input_labels
+        if len(total_input) != 0:
+            statistics_dict['total'] = (len(total_mapping), len(total_mapping) / len(total_input))
+
+    elif _type_dict_label_list_data_struct_check(mapped_labels) or _type_dict_label_scores_dict_data_struct_check(
+            mapped_labels):
+        for mapping_type, mapping in mapped_labels.items():
+
+            if (_type_dict_label_list_data_struct_check(input_labels) or _type_dict_label_scores_dict_data_struct_check(
+                    input_labels)) and mapping_type in input_labels.keys():
+                if len(input_labels[mapping_type]) != 0:
+                    statistics_dict[mapping_type] = (len(mapping), len(mapping) / len(input_labels[mapping_type]))
+                else:
+                    statistics_dict[mapping_type] = (0, 0)
+
+                total_mapping.update(mapping)
+                total_input.update(input_labels[mapping_type])
+            else:
+                if subtotals is None:
+                    subtotal_input = len(input_labels)
+                else:
+                    subtotal_input = subtotals[mapping_type]
+
+                if subtotal_input != 0:
+                    statistics_dict[mapping_type] = (len(mapping), len(mapping) / subtotal_input)
+                else:
+                    statistics_dict[mapping_type] = (0, 0)
+
+                total_input.update(input_labels)
+
+            total_mapping.update(mapping)
+
+        if subtotals:
+            statistics_dict['total_mapping'] = total_mapping
+            statistics_dict['total_input'] = total_input
+
+        if len(total_input) != 0:
+            statistics_dict['total'] = (len(total_mapping), len(total_mapping) / len(total_input))
+
+    elif _two_dimensional_type_dict_label_scores_dict_data_struct_check(
+            mapped_labels) or _two_dimensional_type_dict_label_list_data_struct_check(mapped_labels):
+
+        subtotals_dict = defaultdict(set)
+
+        for _, mapping_subdict in mapped_labels.items():
+            for mapping_subtype, mapping_subdict in mapping_subdict.items():
+                subtotals_dict[mapping_subtype].update(mapping_subdict)
+
+        subtotals_dict = {
+            mapping_subtype: len(mapping_subdict)
+            for mapping_subtype, mapping_subdict in
+            subtotals_dict.items()
+        }
+
+        for mapping_type, mapping_subdict in mapped_labels.items():
+            percentage_dict_i = mapping_statistics(input_labels, mapping_subdict, subtotals=subtotals_dict)
+
+            statistics_dict[mapping_type] = percentage_dict_i
+
+            total_mapping.update(percentage_dict_i.pop('total_mapping'))
+            total_input.update(percentage_dict_i.pop('total_input'))
+
+        if len(total_input) != 0:
+            subtotals_dict = {mapping_type: (mapping, mapping / len(total_input)) for mapping_type, mapping in
+                              subtotals_dict.items()}
+            subtotals_dict['total'] = (len(total_mapping), len(total_mapping) / len(total_input))
+
+            statistics_dict['total'] = subtotals_dict
 
     else:
         raise TypeError(
             f'{EMOJI} The input labels data structure can not be processed for label mapping'
         )
 
-    percentage_dict['General mapping'] = total_mapping / total_labels
+    if len(total_input) == 0:
+        statistics_dict['total'] = (0, 0)
 
-    return percentage_dict
+    return statistics_dict
 
 
 def _map_labels(input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
