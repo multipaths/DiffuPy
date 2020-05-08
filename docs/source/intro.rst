@@ -59,7 +59,7 @@ the entity type of the node to run diffusion by entity type.
 +------------+--------------+
 
 3. You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
-their | logFC | . You may also add a 'NodeType' column to run diffusion by entity type.
+their logFC. You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+
 | Node         |   LogFC    |
@@ -73,10 +73,8 @@ their | logFC | . You may also add a 'NodeType' column to run diffusion by entit
 |      D       | 3          |
 +--------------+------------+
 
-.. | logFC | replace:: Log\ :sub:`2`\ FC
-
-4. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their | logFC |
-and a column 'p-value' with adjusted p-values. You may also add a 'NodeType' column to run diffusion by entity type.
+4. Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their logFC and a
+column 'p-value' with adjusted p-values. You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+---------+
 | Node         |   LogFC    | p-value |
