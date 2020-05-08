@@ -1,4 +1,5 @@
 Source,Target,Relation
-Gene A,Gene B,Increase
-Gene B,Metabolite C,Association
-Gene A,Pathology D,Association
+A, B, Increase
+B, C, Association
+A, D, Association
+
