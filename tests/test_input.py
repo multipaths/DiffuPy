@@ -174,6 +174,15 @@ class ValidateTest(unittest.TestCase):
 
         self.assertEqual(mapping, {'Metabolite': {'C': -1}, 'Gene': {'A': 1, 'B': 1}})
 
+    def test_map_labels_input_type_dict_label_scores_dict_background_two_dimensional_dict(self):
+        """Test map label_input."""
+        # If the labels are classified in another type ('D' and 'B'), since it do not match with the background it will be not mapped.
+        mapping = map_labels_input(input_labels={'Metabolite': {'C': -1}, 'Gene': {'A': 1, 'B': 1, 'D': 1, 'E': 1}},
+                                   background_labels={'db1': {'Gene': ['A', 'B']}, 'db2': {'Metabolite': ['C']}},
+                                   show_descriptive_stat=True)
+
+        print(mapping)
+
     def test_network(self):
         """Test generate graph from csv."""
         graph = get_graph_from_df(NETWORK_PATH, CSV)
@@ -210,41 +219,31 @@ class ValidateTest(unittest.TestCase):
 
     def test_validate_scores_1(self):
         """Test validate scores 1."""
-        matrix = Matrix([1, 2, 3, 4], name='Test Matrix')
-
+        matrix = Matrix([[1, 2, 3, 4]],
+                        rows_labels=['1'],
+                        cols_labels=['1', '2', '3', '4'],
+                        name='Test Matrix')
         _validate_scores(matrix)
 
     def test_validate_scores_2(self):
         """Test validate scores 2."""
         matrix = Matrix(
-            [1, 2, 3, 4],
-            cols_labels=['1', '2', '3', '4'],
-            rows_labels=['1', '2', '3', '4'],
+            [[1], [2]],
+            rows_labels=['1', '2'],
+            cols_labels=['1'],
             name='Test Matrix 2'
         )
-
         _validate_scores(matrix)
 
     def test_validate_scores_3(self):
         """One score in the array is not numeric."""
         matrix = Matrix(
-            [1, '2', 3, 4],
+            [[1, 2, 3, 4]],
             cols_labels=['1', '2', '3', '4'],
-            rows_labels=['1', '2', '3', '4'],
+            rows_labels=['1', '2'],
             name='Test Matrix 3'
         )
-        with self.assertRaises(ValueError):
-            _validate_scores(matrix)
-
-    def test_validate_scores_4(self):
-        """Test empty matrix."""
-        matrix = Matrix(
-            None,
-            cols_labels=[None],
-            rows_labels=[None],
-            name='Test Matrix 4'
-        )
-        with self.assertRaises(ValueError):
+        with self.assertRaises(IndexError):
             _validate_scores(matrix)
 
     kernel_test_1 = Matrix(

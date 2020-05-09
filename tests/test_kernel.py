@@ -7,16 +7,16 @@ import unittest
 
 import networkx as nx
 import numpy as np
-
 from diffupy.kernels import (
-    commute_time_kernel,
+    compute_time_kernel,
     p_step_kernel,
     inverse_cosine_kernel,
     diffusion_kernel,
     regularised_laplacian_kernel,
 )
 from diffupy.matrix import Matrix
-from tests.constants import *
+
+from .constants import *
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class KernelsTest(unittest.TestCase):
 
     graph = nx.read_gml(GML_FILE_EXAMPLE, label='id')
 
-    _run_kernel_test(commute_time_kernel, graph, COMMUTE_TIME_KERNEL)
+    _run_kernel_test(compute_time_kernel, graph, COMMUTE_TIME_KERNEL)
     _run_kernel_test(diffusion_kernel, graph, DIFFUSION_KERNEL)
     _run_kernel_test(p_step_kernel, graph, P_STEP_KERNEL)
     _run_kernel_test(inverse_cosine_kernel, graph, INVERSE_COSINE_KERNEL)
