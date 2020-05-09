@@ -63,7 +63,7 @@ def _validate_scores(scores: Matrix) -> None:
         if row_label in ['Nan', None]:
             raise ValueError("The scores in background must have col names to differentiate score sets.")
 
-    std_mat = Matrix(np.std(scores.mat, axis=0), ['sd'], scores.cols_labels)
+    std_mat = Matrix([np.std(scores.mat, axis=0)], ['sd'], scores.cols_labels)
 
     for sd, row_label, col_label in iter(std_mat):
         if sd in ['Nan', None]:

@@ -68,7 +68,7 @@ class Matrix:
         if init_value is not None and self.rows_labels and list(self.cols_labels):
             mat = np.full((len(self.rows_labels), len(self.cols_labels)), init_value)
 
-        elif not list(mat):
+        elif mat is None:
             raise ValueError('A path matrix or initialization should be provided.')
 
         self.mat = np.array(mat)
@@ -114,7 +114,9 @@ class Matrix:
 
         nxt = tuple()
         if len(self.rows_labels) == 1:
-            nxt += (self.mat[self.j],)
+            nxt += (self.mat[0, self.j],)
+        elif len(self.cols_labels) == 1:
+            nxt += (self.mat[self.i, 0],)
         else:
             nxt += (self.mat[self.i][self.j],)
 
@@ -284,11 +286,21 @@ class Matrix:
 
     def set_cell_from_labels(self, row_label, col_label, x):
         """Set cell from labels."""
-        self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]] = x
+        if len(self.rows_labels) == 1:
+            self.mat[0, self.cols_labels_ix_mapping[col_label]] = x
+        elif len(self.cols_labels) == 1:
+            self.mat[self.rows_labels_ix_mapping[row_label], 0] = x
+        else:
+            self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]] = x
 
     def get_cell_from_labels(self, row_label, col_label):
         """Get cell from labels."""
-        return self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]]
+        if len(self.rows_labels) == 1:
+            return self.mat[0, self.cols_labels_ix_mapping[col_label]]
+        elif len(self.cols_labels) == 1:
+            return self.mat[self.rows_labels_ix_mapping[row_label], 0]
+        else:
+            return self.mat[self.rows_labels_ix_mapping[row_label], self.cols_labels_ix_mapping[col_label]]
 
     """Methods"""
 

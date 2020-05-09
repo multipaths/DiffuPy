@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Miscellaneous utils of the package."""
-
+import itertools
 import json
 import logging
 import pickle
@@ -123,23 +123,30 @@ def get_idx_scores_mapping(scores):
     return {i: score for i, score in enumerate(scores)}
 
 
-def print_dict_dimensions(entities_db, message='Total number of '):
+def map_intersection_type_background(background_labels: Dict[str, list], input_labels: list):
+    """Intersection mapping."""
+    labels_dict = {}
+
+    for bck_label, bck_entities in background_labels.items():
+        labels_dict[bck_label] = set(background_labels[bck_label]).intersection(input_labels)
+
+    return labels_dict
+
+
+def print_dict_dimensions(entities_db, title='Title', message=''):
     """Print dimension of the dictionary."""
     total = 0
+    m = f'{title}\n'
 
     for k1, v1 in entities_db.items():
-        m = ''
+        m += f'\n{message}{k1}:\n'
         if isinstance(v1, dict):
             for k2, v2 in v1.items():
-                m += f'{k2}({len(v2)}), '
-                total += len(v2)
+                m += f'{k2}  ({v2})\n'
         else:
-            m += f'{len(v1)} '
-            total += len(v1)
+            m += f'{v1}'
 
-        log_dict({k1: m}, message)
-
-    print(f'Total: {total} ')
+    print(f'{m}\n\n')
 
 
 def log_dict(dict_to_print: dict, message: str = ''):
@@ -159,7 +166,12 @@ def get_random_value_from_dict(d: dict):
     return d[get_random_key_from_dict(d)]
 
 
-"""File loading utils."""
+def lists_combinations(list_1, list_2):
+    """Return all string combination from two list of strings."""
+    return [x[0] + ' ' + x[1] for x in itertools.product(list_1, list_2)]
+
+
+"""File loading/writting utils."""
 
 
 def format_checker(fmt: str, fmt_list: list = GRAPH_FORMATS) -> None:
@@ -186,6 +198,12 @@ def from_json(path: str):
     """Read from json file."""
     with open(path) as f:
         return json.load(f)
+
+
+def to_json(data, path: str):
+    """Save json file."""
+    with open(path, 'w') as f:
+        json.dump(data, f)
 
 
 def from_pickle(input_path):
@@ -277,8 +295,11 @@ def munge_cell(cell):
     elif isinstance(cell, float) or isinstance(cell, int):
         return cell
 
+    elif cell is None:
+        return 'NA'
+
     else:
-        raise TypeError('The cell type could not be processed.')
+        raise TypeError(f'The cell "{cell}" could not be processed.')
 
 
 def parse_xls_sheet_to_df(sheet: opxl.workbook,
@@ -314,7 +335,7 @@ def parse_xls_to_df(path: str,
         return {sheets[ix].lower(): parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
                 for ix, sheet in enumerate(wb)
                 if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or (
-                    irrelevant_sheets is not None and sheets[ix] in irrelevant_sheets)
+                    irrelevant_sheets is not None and sheets[ix] not in irrelevant_sheets)
                 }
 
     else:
