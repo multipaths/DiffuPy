@@ -266,6 +266,32 @@ def _codify_input_data(
                                     threshold
                                     )
 
+    # Standardize the title of the node column labeling column to 'Label', for later processing.
+    if LABEL not in df.columns:
+        for l in list(df.columns):
+            if l in NODE_LABELING:
+                df = df.rename(columns={l: LABEL})
+                break
+
+    # If node type provided in a column, classify in a dictionary the input codification by its node type.
+    if NODE_TYPE in df.columns:
+
+        node_types = list(set(df[NODE_TYPE]))  # Get the node types list set.
+        codified_by_type_dict = {}
+
+        for node_type in node_types:
+            # Filter the nodes by the iterable type.
+            df_by_type = df.loc[df[NODE_TYPE] == node_type]
+
+            # Codify the nodes for the iterable type.
+            codified_by_type_dict[node_type] = _codify_method_check(df_by_type,
+                                                                    method,
+                                                                    binning,
+                                                                    absolute_value,
+                                                                    p_value,
+                                                                    threshold
+                                                                    )
+        return codified_by_type_dict
 
 def _codify_method_check(
         df: pd.DataFrame,
@@ -587,6 +613,7 @@ def mapping_statistics(
 
             total_mapping.update(mapping)
 
+
         if subtotals:
             statistics_dict['total_mapping'] = total_mapping
             statistics_dict['total_input'] = total_input
@@ -755,7 +782,7 @@ def _map_label_dict(
             label_bck = _check_label_to_background_labels(label, background_labels, check_substrings)
             if label_bck is not None:
                 mapped_dict[label_bck] = v
-
+   
         elif isinstance(label, set) or isinstance(label, tuple) or isinstance(label, list):
             for sublabel in set(label):
                 label_bck = _check_label_to_background_labels(sublabel, background_labels, check_substrings)

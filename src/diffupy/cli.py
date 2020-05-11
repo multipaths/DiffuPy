@@ -9,8 +9,8 @@ import pickle
 import time
 
 import click
-from diffupath.constants import OUTPUT_DIR
-from diffupy.process_network import get_kernel_from_network_path
+
+from .process_network import get_kernel_from_network_path
 
 from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON
 from .diffuse import diffuse as run_diffusion
@@ -93,7 +93,7 @@ def kernel(
     '-o', '--output',
     type=click.File('w'),
     help="Output file",
-    default=OUTPUT_DIR,
+    default=OUTPUT,
 )
 @click.option(
     '-m', '--method',
@@ -141,7 +141,7 @@ def kernel(
 def diffuse(
         input: str,
         network: str,
-        output: str = OUTPUT_DIR,
+        output: str = OUTPUT,
         method: str = RAW,
         binarize: bool = False,
         threshold: float = None,
