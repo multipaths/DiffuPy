@@ -24,7 +24,6 @@ log = logging.getLogger(__name__)
 """Matrix/graph handling utils."""
 
 
-
 def get_laplacian(graph: Graph, normalized: bool = False) -> np.ndarray:
     """Return Laplacian matrix."""
     if nx.is_directed(graph):
@@ -145,8 +144,9 @@ def print_dict_dimensions(entities_db, title='Title', message=''):
                 m += f'{k2}  ({v2})\n'
         else:
             m += f'{v1}'
-            
+
     print(f'{m}\n\n')
+
 
 def log_dict(dict_to_print: dict, message: str = ''):
     """Print dictionary as list with a message."""
@@ -300,12 +300,6 @@ def munge_cell(cell):
     else:
         raise TypeError(f'The cell "{cell}" could not be processed.')
 
-def parse_xls_sheet_to_df(sheet: opxl.workbook,
-                          min_row: Optional[int] = 1,
-                          relevant_cols: Optional[list] = None,
-                          irrelevant_cols: Optional[list] = None) -> pd.DataFrame:
-    """Process/format excel sheets to DataFrame."""
-    parsed_sheet_dict = {}
 
 def parse_xls_sheet_to_df(sheet: opxl.workbook,
                           min_row: Optional[int] = 1,

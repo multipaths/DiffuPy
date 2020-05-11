@@ -271,7 +271,7 @@ class ValidateTest(unittest.TestCase):
             map_labels_input({'Metabolite': {'C': -1}, 'Gene': {'A': 2, 'B': 1}, 'mirnas': {'A': 1, 'T': 1}},
                              self.kernel_test_1.rows_labels),
             self.kernel_test_1,
-        
+        )
 
         # TODO: Implement in Matrix equal, now if the col order is mixed it raises error
         # assert(np.allclose(processed_mapped_nodes_list.mat,
