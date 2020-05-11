@@ -6,11 +6,11 @@ import json
 import logging
 import os
 import pickle
-import sys
 import time
 
 import click
-from diffupy.process_network import get_kernel_from_network_path
+
+from .process_network import get_kernel_from_network_path
 
 from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON
 from .diffuse import diffuse as run_diffusion
@@ -93,7 +93,7 @@ def kernel(
     '-o', '--output',
     type=click.File('w'),
     help="Output file",
-    default=sys.stdout,
+    default=OUTPUT,
 )
 @click.option(
     '-m', '--method',
@@ -107,8 +107,8 @@ def kernel(
          '-1). For scoring methods that accept quantitative values (i.e., raw & z), node labels can also be codified '
          'with LogFC (in this case, set binarize==False).',
     type=bool,
-    default=True,
-    show_default=True,
+    default=False,
+    show_default=False,
 )
 @click.option(
     '-t', '--threshold',
@@ -121,8 +121,8 @@ def kernel(
     help='Codify node labels by applying threshold to | logFC | in input. If absolute_value is set to False,'
          'node labels will be signed.',
     type=bool,
-    default=True,
-    show_default=True,
+    default=False,
+    show_default=False,
 )
 @click.option(
     '-p', '--p_value',
@@ -141,11 +141,11 @@ def kernel(
 def diffuse(
         input: str,
         network: str,
-        output: str = sys.stdout,
+        output: str = OUTPUT,
         method: str = RAW,
-        binarize: bool = True,
+        binarize: bool = False,
         threshold: float = None,
-        absolute_value: bool = True,
+        absolute_value: bool = False,
         p_value: float = 0.05,
         output_format: str = CSV
 ):
