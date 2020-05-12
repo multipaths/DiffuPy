@@ -202,7 +202,7 @@ def from_json(path: str):
 def to_json(data, path: str):
     """Save json file."""
     with open(path, 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=2)
 
 
 def from_pickle(input_path):
