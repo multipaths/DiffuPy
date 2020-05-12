@@ -852,7 +852,8 @@ def format_categorical_input_vector_from_label_list(
             )
         )
 
-    return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
+    return input_mat.match_delete_rows(kernel.rows_labels).match_missing_rows(kernel.rows_labels,
+                                                                              missing_value).match_rows(kernel)
 
 
 def format_categorical_input_matrix_from_label_list(
@@ -935,7 +936,8 @@ def format_input_vector_from_label_score_dict(
             )
         )
 
-    return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
+    return input_mat.match_delete_rows(kernel.rows_labels).match_missing_rows(kernel.rows_labels,
+                                                                              missing_value).match_rows(kernel)
 
 
 def format_input_matrix_from_type_label_score_dict(
