@@ -199,8 +199,8 @@ def _load_data_input_from_file(path: str, **further_parse_args) -> Union[pd.Data
 
     else:
         raise IOError(
-            f'There is a problem with your file. Please ensure the file you submitted is correctly formatted with a'
-            f'.csv or .tsv file extension.'
+            'There is a problem with your file. Please ensure the file you submitted is correctly formatted with a'
+            '.csv or .tsv file extension.'
         )
 
 
@@ -231,9 +231,9 @@ def _codify_input_data(
 
     # Standardize the title of the node column labeling column to 'Label', for later processing.
     if LABEL not in df.columns:
-        for l in list(df.columns):
-            if l in NODE_LABELING:
-                df = df.rename(columns={l: LABEL})
+        for column_label in list(df.columns):
+            if column_label in NODE_LABELING:
+                df = df.rename(columns={column_label: LABEL})
                 break
 
     # If node type provided in a column, classify in a dictionary the input codification by its node type.
@@ -852,7 +852,8 @@ def format_categorical_input_vector_from_label_list(
             )
         )
 
-    return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
+    return input_mat.match_delete_rows(kernel.rows_labels).match_missing_rows(kernel.rows_labels,
+                                                                              missing_value).match_rows(kernel)
 
 
 def format_categorical_input_matrix_from_label_list(
@@ -935,7 +936,8 @@ def format_input_vector_from_label_score_dict(
             )
         )
 
-    return input_mat.match_missing_rows(kernel.rows_labels, missing_value).match_rows(kernel)
+    return input_mat.match_delete_rows(kernel.rows_labels).match_missing_rows(kernel.rows_labels,
+                                                                              missing_value).match_rows(kernel)
 
 
 def format_input_matrix_from_type_label_score_dict(

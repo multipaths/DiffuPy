@@ -165,7 +165,7 @@ def diffuse(
                                                                    threshold,
                                                                    )
 
-    click.secho(f'Computing the diffusion algorithm.')
+    click.secho('Computing the diffusion algorithm.')
 
     results = run_diffusion(
         input_scores_dict,
