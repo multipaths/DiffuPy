@@ -132,9 +132,9 @@ def kernel(
     show_default=True,
 )
 @click.option(
-    '-f', '--output_format',
-    help='Statistical significance (p-value).',
-    type=float,
+    '-f', '--format',
+    help='Output format.',
+    type=str,
     default=CSV,
     show_default=True,
 )
@@ -147,7 +147,7 @@ def diffuse(
         threshold: float = None,
         absolute_value: bool = False,
         p_value: float = 0.05,
-        output_format: str = CSV
+        format: str = CSV
 ):
     """Run a diffusion method over a network or pre-generated kernel."""
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
@@ -173,10 +173,10 @@ def diffuse(
         k=kernel
     )
 
-    if output_format is CSV:
+    if format is CSV:
         results.to_csv(output)
 
-    elif output_format is JSON:
+    elif format is JSON:
         json.dump(results, output, indent=2)
 
     click.secho(f'{EMOJI} Diffusion performed with success. Output located at {output} {EMOJI}')
