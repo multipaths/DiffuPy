@@ -47,7 +47,12 @@ def kernel(
         output: str = OUTPUT,
         log: bool = None
 ):
-    """Generate a kernel for a given network."""
+    """Generate a kernel for a given network.
+
+    :param network: Path to the network as a (NetworkX) graph to be transformed to kernel.
+    :param output: Path (with file name) for the generated scores output file. By default '$OUTPUT/diffusion_scores.csv'
+    :param log: Logging profiling option.
+    """
     # Configure logging level
     if log:
         logging.basicConfig(level=logging.DEBUG)
@@ -149,7 +154,19 @@ def diffuse(
         p_value: float = 0.05,
         output_format: str = CSV
 ):
-    """Run a diffusion method over a network or pre-generated kernel."""
+    """Run a diffusion method for the provided input_scores over a given network.
+
+    :param input: Path to a (miscellaneous format) data input to be processed/formatted.
+    :param network: Path to the network as a (NetworkX) graph or as a (diffuPy.Matrix) kernel.
+    :param output: Path (with file name) for the generated scores output file. By default '$OUTPUT/diffusion_scores.csv'
+    :param method:  Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]. By default 'raw'
+    :param binarize: If logFC provided in dataset, convert logFC to binary. By default False
+    :param threshold: Codify node labels by applying a threshold to logFC in input. By default None
+    :param absolute_value: Codify node labels by applying threshold to | logFC | in input. By default False
+    :param p_value: Statistical significance. By default 0.05
+    :param format_output: Elected output format ["CSV", "JSON"]. By default 'CSV'
+
+    """
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
 
     kernel = get_kernel_from_network_path(network)
