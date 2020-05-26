@@ -499,15 +499,15 @@ class Matrix:
         rows_labels = d.pop('rows_labels')
 
         df = pd.DataFrame(d)
-        df.rows.values = rows_labels
+        df.set_axis(rows_labels)
 
         return df
 
-    def to_csv(self, path, file_name='_export.csv', index=False, ordered=True):
+    def to_csv(self, path, index=True, ordered=True):
         """Export matrix to csv file using the headers (row_labels, cols_labels) of the Matrix class."""
         # Generate dataframe
 
-        self.to_df(ordered).to_csv(os.path.join(path, self.name, file_name), index=index)
+        self.to_df(ordered).to_csv(path, index=index)
 
     def to_nx_graph(self):
         """Export matrix as a Graph using the headers (row_labels, cols_labels) of the Matrix class."""

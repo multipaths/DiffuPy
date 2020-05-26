@@ -12,7 +12,7 @@ import pandas as pd
 from .constants import *
 from .matrix import Matrix
 from .utils import from_pickle, from_json, from_dataframe_file, from_nparray_to_df, get_random_value_from_dict, \
-    get_random_key_from_dict, parse_xls_to_df, print_dict_dimensions
+    get_random_key_from_dict, parse_xls_to_df, print_dict_dimensions, munge_label_scores_dict, munge_label_list
 
 log = logging.getLogger(__name__)
 
@@ -482,6 +482,22 @@ def _two_dimensional_type_dict_label_list_data_struct_check(v: Union[dict, list]
         get_random_value_from_dict(get_random_value_from_dict(v)))
 
 
+def munge_labels(labels: Union[List[str], Dict[str, Union[int, str]]]) -> Union[
+    List[str], Dict[str, Union[list, int, str]], Dict[str, Union[List[str], Dict[str, Union[int, str]]]]]:
+    """Munge labels general checker for different treatment."""
+    if _label_list_data_struct_check(labels):
+        return munge_label_list(labels)
+
+    elif _label_scores_dict_data_struct_check(labels):
+        return munge_label_scores_dict(labels)
+
+    elif _type_dict_label_list_data_struct_check(labels) or _type_dict_label_scores_dict_data_struct_check(labels):
+        munged_labels = {}
+        for type_label, label_set in labels.items():
+            munged_labels[type_label] = munge_labels(label_set)
+        return munged_labels
+
+
 """Mappers from input to network background"""
 
 
@@ -494,21 +510,21 @@ def map_labels_input(
     """Get the mappings from preprocessed input_labels."""
     log.info("Mapping the input labels to the background labels reference.")
 
-    if _label_list_data_struct_check(background_labels):
-        mapped_labels = _map_labels_to_background(input_labels,
+    if _label_list_data_struct_check(background_labels) or _label_scores_dict_data_struct_check(background_labels):
+        mapped_labels = _map_labels_to_background(munge_labels(input_labels),
                                                   background_labels,
                                                   check_substring=check_substrings)
 
     # If type dict _map_labels_to_background for each classified input_labels.
     elif _type_dict_label_list_data_struct_check(background_labels) or _type_dict_label_scores_dict_data_struct_check(
             background_labels):
-        mapped_labels = {node_type: _map_labels_to_background(input_labels,
+        mapped_labels = {node_type: _map_labels_to_background(munge_labels(input_labels),
                                                               node_set,
                                                               background_labels_type=node_type,
                                                               check_substring=check_substrings)
                          for node_type, node_set
                          in background_labels.items()
-                         if _map_labels_to_background(input_labels,
+                         if _map_labels_to_background(munge_labels(input_labels),
                                                       node_set,
                                                       background_labels_type=node_type,
                                                       check_substring=check_substrings) not in [[], {}]
@@ -548,10 +564,14 @@ def mapping_statistics(
         subtotals: Dict[str, int] = None
 ) -> Dict:
     """Calculate mapping descriptive statistics."""
+
     statistics_dict = {}
 
     total_mapping = set()
     total_input = set()
+
+    if len(mapped_labels) == 0:
+        return {'total': (0, 0)}
 
     if _label_list_data_struct_check(mapped_labels) or _label_scores_dict_data_struct_check(mapped_labels):
         total_mapping = mapped_labels
