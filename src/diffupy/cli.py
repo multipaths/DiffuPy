@@ -63,7 +63,6 @@ def kernel(
 
     click.secho(f'{EMOJI} Loading graph from {graph} {EMOJI}')
 
-
     click.secho(f'{EMOJI} Generating regularized Laplacian kernel from graph. This might take a while... {EMOJI}')
     exe_t_0 = time.time()
     kernel = regularised_laplacian_kernel(process_graph_from_file(graph))
