@@ -564,7 +564,6 @@ def mapping_statistics(
         subtotals: Dict[str, int] = None
 ) -> Dict:
     """Calculate mapping descriptive statistics."""
-
     statistics_dict = {}
 
     total_mapping = set()
