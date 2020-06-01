@@ -21,7 +21,7 @@ project = 'diffupy'
 copyright = '2020,  Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 author = ' Josep Marín-Llaó, Sergi Picart Armada, Daniel Domingo-Fernández'
 
-release = '0.0.5-dev'
+release = '0.0.6-dev'
 
 parsed_version = re.match(
     '(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?:-(?P<release>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+(?P<build>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?',

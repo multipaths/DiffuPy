@@ -205,7 +205,7 @@ def to_json(data, path: str):
     with open(path, 'w+') as f:
         json.dump(data, f)
 
-
+        
 def from_pickle(input_path):
     """Read from pickle file."""
     with open(input_path, 'rb') as f:
