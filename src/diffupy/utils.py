@@ -14,6 +14,7 @@ import numpy as np
 import openpyxl as opxl
 import pandas as pd
 import pybel
+
 from networkx import Graph
 
 from .constants import *
@@ -141,11 +142,11 @@ def print_dict_dimensions(entities_db, title='Title', message=''):
         m += f'\n{message}{k1}:\n'
         if isinstance(v1, dict):
             for k2, v2 in v1.items():
-                m += f'{k2}  ({v2})\n'
+                m += f'{k2}  {v2}\n'
         else:
             m += f'{v1}'
 
-    print(f'{m}\n\n')
+    print(f'{m}\n')
 
 
 def log_dict(dict_to_print: dict, message: str = ''):
@@ -201,8 +202,8 @@ def from_json(path: str):
 
 def to_json(data, path: str):
     """Save json file."""
-    with open(path, 'w') as f:
-        json.dump(data, f, indent=2)
+    with open(path, 'w+') as f:
+        json.dump(data, f)
 
 
 def from_pickle(input_path):
@@ -259,7 +260,7 @@ def munge_label(label: Union[str, int, float]) -> str:
     return label
 
 
-def munge_label_list(labels: list):
+def munge_label_list(labels: list) -> List[str]:
     """Munge labels list."""
     return list(set([munge_label(label) for label in labels]))
 
@@ -267,20 +268,6 @@ def munge_label_list(labels: list):
 def munge_label_scores_dict(labels: dict) -> Dict[str, Union[list, int, str]]:
     """Munge labels dict."""
     return {munge_label(label): v for label, v in labels.items()}
-
-
-def munge_label_type_dict(label_dict: Dict[str, Union[list, int, str, dict]]) -> Dict[str, Union[list, int, str, dict]]:
-    """Munge labels type dict."""
-    type_label_dict = {}
-
-    for type_label, labels in label_dict.items():
-        if isinstance(labels, dict):
-            type_label_dict[type_label] = munge_label_scores_dict(labels)
-
-        elif isinstance(labels, dict):
-            type_label_dict[type_label] = munge_label_scores_dict(labels)
-
-    return type_label_dict
 
 
 def munge_cell(cell):

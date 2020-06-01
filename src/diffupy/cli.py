@@ -7,15 +7,15 @@ import logging
 import os
 import pickle
 import time
+from typing import Optional
 
 import click
-
-from .process_network import get_kernel_from_network_path
 
 from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
 from .process_input import process_map_and_format_input_data_for_diff
+from .process_network import get_kernel_from_network_path
 from .process_network import process_graph_from_file
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def main():
 
 @main.command()
 @click.option(
-    '-n', '--network',
+    '-g', '--graph',
     help='Input network',
     required=True,
     type=click.Path(exists=True, dir_okay=False)
@@ -37,17 +37,22 @@ def main():
 @click.option(
     '-o', '--output',
     help='Output path to store the generated kernel pickle',
-    default=OUTPUT,
+    default=os.path.join(OUTPUT, 'kernel.json'),
     show_default=True,
-    type=click.Path(exists=True, file_okay=False)
+    type=click.Path(file_okay=True)
 )
 @click.option('-l', '--log', is_flag=True, help='Activate debug mode')
 def kernel(
         graph: str,
-        output: str = OUTPUT,
-        log: bool = None
+        output: Optional[str] = os.path.join(OUTPUT, 'kernel.json'),
+        log: bool = False
 ):
-    """Generate a kernel for a given network."""
+    """Generate a kernel for a given network.
+
+    :param network: Path to the network as a (NetworkX) graph to be transformed to kernel.
+    :param output: Path (with file name) for the generated scores output file. By default '$OUTPUT/diffusion_scores.csv'
+    :param log: Logging profiling option.
+    """
     # Configure logging level
     if log:
         logging.basicConfig(level=logging.DEBUG)
@@ -58,22 +63,18 @@ def kernel(
 
     click.secho(f'{EMOJI} Loading graph from {graph} {EMOJI}')
 
-    graph = process_graph_from_file(graph)
-
     click.secho(f'{EMOJI} Generating regularized Laplacian kernel from graph. This might take a while... {EMOJI}')
     exe_t_0 = time.time()
-    kernel = regularised_laplacian_kernel(graph)
+    kernel = regularised_laplacian_kernel(process_graph_from_file(graph))
     exe_t_f = time.time()
 
-    output_file = os.path.join(output, f'{graph.split("/")[-1]}.pickle')
-
     # Export numpy array
-    with open(output_file, 'wb') as file:
+    with open(output, 'wb') as file:
         pickle.dump(kernel, file, protocol=4)
 
     running_time = exe_t_f - exe_t_0
 
-    click.secho(f'{EMOJI} Kernel exported to: {output_file} in {running_time} seconds {EMOJI}')
+    click.secho(f'{EMOJI} Kernel exported to: {output} in {running_time} seconds {EMOJI}')
 
 
 @main.command()
@@ -93,7 +94,7 @@ def kernel(
     '-o', '--output',
     type=click.File('w'),
     help="Output file",
-    default=OUTPUT,
+    default=os.path.join(OUTPUT, 'diffusion_scores.csv'),
 )
 @click.option(
     '-m', '--method',
@@ -132,8 +133,8 @@ def kernel(
     show_default=True,
 )
 @click.option(
-    '-f', '--format',
-    help='Output format.',
+    '-f', '--format_output',
+    help='Choose CSV or JSON output scores file format.',
     type=str,
     default=CSV,
     show_default=True,
@@ -141,20 +142,32 @@ def kernel(
 def diffuse(
         input: str,
         network: str,
-        output: str = OUTPUT,
-        method: str = RAW,
-        binarize: bool = False,
-        threshold: float = None,
-        absolute_value: bool = False,
-        p_value: float = 0.05,
-        format: str = CSV
+        output: Optional[str] = os.path.join(OUTPUT, 'diffusion_scores.csv'),
+        method: Optional[str] = RAW,
+        binarize: Optional[bool] = False,
+        threshold: Optional[float] = None,
+        absolute_value: Optional[bool] = False,
+        p_value: Optional[float] = 0.05,
+        format_output: Optional[str] = CSV
 ):
-    """Run a diffusion method over a network or pre-generated kernel."""
+    """Run a diffusion method for the provided input_scores over a given network.
+
+    :param input: Path to a (miscellaneous format) data input to be processed/formatted.
+    :param network: Path to the network as a (NetworkX) graph or as a (diffuPy.Matrix) kernel.
+    :param output: Path (with file name) for the generated scores output file. By default '$OUTPUT/diffusion_scores.csv'
+    :param method:  Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]. By default 'raw'
+    :param binarize: If logFC provided in dataset, convert logFC to binary. By default False
+    :param threshold: Codify node labels by applying a threshold to logFC in input. By default None
+    :param absolute_value: Codify node labels by applying threshold to | logFC | in input. By default False
+    :param p_value: Statistical significance. By default 0.05
+    :param format_output: Elected output format ["CSV", "JSON"]. By default 'CSV'
+
+    """
     click.secho(f'{EMOJI} Loading graph from {network} {EMOJI}')
 
     kernel = get_kernel_from_network_path(network)
 
-    click.secho(f'Processing data input from {input}.')
+    click.secho(f'{EMOJI} Processing data input from {input}. {EMOJI}')
 
     input_scores_dict = process_map_and_format_input_data_for_diff(input,
                                                                    kernel,
@@ -165,7 +178,7 @@ def diffuse(
                                                                    threshold,
                                                                    )
 
-    click.secho('Computing the diffusion algorithm.')
+    click.secho(f'{EMOJI} Computing the diffusion algorithm. {EMOJI}')
 
     results = run_diffusion(
         input_scores_dict,
@@ -173,13 +186,13 @@ def diffuse(
         k=kernel
     )
 
-    if format is CSV:
+    if format_output == CSV:
         results.to_csv(output)
 
-    elif format is JSON:
+    if format_output == JSON:
         json.dump(results, output, indent=2)
 
-    click.secho(f'{EMOJI} Diffusion performed with success. Output located at {output} {EMOJI}')
+    click.secho(f'{EMOJI} Diffusion performed with success. Output located at {output} {EMOJI}\n')
 
 
 if __name__ == '__main__':

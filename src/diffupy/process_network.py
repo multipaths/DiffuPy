@@ -3,21 +3,20 @@
 """Miscellaneous utils of the package."""
 
 import logging
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 import pandas as pd
 import pybel
 from diffupy.matrix import Matrix, MatrixFromDataFrame, MatrixFromDict, MatrixFromNumpyArray
 from diffupy.utils import from_dataframe_file, format_checker, from_pickle, get_label_node, from_json
-from networkx import DiGraph, Graph, read_graphml, read_gml, node_link_graph, read_edgelist
+from networkx import DiGraph, Graph, read_graphml, read_gml, node_link_graph, read_edgelist, nx
 
 from .constants import *
 from .constants import CSV, TSV, GRAPHML, GML, BEL, PICKLE, EMOJI, GRAPH_FORMATS
 from .kernels import regularised_laplacian_kernel
 
 log = logging.getLogger(__name__)
-
 
 """Process network as undefined format (could represented as a graph or as a kernel)"""
 
@@ -31,7 +30,7 @@ def get_kernel_and_graph_from_network_path(path: str) -> Tuple[Matrix, Graph]:
         try:
             graph = process_graph_from_file(path)
 
-        except ValueError or TypeError:
+        except TypeError:
             kernel = process_kernel_from_file(path)
 
     elif path.endswith(GRAPH_FORMATS):
@@ -53,12 +52,12 @@ def get_kernel_and_graph_from_network_path(path: str) -> Tuple[Matrix, Graph]:
 
 
 def get_kernel_from_network_path(path: str) -> Matrix:
-    """Load network provided in cli as a kernel."""
+    """Load network provided in cli (as a graph or as a kernel) retrieving a kernel."""
     if path.endswith(KERNEL_FORMATS):
         try:
             graph = process_graph_from_file(path)
 
-        except ValueError or TypeError:
+        except TypeError:
             return process_kernel_from_file(path)
 
     elif path.endswith(GRAPH_FORMATS):
@@ -79,7 +78,7 @@ def get_graph_from_network_path(path: str) -> Graph:
         try:
             return process_graph_from_file(path)
 
-        except ValueError or TypeError:
+        except TypeError:
             kernel = process_kernel_from_file(path)
 
     elif path.endswith(GRAPH_FORMATS):
@@ -94,7 +93,7 @@ def get_graph_from_network_path(path: str) -> Graph:
     return kernel.to_nx_graph()
 
 
-"""Process input formats"""
+"""Process input file formats"""
 
 
 def process_graph_from_file(path: str) -> Graph:
@@ -128,6 +127,17 @@ def process_graph_from_file(path: str) -> Graph:
             f'{EMOJI} The selected graph format is not valid. Please ensure you use one of the following formats: '
             f'{GRAPH_FORMATS}'
         )
+
+    n_isolates = nx.number_of_isolates(graph)
+    if n_isolates != 0:
+        log.info(
+            f'{EMOJI} Graph loaded with {n_isolates} isolate nodes, which will be removed since are not relevant'
+            f'for the diffusion procedures. {EMOJI} \n'
+        )
+        graph.remove_nodes_from({
+            node
+            for node in nx.isolates(graph)
+        })
 
     log.info(
         f'{EMOJI} Graph loaded with: \n'
@@ -187,7 +197,7 @@ def process_kernel_from_file(path: str) -> Matrix:
     return kernel
 
 
-def get_simple_graph_from_multigraph(multigraph):
+def get_simple_graph_from_multigraph(multigraph: Union[nx.MultiGraph, nx.MultiDiGraph]) -> nx.Graph:
     """Convert undirected graph from multigraph."""
     graph = Graph()
     for u, v, data in multigraph.edges(data=True):
