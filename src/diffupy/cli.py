@@ -169,19 +169,19 @@ def diffuse(
 
     click.secho(f'{EMOJI} Processing data input from {input}. {EMOJI}')
 
-    input_scores_dict = process_map_and_format_input_data_for_diff(input,
-                                                                   kernel,
-                                                                   method,
-                                                                   binarize,
-                                                                   absolute_value,
-                                                                   p_value,
-                                                                   threshold,
-                                                                   )
+    formated_input_scores = process_map_and_format_input_data_for_diff(input,
+                                                                       kernel,
+                                                                       method,
+                                                                       binarize,
+                                                                       absolute_value,
+                                                                       p_value,
+                                                                       threshold,
+                                                                       )
 
     click.secho(f'{EMOJI} Computing the diffusion algorithm. {EMOJI}')
 
     results = run_diffusion(
-        input_scores_dict,
+        formated_input_scores,
         method,
         k=kernel
     )

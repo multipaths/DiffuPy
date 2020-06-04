@@ -9,7 +9,7 @@ import numpy as np
 
 from .kernels import regularised_laplacian_kernel
 from .matrix import Matrix
-from .validate_input import _validate_scores, _validate_graph, _validate_k
+from .validate_input import _validate_graph, _validate_k
 
 logger = logging.getLogger()
 

@@ -4,10 +4,14 @@
 
 import copy
 import logging
-from typing import Dict
+from typing import Union, Optional
 
 import networkx as nx
 import numpy as np
+import pandas as pd
+
+from diffupy.kernels import regularised_laplacian_kernel
+from diffupy.process_input import process_map_and_format_input_data_for_diff
 
 from .constants import *
 from .diffuse_raw import diffuse_raw
@@ -24,32 +28,45 @@ __all__ = [
 """Map nodes from input to network"""
 
 
-def run_diffusion_algorithm(
-        input_labels: Dict[str, int],
-        method: str,
-        network: nx.Graph
-):
-    """Run diffusion algorithm."""
-    # List of nodes in network
-    network_nodes = list(network.nodes)
-    print(f'input_labels: {input_labels}')
+def run_diffusion(
+        input_labels: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
+        network: nx.Graph,
+        method: Optional[str] = RAW,
+        binarize: Optional[bool] = False,
+        threshold: Optional[float] = None,
+        absolute_value: Optional[bool] = False,
+        p_value: Optional[float] = 0.05,
+) -> Matrix:
+    """Process and format miscellaneous data input and run diffusion over a provided graph network.
 
-    print(f'network_nodes:{network_nodes}')
-    # Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes
-    label_vector = [input_labels[node] if node in input_labels else None for node in network_nodes]
-    print(f'label_vector: {label_vector}')
+    :param input: Path to a (miscellaneous format) data input to be processed/formatted.
+    :param network: Path to the network as a (NetworkX) graph or as a (diffuPy.Matrix) kernel.
+    :param method:  Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]. By default 'raw'
+    :param binarize: If logFC provided in dataset, convert logFC to binary. By default False
+    :param threshold: Codify node labels by applying a threshold to logFC in input. By default None
+    :param absolute_value: Codify node labels by applying threshold to | logFC | in input. By default False
+    :param p_value: Statistical significance. By default 0.05
+    """
+    kernel = regularised_laplacian_kernel(network, normalized=False)
 
-    if method == RAW:
-        return diffuse_raw(network, label_vector)
+    formated_input_scores = process_map_and_format_input_data_for_diff(input_labels,
+                                                                       kernel,
+                                                                       method,
+                                                                       binarize,
+                                                                       absolute_value,
+                                                                       p_value,
+                                                                       threshold,
+                                                                       )
+    return diffuse(formated_input_scores, method, k=kernel)
 
 
 def diffuse(
-        input_scores,
+        input_scores: Matrix,
         method: str = 'raw',
         graph: nx.Graph = None,
         **kwargs
 ) -> Matrix:
-    """Run diffusion on a network given an input and a diffusion method.
+    """Run diffusion on a network given a formated input (matched with kernel Matrix) and a diffusion method.
 
     :param input_scores: score collection, supplied as n-dimensional array. Could be 1-dimensional (Vector) or n-dimensional (Matrix).
     :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
