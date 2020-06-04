@@ -36,7 +36,7 @@ def run_diffusion(
         threshold: Optional[float] = None,
         absolute_value: Optional[bool] = False,
         p_value: Optional[float] = 0.05,
-):
+) -> Matrix:
     """Process and format miscellaneous data input and run diffusion over a provided graph network.
 
     :param input: Path to a (miscellaneous format) data input to be processed/formatted.
