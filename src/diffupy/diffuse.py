@@ -47,7 +47,6 @@ def run_diffusion(
     :param absolute_value: Codify node labels by applying threshold to | logFC | in input. By default False
     :param p_value: Statistical significance. By default 0.05
     """
-
     kernel = regularised_laplacian_kernel(network, normalized=False)
 
     formated_input_scores = process_map_and_format_input_data_for_diff(input_labels,
