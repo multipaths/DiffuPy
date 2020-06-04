@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """Miscellaneous utils of the package."""
-
 import logging
 from typing import Tuple, Union
 
