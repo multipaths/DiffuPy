@@ -85,14 +85,14 @@ def get_label_list_graph(graph: nx.Graph, label: str) -> List:
 
         return labels
 
-    elif nx.get_node_attributes(graph, label).values():
+    elif list(nx.get_node_attributes(graph, label).values()):
         return [
             value
             for value in nx.get_node_attributes(graph, label).values()
         ]
 
     elif graph.nodes:
-        return graph.nodes()
+        return list(graph.nodes())
 
     raise Warning('Could not get a label list from graph.')
 
@@ -242,8 +242,9 @@ def decode_labels(labels):
 
 def munge_label(label: Union[str, int, float]) -> str:
     """Munge label strings."""
-    remove_set = ['*', ' ', '|', '-', '"', "'", "↑", "↓", "\n"]
+    remove_set = ['*', '|', "↑", "↓", "hsa-", "hsv1-","kshv-","mmu-","rno-", "\n", "-"]
     split_set = ['/']
+    #split_set = ['/', ', ', ' and ']
 
     label = str(label).lower()
 
@@ -282,7 +283,7 @@ def munge_cell(cell):
         return cell
 
     elif cell is None:
-        return 'NA'
+        return ''
 
     else:
         raise TypeError(f'The cell "{cell}" could not be processed.')
