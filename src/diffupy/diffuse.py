@@ -39,7 +39,7 @@ def run_diffusion(
 ) -> Matrix:
     """Process and format miscellaneous data input and run diffusion over a provided graph network.
 
-    :param input: Path to a (miscellaneous format) data input to be processed/formatted.
+    :param input: (miscellaneous format) data input to be processed/formatted.
     :param network: Path to the network as a (NetworkX) graph or as a (diffuPy.Matrix) kernel.
     :param method:  Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]. By default 'raw'
     :param binarize: If logFC provided in dataset, convert logFC to binary. By default False

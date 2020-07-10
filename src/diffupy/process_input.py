@@ -504,7 +504,6 @@ def munge_labels(labels: Union[List[str], Dict[str, Union[int, str]]]) \
 def map_labels_input(
         input_labels: Union[list, Dict[str, int], Dict[str, list], Dict[str, Dict[str, int]]],
         background_labels: Union[list, Dict[str, list], Dict[str, Dict[str, list]]],
-        check_substrings: Union[List, bool] = None,
         show_descriptive_stat: bool = False
 ) -> Union[Dict[str, int], list]:
     """Get the mappings from preprocessed input_labels."""
@@ -512,22 +511,21 @@ def map_labels_input(
 
     if _label_list_data_struct_check(background_labels) or _label_scores_dict_data_struct_check(background_labels):
         mapped_labels = _map_labels_to_background(munge_labels(input_labels),
-                                                  background_labels,
-                                                  check_substring=check_substrings)
+                                                  background_labels)
 
     # If type dict _map_labels_to_background for each classified input_labels.
     elif _type_dict_label_list_data_struct_check(background_labels) or _type_dict_label_scores_dict_data_struct_check(
             background_labels):
         mapped_labels = {node_type: _map_labels_to_background(munge_labels(input_labels),
                                                               node_set,
-                                                              background_labels_type=node_type,
-                                                              check_substring=check_substrings)
+                                                              background_labels_type=node_type
+                                                              )
                          for node_type, node_set
                          in background_labels.items()
                          if _map_labels_to_background(munge_labels(input_labels),
                                                       node_set,
-                                                      background_labels_type=node_type,
-                                                      check_substring=check_substrings) not in [[], {}]
+                                                      background_labels_type=node_type
+                                                      ) not in [[], {}]
                          }
 
     # If two-dimensional type dict call recursively map_labels_input.
@@ -535,14 +533,12 @@ def map_labels_input(
             background_labels) or _two_dimensional_type_dict_label_scores_dict_data_struct_check(background_labels):
         mapped_labels = {node_type: map_labels_input(input_labels,
                                                      node_set,
-                                                     check_substrings,
                                                      show_descriptive_stat=False
                                                      )
                          for node_type, node_set
                          in background_labels.items()
                          if map_labels_input(input_labels,
                                              node_set,
-                                             check_substrings,
                                              show_descriptive_stat=False
                                              ) not in [[], {}]
                          }
@@ -657,25 +653,24 @@ def mapping_statistics(
 def _map_labels(
         input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
         background_labels: list,
-        check_substrings: bool = False
 ) -> Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
     """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
     if _label_list_data_struct_check(input_labels):
-        return _map_label_list(input_labels, background_labels, check_substrings)
+        return _map_label_list(input_labels, background_labels)
 
     elif _label_scores_dict_data_struct_check(input_labels):
-        return _map_label_dict(input_labels, background_labels, check_substrings)
+        return _map_label_dict(input_labels, background_labels)
 
     elif _type_dict_label_list_data_struct_check(input_labels):
         map_list = []
         for type, label_list in input_labels.items():
-            map_list += _map_labels(label_list, background_labels, check_substrings)
+            map_list += _map_labels(label_list, background_labels)
         return map_list
 
     elif _type_dict_label_scores_dict_data_struct_check(input_labels):
         map_dict = {}
         for type, scores_dict in input_labels.items():
-            map_dict.update(_map_labels(scores_dict, background_labels, check_substrings))
+            map_dict.update(_map_labels(scores_dict, background_labels))
         return map_dict
 
     else:
@@ -688,24 +683,20 @@ def _map_labels_to_background(
         input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
         background_labels: list,
         background_labels_type: str = None,
-        check_substring: Union[List, bool] = None
 ) -> Union[Dict[str, Dict[str, int]], Dict[str, int]]:
     """Map labels from preprocessed input to background_labels to get a set of matched labels."""
     if _type_dict_label_scores_dict_data_struct_check(input_labels) or \
             _type_dict_label_list_data_struct_check(input_labels):
 
         if background_labels_type and background_labels_type in input_labels.keys():
-            return _map_labels(input_labels[background_labels_type], background_labels,
-                               check_substring is not None and background_labels_type in check_substring)
+            return _map_labels(input_labels[background_labels_type], background_labels)
         return {
-            type: _map_labels(label_list, background_labels,
-                              check_substring is not None and type in check_substring)
+            type: _map_labels(label_list, background_labels)
             for type, label_list in input_labels.items()
-            if _map_labels(label_list, background_labels,
-                           check_substring is not None and type in check_substring) not in [[], {}]
+            if _map_labels(label_list, background_labels) not in [[], {}]
         }
 
-    return _map_labels(input_labels, background_labels, check_substring)
+    return _map_labels(input_labels, background_labels,)
 
 
 def _check_label_to_background_labels(
@@ -736,19 +727,18 @@ def _check_label_to_background_labels(
 
 def _map_label_list(
         input_labels: Union[str, Set[str], List[str]],
-        background_labels: List[str],
-        check_substrings: bool = False
+        background_labels: List[str]
 ) -> List[str]:
     """Map labels from preprocessed input to background_labels LIST to get a set of matched labels."""
     mapped_list = []
     for label in input_labels:
         if isinstance(label, str):
-            label_bck = _check_label_to_background_labels(label, background_labels, check_substrings)
+            label_bck = _check_label_to_background_labels(label, background_labels)
             if label_bck is not None:
                 mapped_list.append(label_bck)
         elif isinstance(label, set) or isinstance(label, tuple) or isinstance(label, list):
             for sublabel in set(label):
-                label_bck = _check_label_to_background_labels(sublabel, background_labels, check_substrings)
+                label_bck = _check_label_to_background_labels(sublabel, background_labels)
                 if label_bck is not None:
                     mapped_list.append(label_bck)
         else:
@@ -760,8 +750,7 @@ def _map_label_list(
 
 def _map_label_dict(
         input_labels: Dict[Union[str, set], Union[int, float]],
-        background_labels: list,
-        check_substrings: bool = False
+        background_labels: list
 ) -> Dict[str, Union[int, float]]:
     """Map labels from preprocessed input to background_labels DICT to get a set of matched labels."""
     mapped_dict = {}
@@ -771,13 +760,13 @@ def _map_label_dict(
             label = str(label)
 
         if isinstance(label, str):
-            label_bck = _check_label_to_background_labels(label, background_labels, check_substrings)
+            label_bck = _check_label_to_background_labels(label, background_labels)
             if label_bck is not None:
                 mapped_dict[label_bck] = v
 
         elif isinstance(label, set) or isinstance(label, tuple) or isinstance(label, list):
             for sublabel in set(label):
-                label_bck = _check_label_to_background_labels(sublabel, background_labels, check_substrings)
+                label_bck = _check_label_to_background_labels(sublabel, background_labels)
                 if label_bck is not None:
                     mapped_dict[label_bck] = v
         else:
