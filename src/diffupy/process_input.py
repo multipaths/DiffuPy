@@ -98,13 +98,10 @@ def process_input_data(
 
     # If the preprocessed input is a list or a label type dict (Dict[str, list]) return it for latter categorical input generation.
     if _label_list_data_struct_check(preprocessed_data) or _type_dict_label_list_data_struct_check(preprocessed_data):
-        print("check1")
-        print(preprocessed_data)
         return preprocessed_data
 
     # If the preprocessed input is a label type label-scores dict (Dict[str, pd.DataFrame]) pipeline it for scores codifying.
     if isinstance(preprocessed_data, dict):
-        print("check2")
         return {label: _codify_input_data(preprocessed_data_i,
                                                method,
                                                binning,
