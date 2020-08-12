@@ -242,9 +242,9 @@ def decode_labels(labels):
 
 def munge_label(label: Union[str, int, float]) -> str:
     """Munge label strings."""
-    remove_set = ['*', '|', "↑", "↓", "hsa-", "hsv1-","kshv-","mmu-","rno-", "\n", "-"]
+    remove_set = ['*', '|', "↑", "↓", "hsa-", "hsv1-", "kshv-", "mmu-", "rno-", "\n", "-"]
     split_set = ['/']
-    #split_set = ['/', ', ', ' and ']
+    # split_set = ['/', ', ', ' and ']
 
     label = str(label).lower()
 
@@ -322,7 +322,7 @@ def parse_xls_to_df(path: str,
         return {sheets[ix].lower(): parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
                 for ix, sheet in enumerate(wb)
                 if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or (
-                    irrelevant_sheets is not None and sheets[ix] not in irrelevant_sheets)
+                        irrelevant_sheets is not None and sheets[ix] not in irrelevant_sheets)
                 }
 
     else:
