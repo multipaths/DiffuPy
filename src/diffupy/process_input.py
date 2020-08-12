@@ -103,13 +103,13 @@ def process_input_data(
     # If the preprocessed input is a label type label-scores dict (Dict[str, pd.DataFrame]) pipeline it for scores codifying.
     if isinstance(preprocessed_data, dict):
         return {label: _codify_input_data(preprocessed_data_i,
-                                               method,
-                                               binning,
-                                               absolute_value,
-                                               p_value,
-                                               threshold,
-                                               further_parse_args.get('cols_titles_mapping')
-                                               )
+                                          method,
+                                          binning,
+                                          absolute_value,
+                                          p_value,
+                                          threshold,
+                                          further_parse_args.get('cols_titles_mapping')
+                                          )
                 for label, preprocessed_data_i in preprocessed_data.items()
                 }
 
@@ -696,7 +696,7 @@ def _map_labels_to_background(
             if _map_labels(label_list, background_labels) not in [[], {}]
         }
 
-    return _map_labels(input_labels, background_labels,)
+    return _map_labels(input_labels, background_labels, )
 
 
 def _check_label_to_background_labels(
