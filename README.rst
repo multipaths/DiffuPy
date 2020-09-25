@@ -3,8 +3,8 @@
    :align: center
    :target: https://diffupy.readthedocs.io/en/latest/
 
-Introduction |build| |docs|
-===========================
+Introduction |build| |docs| |zenodo|
+====================================
 
 DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms. DiffuPy supports generic
 graph formats such as `JSON, CSV, GraphML, or GML <https://github.com/multipaths/DiffuPy/tree/master/examples>`_. Check
@@ -79,3 +79,7 @@ guarantee of maintenance, support, or back-up of data.
 
 .. |pypi_license| image:: https://img.shields.io/pypi/l/diffupy.svg
     :alt: Apache-2.0
+
+..  |zenodo| image:: https://zenodo.org/badge/195810310.svg
+   :target: https://zenodo.org/badge/latestdoi/195810310
+
