@@ -477,6 +477,7 @@ class Matrix:
         return ordered_mat
 
     def len_not_null(self):
+        """Get count of n cells not 0 in matrix."""
         cnt = 0
 
         for x in self.__iter__(get_labels=False, get_indices=False):
