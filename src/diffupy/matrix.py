@@ -479,7 +479,7 @@ class Matrix:
     def len_not_null(self):
         cnt = 0
 
-        for x in self.mat:
+        for x in self.__iter__(get_labels=False, get_indices=False):
             if x != 0:
                 cnt += 1
 
