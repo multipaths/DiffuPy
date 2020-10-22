@@ -476,6 +476,15 @@ class Matrix:
 
         return ordered_mat
 
+    def len_not_null(self):
+        cnt = 0
+
+        for x in self.mat:
+            if x != 0:
+                cnt += 1
+
+        return cnt
+
     """Export"""
 
     def to_dict(self, ordered=True):
