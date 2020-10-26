@@ -53,7 +53,7 @@ Generates the regularised Laplacian kernel of a given graph. More information in
 .. code-block:: sh
 
     $ python3 -m diffupy kernel --network=<path-to-network-file>
-    
+
 Here you can find samples of input datasets and networks to run diffusion methods over.
 
 Input Data
