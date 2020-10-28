@@ -62,14 +62,14 @@ def run_diffusion(
 
 def diffuse(
         input_scores: Matrix,
-        method: str = 'raw',
+        method: Union[str, Callable] = RAW,
         graph: nx.Graph = None,
         **kwargs
 ) -> Matrix:
     """Run diffusion on a network given a formated input (matched with kernel Matrix) and a diffusion method.
 
     :param input_scores: score collection, supplied as n-dimensional array. Could be 1-dimensional (Vector) or n-dimensional (Matrix).
-    :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]
+    :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"] or custom method FUNCTION(network, scores, kargs).
     :param graph: A network as a graph. It could be optional if a Kernel is provided
     :param kwargs: Optional arguments:
                     - k: a  kernel [matrix] stemming from a graph, thus sparing the graph transformation process
@@ -90,65 +90,85 @@ def diffuse(
             raise ValueError("Neither a graph 'graph' or a kernel 'k' has been provided.")
         format_network = 'kernel'
 
-    if method == RAW:
-        return diffuse_raw(graph, scores, **kwargs)
-
-    elif method == Z:
-        return diffuse_raw(graph, scores, z=True, **kwargs)
-
-    elif method == ML:
-        for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
-            if score not in [-1, 0, 1]:
-                raise ValueError("Input scores must be binary.")
-            if score == 0:
-                scores.mat[i, j] = -1
-
-        return diffuse_raw(graph, scores, **kwargs)
-
-    elif method == GM:
-        for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
-            if score not in [0, 1]:
-                raise ValueError("Input scores must be binary.")
-                # Have to match rownames with background
-                # If the kernel is provided...
+    # Allow custom method function.
+    if callable(method):
 
         if format_network == 'graph':
-            names_ordered = get_label_list_graph(graph, 'name')
-        elif format_network == 'kernel':
-            names_ordered = kwargs['k'].rows_labels
+            network = graph
+        else:
+            network = kwargs['k']
 
-        # If the graph is defined
-        ids_nobkgd = set(names_ordered) - set(scores.rows_labels)
+        if len(inspect.getfullargspec(method).args) == 1:
+            return method(network)
+        elif len(inspect.getfullargspec(method).args) == 2:
+            return method(network, scores)
+        elif len(inspect.getfullargspec(method).args) > 2:
+            return method(graph, scores, **kwargs)
+        else:
+            raise ValueError(f"Method function arguments not allowed {type(method).__name__}")
 
-        n_tot = len(names_ordered)
-        n_bkgd = scores.mat.shape[0]
 
-        # Normalisation is performed for each column, as it depends on the number of positives and negatives.
-        # n_pos and n_neg are vectors counting the number of positives and negatives in each column
-        n_pos = np.sum(scores.mat, axis=0)
-        n_neg = n_bkgd - n_pos
+    elif isinstance(method, str):
 
-        # Biases
-        p = (n_pos - n_neg) / n_tot
+        if method == RAW:
+            return diffuse_raw(graph, scores, **kwargs)
 
-        for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
-            if score == 0:
-                scores.mat[i, j] = -1
+        elif method == Z:
+            return diffuse_raw(graph, scores, z=True, **kwargs)
 
-        # Add biases (each column has its bias)
-        scores.row_bind(
-            np.transpose(np.array(
-                [np.repeat(
-                    score,
-                    n_tot - n_bkgd
-                )
-                    for score in p
-                ])
-            ),
-            ids_nobkgd
-        )
+        elif method == ML:
+            for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
+                if score not in [-1, 0, 1]:
+                    raise ValueError("Input scores must be binary.")
+                if score == 0:
+                    scores.mat[i, j] = -1
 
-        return diffuse_raw(graph, scores, **kwargs)
+            return diffuse_raw(graph, scores, **kwargs)
 
-    else:
-        raise ValueError(f"Method not allowed {method}")
+        elif method == GM:
+            for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
+                if score not in [0, 1]:
+                    raise ValueError("Input scores must be binary.")
+                    # Have to match rownames with background
+                    # If the kernel is provided...
+
+            if format_network == 'graph':
+                names_ordered = get_label_list_graph(graph, 'name')
+            elif format_network == 'kernel':
+                names_ordered = kwargs['k'].rows_labels
+
+            # If the graph is defined
+            ids_nobkgd = set(names_ordered) - set(scores.rows_labels)
+
+            n_tot = len(names_ordered)
+            n_bkgd = scores.mat.shape[0]
+
+            # Normalisation is performed for each column, as it depends on the number of positives and negatives.
+            # n_pos and n_neg are vectors counting the number of positives and negatives in each column
+            n_pos = np.sum(scores.mat, axis=0)
+            n_neg = n_bkgd - n_pos
+
+            # Biases
+            p = (n_pos - n_neg) / n_tot
+
+            for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
+                if score == 0:
+                    scores.mat[i, j] = -1
+
+            # Add biases (each column has its bias)
+            scores.row_bind(
+                np.transpose(np.array(
+                    [np.repeat(
+                        score,
+                        n_tot - n_bkgd
+                    )
+                        for score in p
+                    ])
+                ),
+                ids_nobkgd
+            )
+
+            return diffuse_raw(graph, scores, **kwargs)
+
+        else:
+            raise V
