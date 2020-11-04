@@ -15,8 +15,23 @@ Input scores can be specified in three formats:
 If the path labels are not quantitative, i.e. positive(1), negative(0) and possibly unlabelled, all the scores raw, gm,
 ml, z, mc, ber_s, ber_p can be used.
 
+
 Methods
 -------
+
+The provided methods can be elected for the diffusion computation through the paramter *method*.
+
+.. code-block:: python3
+
+  from diffupy.diffuse import run_diffusion
+
+  diffusion_scores = run_diffusion(input_scores, network, method = 'raw')
+
+.. automodule:: diffupy.diffuse
+   :members:
+
+.. automodule:: diffupy.diffuse_raw
+   :members:
 
 Methods without statistical normalisation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,6 +93,20 @@ Methods with statistical normalization
 +-------------+----------+---------+--------+-------------+-------------+-----------------+------------+
 
 
+
+Method modularity
+-----------------
+
+Through the parameter *method* can also be provided a callable function as a custom method.
+
+.. code-block:: python3
+
+  from diffupy.diffuse import run_diffusion
+  from networkx import pagerank
+
+  diffusion_scores = run_diffusion(input_scores, network, method = pagerank)
+
+
 .. automodule:: diffupy.diffuse
    :members:
 
@@ -101,6 +130,4 @@ References
 .. [5] Bersanelli, M. *et al.* (2016). Network diffusion-based analysis of high-throughput data for the detection of
     differentially enriched modules. Scientific Reports. (6), 34841.
 
-.. [6] Tsuda, K., *et al.* (2005).  Fast  protein  classification  with  multiple  networks. Bioinformatics, (21), 59–65
-
-
+.. [6] Tsuda, K., *et al.* (
