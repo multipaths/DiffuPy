@@ -62,7 +62,6 @@ def process_map_and_format_input_data_for_diff(
                                                                                        **further_parse_args
                                                                                        ),
                                                        background_labels=background_labels,
-                                                       check_substrings=further_parse_args.get('check_substrings'),
                                                        show_descriptive_stat=show_statistics
                                                        ),
                                       kernel

@@ -2,7 +2,7 @@
 
 """Miscellaneous utils of the package."""
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, List, Optional, Callable
 
 import numpy as np
 import pandas as pd
@@ -11,6 +11,7 @@ from diffupy.matrix import Matrix, MatrixFromDataFrame, MatrixFromDict, MatrixFr
 from diffupy.utils import from_dataframe_file, format_checker, from_pickle, get_label_node, from_json
 from networkx import DiGraph, Graph, read_graphml, read_gml, node_link_graph, read_edgelist, nx
 
+from pybel import get_subgraph_by_annotation_value
 from .constants import *
 from .constants import CSV, TSV, GRAPHML, GML, BEL, PICKLE, EMOJI, GRAPH_FORMATS
 from .kernels import regularised_laplacian_kernel
@@ -20,7 +21,9 @@ log = logging.getLogger(__name__)
 """Process network as undefined format (could represented as a graph or as a kernel)"""
 
 
-def get_kernel_and_graph_from_network_path(path: str) -> Tuple[Matrix, Graph]:
+def get_kernel_and_graph_from_network_path(path: str,
+                                           kernel_method: Optional[Callable] = regularised_laplacian_kernel
+                                           ) -> Tuple[Matrix, Graph]:
     """Load network provided in cli as a kernel and as a graph."""
     graph = None
     kernel = None
@@ -42,7 +45,7 @@ def get_kernel_and_graph_from_network_path(path: str) -> Tuple[Matrix, Graph]:
         )
 
     if kernel is None and graph is not None:
-        kernel = regularised_laplacian_kernel(graph)
+        kernel = kernel_method(graph)
 
     if kernel is not None and graph is None:
         graph = kernel.to_nx_graph()
@@ -50,7 +53,12 @@ def get_kernel_and_graph_from_network_path(path: str) -> Tuple[Matrix, Graph]:
     return kernel, graph
 
 
-def get_kernel_from_network_path(path: str) -> Matrix:
+def get_kernel_from_network_path(path: str,
+                                 normalized: bool = False,
+                                 filter_network_database: Optional[List[str]] = None,
+                                 filter_network_omic: Optional[List[str]] = None,
+                                 kernel_method: Optional[Callable] = regularised_laplacian_kernel
+                                 ) -> Matrix:
     """Load network provided in cli (as a graph or as a kernel) retrieving a kernel."""
     if path.endswith(KERNEL_FORMATS):
         try:
@@ -59,8 +67,26 @@ def get_kernel_from_network_path(path: str) -> Matrix:
         except TypeError:
             return process_kernel_from_file(path)
 
+        if filter_network_omic or filter_network_database:
+            raise ValueError(
+                "The provided network can not be filtered, since has been provided as a kernel. "
+                "For filtering, please provide the network formated as a graph.")
+
     elif path.endswith(GRAPH_FORMATS):
         graph = process_graph_from_file(path)
+
+        if filter_network_database:
+            graph = get_subgraph_by_annotation_value(graph,
+                                                     'database',
+                                                     filter_network_database
+                                                     )
+
+        if filter_network_omic:
+            graph = get_subgraph_by_annotation_value(graph,
+                                                     'enity_type',
+                                                     filter_network_omic
+                                                     )
+
 
     else:
         raise IOError(
@@ -68,7 +94,7 @@ def get_kernel_from_network_path(path: str) -> Matrix:
             f'{GRAPH_FORMATS}'
         )
 
-    return regularised_laplacian_kernel(graph)
+    return kernel_method(graph, normalized=normalized)
 
 
 def get_graph_from_network_path(path: str) -> Graph:
@@ -243,8 +269,4 @@ def get_graph_from_df(path: str, sep: str) -> DiGraph:
             )
 
         else:
-            graph.add_edge(
-                sub_name, obj_name,
-            )
-
-    return graph
+            gr
