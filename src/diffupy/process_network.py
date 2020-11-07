@@ -87,7 +87,6 @@ def get_kernel_from_network_path(path: str,
                                                      filter_network_omic
                                                      )
 
-
     else:
         raise IOError(
             f'{EMOJI} The selected network format is not valid neither as a graph or as a kernel. Please ensure you use one of the following formats: '

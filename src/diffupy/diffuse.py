@@ -121,7 +121,6 @@ def diffuse(
         else:
             raise ValueError(f"Method function arguments not allowed {type(method).__name__}")
 
-
     elif isinstance(method, str):
 
         if method == RAW:
