@@ -3,8 +3,8 @@
    :align: center
    :target: https://diffupy.readthedocs.io/en/latest/
 
-Introduction |build| |docs|
-===========================
+Introduction |build| |docs| |zenodo|
+====================================
 
 DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms. DiffuPy supports generic
 graph formats such as `JSON, CSV, GraphML, or GML <https://github.com/multipaths/DiffuPy/tree/master/examples>`_. Check
@@ -155,6 +155,7 @@ or **Pythonicaly** as a data structure as the *input_scores* parameter:
   diffusion_scores_from_dict = run_diffusion(df, network)
 
 
+
 Please ensure that the dataset minimally has a column 'Node' containing node IDs. You can also optionally add the
 following columns to your dataset:
 
@@ -208,7 +209,6 @@ Kernel
 --------
 If you dispose of a precalculated **kernel**, you can provide it directly as the *network* parameter without needing to also provide a graph object.
 
-
 Input dataset examples
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -249,6 +249,7 @@ Also as a list of nodes:
 
 
 **2.** You can also provide a dataset with a column 'Node' containing node IDs as well as a column 'NodeType', indicating
+
 the entity type of the node to run diffusion by entity type.
 
 +------------+--------------+
@@ -276,6 +277,7 @@ Also as a dictionary of type:list of nodes :
 
 
 **3.** You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
+
 their logFC. You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+
@@ -325,6 +327,7 @@ Also as a dictionary of type:node:score_value :
 
 
 **4.** Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their logFC and a
+
 column 'p-value' with adjusted p-values. You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+---------+
@@ -445,4 +448,8 @@ guarantee of maintenance, support, or back-up of data.
 
 .. |pypi_license| image:: https://img.shields.io/pypi/l/diffupy.svg
     :alt: Apache-2.0
-                                                                                    
+
+
+..  |zenodo| image:: https://zenodo.org/badge/195810310.svg
+   :target: https://zenodo.org/badge/latestdoi/195810310
+
