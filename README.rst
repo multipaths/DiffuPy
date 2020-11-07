@@ -67,7 +67,6 @@ Further parameters to adapt the propagation procedure can be provided, such as c
 or providing a custom method function. See the `diffusion Methods and/or Method modularity <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
 
 .. code-block:: python3
-  from diffupath.cli import run
 
   diffusion_scores_select_method = run(input_scores, method = 'raw')
 
@@ -79,7 +78,6 @@ You can also provide your own kernel method or select among other provided in *k
 By default *regularised_laplacian_kernel* is used.
 
 .. code-block:: python3
-  from diffupath.cli import run
 
   from diffupath.kernels import p_step_kernel # Custom kernel calculation function
 
@@ -243,7 +241,6 @@ Also as a list of nodes:
   ['A', 'B', 'C', 'D']
 
 .. code-block:: python3
-  from diffupy.diffuse import run_diffusion
 
   diffusion_scores = run_diffusion(['A', 'B', 'C', 'D'], network)
 
@@ -271,7 +268,6 @@ Also as a dictionary of type:list of nodes :
   {'Gene': ['A', 'B', 'D'], 'Metabolite': ['C']}
 
 .. code-block:: python3
-  from diffupy.diffuse import run_diffusion
 
   diffusion_scores = run_diffusion({'Genes': ['A', 'B', 'D'], 'Metabolites': ['C']}, network)
 
@@ -299,7 +295,6 @@ Also as a dictionary of node:score_value :
   {'A':-1, 'B':-1, 'C':1.5, 'D':4}
 
 .. code-block:: python3
-  from diffupy.diffuse import run_diffusion
 
   diffusion_scores = run_diffusion({'A':-1, 'B':-1, 'C':1.5, 'D':4})
 
