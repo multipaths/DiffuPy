@@ -3,8 +3,9 @@
 """This module provides a generalized function as an interface to interact with the different diffusion methods."""
 
 import copy
+import inspect
 import logging
-from typing import Union, Optional
+from typing import Union, Optional, Callable
 
 import networkx as nx
 import numpy as np
@@ -12,6 +13,7 @@ import pandas as pd
 
 from diffupy.kernels import regularised_laplacian_kernel
 from diffupy.process_input import process_map_and_format_input_data_for_diff
+from diffupy.process_network import get_kernel_from_network_path
 
 from .constants import *
 from .diffuse_raw import diffuse_raw
@@ -30,24 +32,36 @@ __all__ = [
 
 def run_diffusion(
         input_labels: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
-        network: nx.Graph,
-        method: Optional[str] = RAW,
+        network: Union[str, nx.Graph, Matrix],
+        method: Union[str, Callable] = Z,
         binarize: Optional[bool] = False,
         threshold: Optional[float] = None,
         absolute_value: Optional[bool] = False,
         p_value: Optional[float] = 0.05,
+        kernel_method: Optional[Callable] = regularised_laplacian_kernel
 ) -> Matrix:
     """Process and format miscellaneous data input and run diffusion over a provided graph network.
 
     :param input: (miscellaneous format) data input to be processed/formatted.
-    :param network: Path to the network as a (NetworkX) graph or as a (diffuPy.Matrix) kernel.
-    :param method:  Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"]. By default 'raw'
+    :param network: Path to the network or the network Object, as a (NetworkX) graph or as a (diffuPy.Matrix) kernel.
+    :param method: Elected method ["raw", "ml", "gm", "ber_s", "ber_p", "mc", "z"] or custom method FUNCTION(network, scores, kargs). By default 'raw'
     :param binarize: If logFC provided in dataset, convert logFC to binary. By default False
     :param threshold: Codify node labels by applying a threshold to logFC in input. By default None
     :param absolute_value: Codify node labels by applying threshold to | logFC | in input. By default False
     :param p_value: Statistical significance. By default 0.05
+    :param kernel_method: Callable method for kernel computation.
     """
-    kernel = regularised_laplacian_kernel(network, normalized=False)
+    if isinstance(network, nx.Graph):
+        kernel = kernel_method(network)
+    elif isinstance(network, Matrix):
+        kernel = network
+    elif isinstance(network, str):
+        kernel = get_kernel_from_network_path(network, False, kernel_method=kernel_method)
+    else:
+        raise IOError(
+            f'{EMOJI} The selected network format is not valid neither as a graph or as a kernel. Please ensure you use one of the following formats: '
+            f'{GRAPH_FORMATS}'
+        )
 
     formated_input_scores = process_map_and_format_input_data_for_diff(input_labels,
                                                                        kernel,
@@ -171,4 +185,6 @@ def diffuse(
             return diffuse_raw(graph, scores, **kwargs)
 
         else:
-            raise V
+            raise ValueError(f"Method not allowed {method}")
+
+    raise ValueError(f"Method type not allowed {type(method).__name__}")
