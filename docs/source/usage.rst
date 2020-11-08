@@ -146,10 +146,6 @@ If you dispose of a precalculated kernel, you can provide directly the kernel ob
 graph object. As mentioned above, if you wish to use your kernel method function you can provide it as *kernel_method*
 argument on the previous described functions:
 
-.. automodule:: diffupy.diffuse_raw
-   :members:
-
-
 Input dataset examples
 ~~~~~~~~~~~~~~~~~~~~~~
 
