@@ -21,7 +21,7 @@ For its usability, you can either use:
 
 Methods
 ~~~~~~~
-The diffusion method by default is *z*, which statistical normalization has previously shown outperformance [1]_.
+The diffusion method by default is *z*, which statistical normalization has previously shown to outperform.
 Further parameters to adapt the propagation procedure can be provided, such as choosing among the available diffusion
 methods or providing a custom method function. See the `diffusion Methods and/or Method modularity
 <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
@@ -353,8 +353,3 @@ be exported into the following formats:
   diffusion_scores.to_df()
   diffusion_scores.to_csv()
   diffusion_scores.to_nx_graph()
-
-References
-----------
-.. [1] Picart-Armada, S., *et al.* (2017). `Null diffusion-based enrichment for metabolomics data
-   <https://doi.org/10.1371/journal.pone.0189012>`_. *PloS one* 12.12.
