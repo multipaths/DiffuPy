@@ -54,12 +54,6 @@ For its usability, you can either:
 
   diffusion_scores = run_diffusion(input_scores, network).to_dict()
 
-.. automodule:: diffupy.diffuse
-   :members:
-
-.. automodule:: diffupy.diffuse_raw
-   :members:
-
 Methods
 ~~~~~~~
 The diffusion method by default is *z*, which statistical normalization has previously shown outperformance  [1].
@@ -85,7 +79,6 @@ By default *regularised_laplacian_kernel* is used.
 
 So *method* stands for the **diffusion process** method, and *kernel_method* for the **kernel calculation** method.
 
-
 Command Line Interface
 ~~~~~~~~~~~~~~~~~~~~~~
 The following commands can be used directly from your terminal:
@@ -97,7 +90,6 @@ The following command will run a diffusion method on a given network with the gi
 .. code-block:: sh
 
     $ python3 -m diffupy diffuse --network=<path-to-network-file> --data=<path-to-data-file> --method=<method>
-
 
 2. **Generate a kernel with one of the seven methods implemented**
 Generates the regularised Laplacian kernel of a given graph. More information in the `documentation
@@ -187,6 +179,7 @@ If you would like to submit your own networks, please ensure they are in one of 
 - TXT (.txt)
 
 .. _Edge: https://networkx.github.io/documentation/stable/reference/readwrite/edgelist.html
+
 __ Edge_
 .. _GraphML: http://graphml.graphdrawing.org
 .. _BEL: https://language.bel.bio/
@@ -444,7 +437,5 @@ guarantee of maintenance, support, or back-up of data.
 .. |pypi_license| image:: https://img.shields.io/pypi/l/diffupy.svg
     :alt: Apache-2.0
 
-
 ..  |zenodo| image:: https://zenodo.org/badge/195810310.svg
    :target: https://zenodo.org/badge/latestdoi/195810310
-
