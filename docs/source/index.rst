@@ -18,7 +18,6 @@ Installation is as easy as getting the code from `PyPI <https://pypi.python.org/
    :caption: Contents:
 
    installation
-   intro
    usage
    cli
    kernels
