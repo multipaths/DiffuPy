@@ -19,12 +19,6 @@ For its usability, you can either use:
 
   diffusion_scores = run_diffusion(input_scores, network).to_dict()
 
-.. automodule:: diffupy.diffuse
-   :members:
-
-.. automodule:: diffupy.diffuse_raw
-   :members:
-
 Methods
 ~~~~~~~
 The diffusion method by default is *z*, which statistical normalization has previously shown outperformance  [1].
