@@ -54,7 +54,7 @@ For its usability, you can either:
 
 Methods
 -------
-The diffusion method by default is *z*, which statistical normalization has previously shown outperformance  [1].
+The diffusion method by default is *z*, which statistical normalization has previously shown outperformance [1]_.
 Further parameters to adapt the propagation procedure can be provided, such as choosing among the available diffusion
 methods or providing a custom method function. See the `diffusion Methods and/or Method modularity
 <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
