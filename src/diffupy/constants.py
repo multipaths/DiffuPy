@@ -91,6 +91,7 @@ GRAPH_FORMATS = (
     BEL,
     JSON,
     PICKLE,
+    GML
 )
 
 #: Available kernel formats
