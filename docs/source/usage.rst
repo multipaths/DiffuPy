@@ -2,16 +2,16 @@ Basic Usage
 ~~~~~~~~~~~
 The two required input elements to run diffusion using DiffuPy are:
  1) A **network/graph**. (see Network-Input Formatting below)
- 2) A **dataset of scores/ponderations**. (see Scores-Input Formatting below)
+ 2) A **dataset of scores**. (see Scores-Input Formatting below)
 
 .. image:: meta/DiffuPyScheme2.png
   :width: 400
   :alt: Alternative text
 
-For its usability, you can either use:
+For its usability, you can either:
 
  - Use the `Command Line Interface (see cli) <https://github.com/multipaths/DiffuPy/blob/master/docs/source/cli.rst>`_.
- - Use *pythonicaly* the **functions** provided in *diffupy.diffuse*:
+ - Use *pythonically* the **functions** provided in *diffupy.diffuse*:
 
 .. code-block:: python3
 
@@ -22,8 +22,8 @@ For its usability, you can either use:
 Methods
 ~~~~~~~
 The diffusion method by default is *z*, which statistical normalization has previously shown to outperform.
-Further parameters to adapt the propagation procedure can be provided, such as choosing among the available diffusion
-methods or providing a custom method function. See the `diffusion Methods and/or Method modularity
+Further parameters to adapt the propagation procedure are also provided, such as choosing from the available diffusion
+methods or providing a custom method function. See `diffusion Methods and/or Method modularity
 <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
 
 .. code-block:: python3
@@ -34,8 +34,8 @@ methods or providing a custom method function. See the `diffusion Methods and/or
 
   diffusion_scores_custom_method = run_diffusion(input_scores, network,  method = page_rank)
 
-You can also provide your own kernel method or select among other provided in *kernels.py* function you can provide it
-as *kernel_method* argument. By default *regularised_laplacian_kernel* is used.
+You can also provide your own kernel method or select among the ones provided in the *kernels.py* function which you can
+provide as a *kernel_method* argument. By default *regularised_laplacian_kernel* is used.
 
 .. code-block:: python3
 
@@ -54,9 +54,9 @@ input data/scores formats**. You can find specified here samples of supported in
 Input format
 ~~~~~~~~~~~~~
 
-The input is preprocessed and further mapped before the diffusion. See input mapping or or `see process_input docs
-<https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_ for further details. Here are
-exposed the covered input formats for its preprocessing.
+The input is preprocessed and further mapped before the diffusion. See input mapping or `see process_input docs
+<https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_ for further details. Here we
+outline the input formats covered for its preprocessing.
 
 Scores
 --------
@@ -78,7 +78,7 @@ So you can **either** provide a **path** to a *.csv* or *.tsv* file:
 
   diffusion_scores_from_file = run_diffusion('~/data/diffusion_scores.csv', network)
 
-or **Pythonicaly** as a data structure as the *input_scores* parameter:
+or **Pythonically** as a data structure as the *input_scores* parameter:
 
 .. code-block:: python3
 
@@ -297,12 +297,12 @@ folder for some examples.
 
 Input Mapping/Coverage
 ~~~~~~~~~~~~~~~~~~~~~~
-Even though it is not relevant for the input user usage, it is relevant for the diffusion process assessment taking into
-account the input mapped entities over the background network, since the coverage of the input implies the actual
-entities-scores that are being diffused. In other words, only will be further processed for diffusion, the entities
-which label matches an entity in the network.
+Even though it is not relevant for the input user usage, taking into account the input mapped entities over the
+background network is relevant for the diffusion process assessment, since the coverage of the input implies the actual
+entities-scores that are being diffused. In other words, only the entities whose labels match an entity in the network
+will be further processed for diffusion.
 
-The diffusion running will report the mapping as follows:
+Running diffusion will report the mapping as follows:
 
 .. code-block:: RST
 
@@ -337,7 +337,7 @@ The diffusion running will report the mapping as follows:
 
 To graphically see the mapping coverage, you can also plot a `heatmap view of the mapping (see views)
 <https://github.com/multipaths/DiffuPath/blob/master/docs/source/views.rst>`_. To see how the mapping is performed over
-a input pipeline preprocessing, take a look at this `Jupyter Notebook
+an input pipeline preprocessing, take a look at this `Jupyter Notebook
 <https://nbviewer.jupyter.org/github/multipaths/Results/blob/master/notebooks/processing_datasets/dataset_1.ipynb>`_
 or `see process_input docs <https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_
 in DiffuPy.
