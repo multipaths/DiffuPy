@@ -8,6 +8,7 @@ from typing import Dict, Optional, Union, List, Set, Tuple
 
 import numpy as np
 import pandas as pd
+from numpy.core.defchararray import lower
 
 from .constants import *
 from .matrix import Matrix
@@ -22,7 +23,7 @@ log = logging.getLogger(__name__)
 def process_map_and_format_input_data_for_diff(
         data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
         kernel: Matrix,
-        method: str = 'raw',
+        method: str = Z,
         binning: Optional[bool] = False,
         absolute_value: Optional[bool] = False,
         p_value: Optional[float] = None,
@@ -70,7 +71,7 @@ def process_map_and_format_input_data_for_diff(
 
 def process_input_data(
         data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
-        method: str = RAW,
+        method: str = Z,
         binning: bool = False,
         absolute_value: bool = False,
         p_value: float = 0.05,
@@ -164,7 +165,7 @@ def _process_data_input_format(
         return from_nparray_to_df(raw_data_input)
 
     elif isinstance(raw_data_input, Matrix):
-        return raw_data_input.to_df()
+        return raw_data_input.as_pd_dataframe()
 
     else:
         raise TypeError(
@@ -276,7 +277,7 @@ def _codify_method_check(
 ) -> Dict[str, int]:
     """Classify the input data codification according the diffusion method."""
     # Prepare input data for quantitative diffusion scoring methods
-    if method == RAW or method == Z:
+    if callable(method) or method == RAW or method == Z:
         return _codify_quantitative_input_data(df, binning, absolute_value, p_value, threshold)
 
     # Prepare input data for non-quantitative diffusion methods
@@ -548,7 +549,7 @@ def map_labels_input(
         )
 
     if show_descriptive_stat:
-        print_dict_dimensions(mapping_statistics(input_labels, mapped_labels), title='Mapping descriptive statistics')
+        print_dict_dimensions(mapping_statistics(input_labels, mapped_labels), title='Mapping coverage statistics')
 
     return mapped_labels
 
@@ -593,7 +594,7 @@ def mapping_statistics(
                     subtotal_input = subtotals[mapping_type]
 
                 if subtotal_input != 0:
-                    statistics_dict[mapping_type] = (len(mapping), len(mapping) / subtotal_input)
+                    statistics_dict[mapping_type] = (len(mapping), len(mapping) / subtotal_input*100)
                 else:
                     statistics_dict[mapping_type] = (0, 0)
 
@@ -709,16 +710,18 @@ def _check_label_to_background_labels(
 
     # If the first fast mapping check do not match, perform further mapping iteration
     for entity in label_list:
-
+        label_cmp = lower(str(label))
         if isinstance(entity, set) or isinstance(entity, tuple) or isinstance(entity, list):
             for subentity in entity:
-                if not substring:
-                    if str(subentity) == label:
+                entity_cmp = lower(str(subentity))
+                if not entity_cmp:
+                    if entity_cmp == label_cmp:
                         return subentity
-                elif str(subentity) in label or label in str(subentity):
+                elif str(subentity) in label_cmp or label_cmp in str(subentity):
                     return subentity
-
-        elif substring and (str(entity) in label or label in str(entity)):
+        elif lower(str(entity)) ==  label_cmp:
+            return entity
+        elif substring and (lower(str(entity)) in label_cmp or label_cmp in lower(str(entity))):
             return entity
 
     return None
@@ -760,6 +763,7 @@ def _map_label_dict(
 
         if isinstance(label, str):
             label_bck = _check_label_to_background_labels(label, background_labels)
+
             if label_bck is not None:
                 mapped_dict[label_bck] = v
 

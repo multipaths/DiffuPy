@@ -11,7 +11,7 @@ from typing import Optional, Callable, Union
 
 import click
 
-from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON
+from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON, Z
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
 from .process_input import process_map_and_format_input_data_for_diff
@@ -143,7 +143,7 @@ def diffuse(
         input: str,
         network: str,
         output: Optional[str] = os.path.join(OUTPUT, 'diffusion_scores.csv'),
-        method: Union[str, Callable] = RAW,
+        method: Union[str, Callable] = Z,
         binarize: Optional[bool] = False,
         threshold: Optional[float] = None,
         absolute_value: Optional[bool] = False,
@@ -188,7 +188,7 @@ def diffuse(
     )
 
     if format_output == CSV:
-        results.to_csv(output)
+        results.as_csv(output)
 
     if format_output == JSON:
         json.dump(results, output, indent=2)
