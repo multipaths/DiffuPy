@@ -11,7 +11,7 @@ from typing import Optional, Callable, Union
 
 import click
 
-from .constants import OUTPUT, METHODS, EMOJI, RAW, CSV, JSON
+from .constants import OUTPUT, METHODS, EMOJI, Z, CSV, JSON
 from .diffuse import diffuse as run_diffusion
 from .kernels import regularised_laplacian_kernel
 from .process_input import process_map_and_format_input_data_for_diff
@@ -100,7 +100,7 @@ def kernel(
     '-m', '--method',
     help='Diffusion method',
     type=click.Choice(METHODS),
-    default=RAW,
+    default=Z,
 )
 @click.option(
     '-b', '--binarize',
