@@ -16,6 +16,7 @@ import pandas as pd
 import pybel
 
 from networkx import Graph
+from numpy.core.defchararray import upper
 
 from .constants import *
 from .constants import CSV, TSV, GRAPH_FORMATS
@@ -246,7 +247,7 @@ def munge_label(label: Union[str, int, float]) -> str:
     split_set = ['/']
     # split_set = ['/', ', ', ' and ']
 
-    label = str(label).lower()
+    label = str(label)
 
     for symb in remove_set:
         if symb in label:
@@ -259,7 +260,6 @@ def munge_label(label: Union[str, int, float]) -> str:
                 label = label[0]
 
     return label
-
 
 def munge_label_list(labels: list) -> List[str]:
     """Munge labels list."""

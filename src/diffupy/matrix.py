@@ -502,7 +502,7 @@ class Matrix:
 
         return d
 
-    def to_df(self, ordered=True):
+    def as_pd_dataframe(self, ordered=True):
         """Export matrix as a data frame using the headers (row_labels, cols_labels) of the Matrix class."""
         d = self.to_dict(ordered)
 
@@ -513,11 +513,11 @@ class Matrix:
 
         return df
 
-    def to_csv(self, path, index=True, ordered=True):
+    def as_csv(self, path, index=True, ordered=True):
         """Export matrix to csv file using the headers (row_labels, cols_labels) of the Matrix class."""
         # Generate dataframe
 
-        self.to_df(ordered).to_csv(path, index=index)
+        self.as_pd_dataframe(ordered).to_csv(path, index=index)
 
     def to_nx_graph(self):
         """Export matrix as a Graph using the headers (row_labels, cols_labels) of the Matrix class."""

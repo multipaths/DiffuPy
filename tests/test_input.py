@@ -26,7 +26,8 @@ class ValidateTest(unittest.TestCase):
         input_labels_dict = process_input_data(
             input, method=RAW, binning=True, absolute_value=True, p_value=0.05, threshold=None,
         )
-        self.assertEqual(input_labels_dict, {'Metabolite': {'C': 1}, 'Gene': {'A': 1, 'B': 1, 'D': 1, 'E': 1}})
+        self.assertEqual(input_labels_dict, {'Metabolite': {'C': 1, 'E': 1}, 'Gene': {'A': 1, 'B': 1, 'D': 1, 'F': 1},
+                                             'Pathology': {'G': 1}})
 
     def test_quantitative_bin_fc_sign(self):
         """Test codify label_input for quantitative scoring methods- logFC given (binary, signed labels)."""
@@ -98,7 +99,8 @@ class ValidateTest(unittest.TestCase):
         input_labels_dict = process_input_data(
             input, method=ML, binning=True, absolute_value=True, p_value=0.05, threshold=None,
         )
-        self.assertEqual(input_labels_dict, {'Metabolite': {'C': 1}, 'Gene': {'A': 1, 'B': 1, 'D': 1, 'E': 1}})
+        self.assertEqual(input_labels_dict, {'Metabolite': {'C': 1, 'E': 1}, 'Gene': {'A': 1, 'B': 1, 'D': 1, 'F': 1},
+                                             'Pathology': {'G': 1}})
 
     def test_non_quantitative_bin_fc_abs(self):
         """Test codify label_input for non-quantitative scoring methods- logFC given (binary, absolute values (sign))."""
@@ -125,17 +127,17 @@ class ValidateTest(unittest.TestCase):
 
     def test_map_labels_input_label_list_background_dict(self):
         """Test map label_input."""
-        mapping = map_labels_input(input_labels=['A', 'B', 'C', 'D'],
+        mapping = map_labels_input(input_labels=['A', 'C', 'D'],
                                    background_labels={'Gene': ['A', 'B'], 'Metabolite': ['C']})
 
-        self.assertEqual(mapping, {'Gene': ['A', 'B'], 'Metabolite': ['C']})
+        self.assertEqual(mapping, {'Gene': ['A'], 'Metabolite': ['C']})
 
     def test_map_labels_input_type_dict_label_list_background_list(self):
         """Test map label_input."""
-        mapping = map_labels_input(input_labels={'Gene': ['A', 'B'], 'Metabolite': ['C', 'D']},
+        mapping = map_labels_input(input_labels={'Gene': ['A'], 'Metabolite': ['C', 'D']},
                                    background_labels=['A', 'B', 'C'])
 
-        self.assertEqual(mapping, {'Gene': ['A', 'B'], 'Metabolite': ['C']})
+        self.assertEqual(mapping, {'Gene': ['A'], 'Metabolite': ['C']})
 
     def test_map_labels_input_type_dict_label_dict_background_dict(self):
         """Test map label_input."""

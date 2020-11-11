@@ -11,10 +11,9 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from diffupy.kernels import regularised_laplacian_kernel
-from diffupy.process_input import process_map_and_format_input_data_for_diff
-from diffupy.process_network import get_kernel_from_network_path
-
+from .kernels import regularised_laplacian_kernel
+from .process_input import process_map_and_format_input_data_for_diff
+from .process_network import get_kernel_from_network_path, get_graph_from_network_path
 from .constants import *
 from .diffuse_raw import diffuse_raw
 from .matrix import Matrix
@@ -51,6 +50,14 @@ def run_diffusion(
     :param p_value: Statistical significance. By default 0.05
     :param kernel_method: Callable method for kernel computation.
     """
+    log.info(f"{EMOJI} Loading graph. {EMOJI}")
+
+    # Allow custom method function.
+    if callable(method):
+        diff_call = diffuse_callable(method, network)
+        if diff_call:
+            return diff_call
+
     if isinstance(network, nx.Graph):
         kernel = kernel_method(network)
     elif isinstance(network, Matrix):
@@ -63,6 +70,8 @@ def run_diffusion(
             f'{GRAPH_FORMATS}'
         )
 
+    log.info(f"{EMOJI} Processing data input. {EMOJI}")
+
     formated_input_scores = process_map_and_format_input_data_for_diff(input_labels,
                                                                        kernel,
                                                                        method,
@@ -71,6 +80,13 @@ def run_diffusion(
                                                                        p_value,
                                                                        threshold,
                                                                        )
+
+    # Allow custom method function.
+    if callable(method):
+        return diffuse_callable(method, network, formated_input_scores)
+
+    log.info(f"{EMOJI} Computing the diffusion algorithm. {EMOJI}")
+
     return diffuse(formated_input_scores, method, k=kernel)
 
 
@@ -112,14 +128,7 @@ def diffuse(
         else:
             network = kwargs['k']
 
-        if len(inspect.getfullargspec(method).args) == 1:
-            return method(network)
-        elif len(inspect.getfullargspec(method).args) == 2:
-            return method(network, scores)
-        elif len(inspect.getfullargspec(method).args) > 2:
-            return method(graph, scores, **kwargs)
-        else:
-            raise ValueError(f"Method function arguments not allowed {type(method).__name__}")
+        return diffuse_callable(network, network, input_scores, **kwargs)
 
     elif isinstance(method, str):
 
@@ -187,3 +196,20 @@ def diffuse(
             raise ValueError(f"Method not allowed {method}")
 
     raise ValueError(f"Method type not allowed {type(method).__name__}")
+
+
+def diffuse_callable(method_funct, network, scores=None, **kwargs):
+    req_args = len(inspect.getfullargspec(method_funct).args) - len(inspect.getfullargspec(method_funct).defaults)
+    if isinstance(network, str):
+        network = get_graph_from_network_path(network)
+
+    if req_args == 1:
+        return method_funct(network)
+    elif req_args == 2 and scores:
+        return method_funct(network, scores)
+    elif req_args > 2 and scores:
+        return method_funct(network, scores, **kwargs)
+    elif scores:
+        raise ValueError(f"Method function arguments not allowed {type(method_funct).__name__}")
+    else:
+        return None
