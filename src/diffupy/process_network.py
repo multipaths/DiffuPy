@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Miscellaneous utils of the package."""
+import inspect
 import logging
 from typing import Tuple, Union, List, Optional, Callable
 
@@ -22,6 +23,8 @@ log = logging.getLogger(__name__)
 
 
 def get_kernel_and_graph_from_network_path(path: str,
+                                           filter_network_database: Optional[List[str]] = None,
+                                           filter_network_omic: Optional[List[str]] = None,
                                            kernel_method: Optional[Callable] = regularised_laplacian_kernel
                                            ) -> Tuple[Matrix, Graph]:
     """Load network provided in cli as a kernel and as a graph."""
@@ -37,6 +40,18 @@ def get_kernel_and_graph_from_network_path(path: str,
 
     elif path.endswith(GRAPH_FORMATS):
         graph = process_graph_from_file(path)
+
+        if filter_network_database:
+            graph = get_subgraph_by_annotation_value(graph,
+                                                     'database',
+                                                     filter_network_database
+                                                     )
+
+        if filter_network_omic:
+            graph = get_subgraph_by_annotation_value(graph,
+                                                     'enity_type',
+                                                     filter_network_omic
+                                                     )
 
     else:
         raise IOError(
@@ -93,7 +108,10 @@ def get_kernel_from_network_path(path: str,
             f'{GRAPH_FORMATS}'
         )
 
-    return kernel_method(graph, normalized=normalized)
+    if 'normalized' in inspect.getfullargspec(kernel_method).args:
+        return kernel_method(graph, normalized=normalized)
+    else:
+        return kernel_method(graph)
 
 
 def get_graph_from_network_path(path: str) -> Graph:
@@ -135,7 +153,7 @@ def process_graph_from_file(path: str) -> Graph:
         graph = read_graphml(path)
 
     elif path.endswith(GML):
-        graph = read_gml(path)
+        graph = read_gml(path, label='id')
 
     elif path.endswith(BEL):
         graph = pybel.from_path(path)
@@ -268,4 +286,8 @@ def get_graph_from_df(path: str, sep: str) -> DiGraph:
             )
 
         else:
-            gr
+            graph.add_edge(
+                sub_name, obj_name,
+            )
+
+    return graph
