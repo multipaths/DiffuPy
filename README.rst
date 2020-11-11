@@ -52,7 +52,11 @@ For its usability, you can either:
 
   from diffupy.diffuse import run_diffusion
 
-  diffusion_scores = run_diffusion(input_scores, network).to_dict()
+  # DATA INPUT and GRAPH as PATHs -> returned as *PandasDataFrame*
+  diffusion_scores = run_diffusion(~/data/input_scores.csv, ~/data/network.csv).as_pd_dataframe()
+
+  # DATA INPUT and GRAPH as Python OBJECTS -> exported *as_csv*
+  diffusion_scores = run_diffusion(input_scores, network).as_csv('~/output/diffusion_results.csv')
 
 .. automodule:: diffupy.diffuse
    :members:
@@ -68,11 +72,11 @@ or providing a custom method function. See the `diffusion Methods and/or Method 
 
 .. code-block:: python3
 
-  diffusion_scores_select_method = run(input_scores, method = 'raw')
+  diffusion_scores_select_method = run_diffusion(input_scores, method = 'raw')
 
   from networkx import page_rank # Custom method function
 
-  diffusion_scores_custom_method = run(input_scores, method = page_rank)
+  diffusion_scores_custom_method = run_diffusion(input_scores, method = page_rank)
 
 You can also provide your own kernel method or select among other provided in *kernels.py* function you can provide it as *kernel_method* argument.
 By default *regularised_laplacian_kernel* is used.
@@ -81,7 +85,7 @@ By default *regularised_laplacian_kernel* is used.
 
   from diffupath.kernels import p_step_kernel # Custom kernel calculation function
 
-  diffusion_scores_custom_kernel_method = run(input_scores, method = 'raw', kernel_method = p_step_kernel)
+  diffusion_scores_custom_kernel_method = run_diffusion(input_scores, method = 'raw', kernel_method = p_step_kernel)
 
 So *method* stands for the **diffusion process** method, and *kernel_method* for the **kernel calculation** method.
 
@@ -413,8 +417,8 @@ be exported into the following formats:
 .. code-block:: python3
 
   diffusion_scores.to_dict()
-  diffusion_scores.to_df()
-  diffusion_scores.to_csv()
+  diffusion_scores.as_pd_dataframe()
+  diffusion_scores.as_csv()
   diffusion_scores.to_nx_graph()
 
 
