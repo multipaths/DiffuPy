@@ -12,7 +12,7 @@ from diffupy.matrix import Matrix, MatrixFromDataFrame, MatrixFromDict, MatrixFr
 from diffupy.utils import from_dataframe_file, format_checker, from_pickle, get_label_node, from_json
 from networkx import DiGraph, Graph, read_graphml, read_gml, node_link_graph, read_edgelist, nx
 
-from pybel import get_subgraph_by_annotation_value
+from pybel.struct.mutation.induction.annotations import get_subgraph_by_annotation_value
 from .constants import *
 from .constants import CSV, TSV, GRAPHML, GML, BEL, PICKLE, EMOJI, GRAPH_FORMATS
 from .kernels import regularised_laplacian_kernel
@@ -76,16 +76,16 @@ def get_kernel_from_network_path(path: str,
                                  ) -> Matrix:
     """Load network provided in cli (as a graph or as a kernel) retrieving a kernel."""
     if path.endswith(KERNEL_FORMATS):
+        if filter_network_omic or filter_network_database:
+            raise ValueError(
+                "The provided network can not be filtered, since has been provided as a kernel. "
+                "For filtering, please provide the network formated as a graph.")
+
         try:
             graph = process_graph_from_file(path)
 
         except TypeError:
             return process_kernel_from_file(path)
-
-        if filter_network_omic or filter_network_database:
-            raise ValueError(
-                "The provided network can not be filtered, since has been provided as a kernel. "
-                "For filtering, please provide the network formated as a graph.")
 
     elif path.endswith(GRAPH_FORMATS):
         graph = process_graph_from_file(path)

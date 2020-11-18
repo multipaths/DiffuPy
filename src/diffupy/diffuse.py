@@ -204,7 +204,7 @@ def diffuse_callable(method_funct, network, scores=None, **kwargs):
         network = get_graph_from_network_path(network)
 
     if req_args == 1:
-        return method_funct(network)
+        return method_funct(nx.Graph(network))
     elif req_args == 2 and scores:
         return method_funct(network, scores)
     elif req_args > 2 and scores:
