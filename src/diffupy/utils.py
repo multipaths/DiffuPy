@@ -143,9 +143,16 @@ def print_dict_dimensions(entities_db, title='Title', message=''):
         m += f'\n{message}{k1}:\n'
         if isinstance(v1, dict):
             for k2, v2 in v1.items():
-                m += f'{k2}  {v2}\n'
+                if isinstance(v2, tuple):
+                    m += f'{k2}  {v2[0]} mapped entities, {v2[1]*100}% input {k2} coverage.\n'
+                else:
+                    print()
+                    m += f'{k2}  {v2}\n'
         else:
-            m += f'{v1}'
+            if isinstance(v1, tuple):
+                m += f'{v1[0]} mapped entities, {v1[1]*100}% input coverage\n'
+            else:
+                m += f'{v1}'
 
     print(f'{m}\n')
 
