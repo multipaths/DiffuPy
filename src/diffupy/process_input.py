@@ -482,8 +482,9 @@ def _two_dimensional_type_dict_label_list_data_struct_check(v: Union[dict, list]
         get_random_value_from_dict(get_random_value_from_dict(v)))
 
 
-def munge_labels(labels: Union[List[str], Dict[str, Union[int, str]]]) \
-    -> Union[List[str], Dict[str, Union[list, int, str]], Dict[str, Union[List[str], Dict[str, Union[int, str]]]]]:
+def munge_labels(
+    labels: Union[List[str], Dict[str, Union[int, str]]]
+) -> Union[List[str], Dict[str, Union[list, int, str]], Dict[str, Union[List[str], Dict[str, Union[int, str]]]]]:
     """Munge labels general checker for different treatment."""
     if _label_list_data_struct_check(labels):
         return munge_label_list(labels)
