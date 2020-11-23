@@ -21,16 +21,16 @@ log = logging.getLogger(__name__)
 
 
 def process_map_and_format_input_data_for_diff(
-        data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
-        kernel: Matrix,
-        method: str = Z,
-        binning: Optional[bool] = False,
-        absolute_value: Optional[bool] = False,
-        p_value: Optional[float] = None,
-        threshold: Optional[float] = None,
-        background_labels: Optional[Union[list, Dict[str, list]]] = None,
-        show_statistics: bool = True,
-        **further_parse_args
+    data_input: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
+    kernel: Matrix,
+    method: str = Z,
+    binning: Optional[bool] = False,
+    absolute_value: Optional[bool] = False,
+    p_value: Optional[float] = None,
+    threshold: Optional[float] = None,
+    background_labels: Optional[Union[list, Dict[str, list]]] = None,
+    show_statistics: bool = True,
+    **further_parse_args
 ) -> Matrix:
     """Process miscellaneous data input, perform the mapping to the diffusion background network (as a kernel) and format it for the diffusion computation function.
 
@@ -70,13 +70,13 @@ def process_map_and_format_input_data_for_diff(
 
 
 def process_input_data(
-        data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
-        method: str = Z,
-        binning: bool = False,
-        absolute_value: bool = False,
-        p_value: float = 0.05,
-        threshold: Optional[float] = 0.5,
-        **further_parse_args
+    data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
+    method: str = Z,
+    binning: bool = False,
+    absolute_value: bool = False,
+    p_value: float = 0.05,
+    threshold: Optional[float] = 0.5,
+    **further_parse_args
 ) -> Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]]:
     """Pipeline the provided miscellaneous data input for further processing, in the following standardized data structures: label list, type_dict label lists, label-scores dict or type_dict label-scores dicts.
 
@@ -128,9 +128,9 @@ def process_input_data(
 
 
 def _process_data_input_format(
-        raw_data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
-        separ_str: str = ', ',
-        **further_parse_args
+    raw_data_input: Union[str, list, dict, np.ndarray, pd.DataFrame],
+    separ_str: str = ', ',
+    **further_parse_args
 ) -> Union[pd.DataFrame, list, Dict[str, Union[pd.DataFrame, list]]]:
     """Format the input as a label-score dataframe, a list or a labels or a type dict for latter input processing."""
     if isinstance(raw_data_input, str):
@@ -208,13 +208,13 @@ def _load_data_input_from_file(path: str, **further_parse_args) -> Union[pd.Data
 
 
 def _codify_input_data(
-        df: pd.DataFrame,
-        method: str,
-        binning: bool,
-        absolute_value: bool,
-        p_value: float,
-        threshold: Optional[float],
-        cols_titles_mapping: Optional[Dict[str, str]] = None
+    df: pd.DataFrame,
+    method: str,
+    binning: bool,
+    absolute_value: bool,
+    p_value: float,
+    threshold: Optional[float],
+    cols_titles_mapping: Optional[Dict[str, str]] = None
 ) -> Union[Dict[str, Dict[str, int]], Dict[str, int]]:
     """Process the input scores dataframe for the codifying process."""
     # Rename dataframe column titles according (if) provided label_mapping.
@@ -268,12 +268,12 @@ def _codify_input_data(
 
 
 def _codify_method_check(
-        df: pd.DataFrame,
-        method: str,
-        binning: bool,
-        absolute_value: bool,
-        p_value: float,
-        threshold: Optional[float],
+    df: pd.DataFrame,
+    method: str,
+    binning: bool,
+    absolute_value: bool,
+    p_value: float,
+    threshold: Optional[float],
 ) -> Dict[str, int]:
     """Classify the input data codification according the diffusion method."""
     # Prepare input data for quantitative diffusion scoring methods
@@ -293,9 +293,9 @@ def _codify_method_check(
 
 
 def _codify_non_quantitative_input_data(
-        df: pd.DataFrame,
-        p_value: float,
-        threshold: Optional[float]
+    df: pd.DataFrame,
+    p_value: float,
+    threshold: Optional[float]
 ) -> Dict[str, int]:
     """Codify input data to get a set of scored nodes for scoring methods that accept non-quantitative values."""
     # LogFC provided in dataset and threshold given
@@ -322,11 +322,11 @@ def _codify_non_quantitative_input_data(
 
 
 def _codify_quantitative_input_data(
-        df: pd.DataFrame,
-        binning: bool,
-        absolute_value: bool,
-        p_value: float,
-        threshold: Optional[float],
+    df: pd.DataFrame,
+    binning: bool,
+    absolute_value: bool,
+    p_value: float,
+    threshold: Optional[float],
 ) -> Dict[str, int]:
     """Codify input data to get a set of scored nodes for scoring methods that accept quantitative values."""
     # LogFC provided in dataset and threshold given
@@ -359,9 +359,9 @@ def _codify_quantitative_input_data(
 
 
 def _bin_quantitative_input_by_abs_val(
-        df: pd.DataFrame,
-        threshold: float,
-        p_value: float,
+    df: pd.DataFrame,
+    threshold: float,
+    p_value: float,
 ) -> Dict[str, int]:
     """Process quantitative inputs and bin scores by absolute value."""
     # Add score 1 if | logFC | is above threshold
@@ -377,9 +377,9 @@ def _bin_quantitative_input_by_abs_val(
 
 
 def _bin_quantitative_input_by_threshold(
-        df: pd.DataFrame,
-        threshold: float,
-        p_value: float,
+    df: pd.DataFrame,
+    threshold: float,
+    p_value: float,
 ) -> Dict[str, int]:
     """Process quantitative inputs and bin scores by threshold."""
     # Add score 1 if logFC is above threshold
@@ -402,9 +402,9 @@ def _bin_quantitative_input_by_threshold(
 
 
 def _codify_quantitative_input_by_abs_val(
-        df: pd.DataFrame,
-        threshold: float,
-        p_value: float,
+    df: pd.DataFrame,
+    threshold: float,
+    p_value: float,
 ) -> Dict[str, int]:
     """Codify nodes with | logFC | if they pass threshold, otherwise score is 0."""
     # Codify nodes with | logFC | if they pass threshold
@@ -421,9 +421,9 @@ def _codify_quantitative_input_by_abs_val(
 
 
 def _codify_quantitative_input_by_threshold(
-        df: pd.DataFrame,
-        threshold: float,
-        p_value: float,
+    df: pd.DataFrame,
+    threshold: float,
+    p_value: float,
 ) -> Dict[str, int]:
     """Codify inputs with logFC if they pass threshold value."""
     df.loc[df[LOG_FC] >= threshold, SCORE] = df[LOG_FC]
@@ -482,8 +482,9 @@ def _two_dimensional_type_dict_label_list_data_struct_check(v: Union[dict, list]
         get_random_value_from_dict(get_random_value_from_dict(v)))
 
 
-def munge_labels(labels: Union[List[str], Dict[str, Union[int, str]]]) \
-        -> Union[List[str], Dict[str, Union[list, int, str]], Dict[str, Union[List[str], Dict[str, Union[int, str]]]]]:
+def munge_labels(
+    labels: Union[List[str], Dict[str, Union[int, str]]]
+) -> Union[List[str], Dict[str, Union[list, int, str]], Dict[str, Union[List[str], Dict[str, Union[int, str]]]]]:
     """Munge labels general checker for different treatment."""
     if _label_list_data_struct_check(labels):
         return munge_label_list(labels)
@@ -502,9 +503,9 @@ def munge_labels(labels: Union[List[str], Dict[str, Union[int, str]]]) \
 
 
 def map_labels_input(
-        input_labels: Union[list, Dict[str, int], Dict[str, list], Dict[str, Dict[str, int]]],
-        background_labels: Union[list, Dict[str, list], Dict[str, Dict[str, list]]],
-        show_descriptive_stat: bool = False
+    input_labels: Union[list, Dict[str, int], Dict[str, list], Dict[str, Dict[str, int]]],
+    background_labels: Union[list, Dict[str, list], Dict[str, Dict[str, list]]],
+    show_descriptive_stat: bool = False
 ) -> Union[Dict[str, int], list]:
     """Get the mappings from preprocessed input_labels."""
     log.info("Mapping the input labels to the background labels reference.")
@@ -555,9 +556,9 @@ def map_labels_input(
 
 
 def mapping_statistics(
-        input_labels: Union[list, Dict[str, Dict[str, list]], Dict[str, list]],
-        mapped_labels: Union[list, Dict[str, Dict[str, list]], Dict[str, list]],
-        subtotals: Dict[str, int] = None
+    input_labels: Union[list, Dict[str, Dict[str, list]], Dict[str, list]],
+    mapped_labels: Union[list, Dict[str, Dict[str, list]], Dict[str, list]],
+    subtotals: Dict[str, int] = None
 ) -> Dict:
     """Calculate mapping descriptive statistics."""
     statistics_dict = {}
@@ -594,7 +595,7 @@ def mapping_statistics(
                     subtotal_input = subtotals[mapping_type]
 
                 if subtotal_input != 0:
-                    statistics_dict[mapping_type] = (len(mapping), len(mapping) / subtotal_input*100)
+                    statistics_dict[mapping_type] = (len(mapping), len(mapping) / subtotal_input * 100)
                 else:
                     statistics_dict[mapping_type] = (0, 0)
 
@@ -651,8 +652,8 @@ def mapping_statistics(
 
 
 def _map_labels(
-        input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-        background_labels: list,
+    input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
+    background_labels: list,
 ) -> Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]]:
     """Map nodes from input dataset to nodes in network to get a set of labelled and unlabelled nodes."""
     if _label_list_data_struct_check(input_labels):
@@ -680,9 +681,9 @@ def _map_labels(
 
 
 def _map_labels_to_background(
-        input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
-        background_labels: list,
-        background_labels_type: str = None,
+    input_labels: Union[list, Dict[str, Dict[str, int]], Dict[str, int], Dict[str, list]],
+    background_labels: list,
+    background_labels_type: str = None,
 ) -> Union[Dict[str, Dict[str, int]], Dict[str, int]]:
     """Map labels from preprocessed input to background_labels to get a set of matched labels."""
     if _type_dict_label_scores_dict_data_struct_check(input_labels) or \
@@ -700,9 +701,9 @@ def _map_labels_to_background(
 
 
 def _check_label_to_background_labels(
-        label: str,
-        label_list: List[Union[str, Tuple[str]]],
-        substring: bool = False
+    label: str,
+    label_list: List[Union[str, Tuple[str]]],
+    substring: bool = False
 ) -> Union[str, None]:
     """Check if label string in a label list, also check further if substring checking."""
     if label in label_list:
@@ -719,7 +720,7 @@ def _check_label_to_background_labels(
                         return subentity
                 elif str(subentity) in label_cmp or label_cmp in str(subentity):
                     return subentity
-        elif lower(str(entity)) ==  label_cmp:
+        elif lower(str(entity)) == label_cmp:
             return entity
         elif substring and (lower(str(entity)) in label_cmp or label_cmp in lower(str(entity))):
             return entity
@@ -728,8 +729,8 @@ def _check_label_to_background_labels(
 
 
 def _map_label_list(
-        input_labels: Union[str, Set[str], List[str]],
-        background_labels: List[str]
+    input_labels: Union[str, Set[str], List[str]],
+    background_labels: List[str]
 ) -> List[str]:
     """Map labels from preprocessed input to background_labels LIST to get a set of matched labels."""
     mapped_list = []
@@ -751,8 +752,8 @@ def _map_label_list(
 
 
 def _map_label_dict(
-        input_labels: Dict[Union[str, set], Union[int, float]],
-        background_labels: list
+    input_labels: Dict[Union[str, set], Union[int, float]],
+    background_labels: list
 ) -> Dict[str, Union[int, float]]:
     """Map labels from preprocessed input to background_labels DICT to get a set of matched labels."""
     mapped_dict = {}
@@ -784,10 +785,10 @@ def _map_label_dict(
 
 
 def format_input_for_diffusion(
-        processed_input: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
-        kernel: Matrix,
-        missing_value: int = -1,
-        title=''
+    processed_input: Union[list, Dict[str, int], Dict[str, Dict[str, int]], Dict[str, list]],
+    kernel: Matrix,
+    missing_value: int = -1,
+    title=''
 ) -> Matrix:
     """Format/generate input vector/matrix according the data structure of the processed_data_input."""
     log.info("Formatting the processed to the reference kernel Matrix.")
@@ -832,13 +833,13 @@ def format_input_for_diffusion(
 
 
 def format_categorical_input_vector_from_label_list(
-        rows_labeled: Union[set, list],
-        col_label: Union[str, set, list],
-        kernel: Matrix,
-        missing_value: int = -1,
-        rows_unlabeled=None,
-        i: int = None,
-        title=''
+    rows_labeled: Union[set, list],
+    col_label: Union[str, set, list],
+    kernel: Matrix,
+    missing_value: int = -1,
+    rows_unlabeled=None,
+    i: int = None,
+    title=''
 ) -> Matrix:
     """Generate categoric input vector from labels."""
     if isinstance(col_label, str):
@@ -868,12 +869,12 @@ def format_categorical_input_vector_from_label_list(
 
 
 def format_categorical_input_matrix_from_label_list(
-        rows_labels: Union[set, list],
-        cols_labels: Union[set, list],
-        kernel: Matrix,
-        missing_value: int = -1,
-        rows_unlabeled=None,
-        title=''
+    rows_labels: Union[set, list],
+    cols_labels: Union[set, list],
+    kernel: Matrix,
+    missing_value: int = -1,
+    rows_unlabeled=None,
+    title=''
 ) -> Matrix:
     """Generate input vector from labels."""
     if not isinstance(cols_labels, list):
@@ -918,13 +919,13 @@ def format_categorical_input_matrix_from_label_list(
 
 
 def format_input_vector_from_label_score_dict(
-        labels_scores_dict: Dict[str, int],
-        kernel: Matrix,
-        col_label: str = 'scores',
-        missing_value: int = -1,
-        rows_unlabeled: dict = None,  # TODO: To discuss
-        type_k: bool = False,
-        title=''
+    labels_scores_dict: Dict[str, int],
+    kernel: Matrix,
+    col_label: str = 'scores',
+    missing_value: int = -1,
+    rows_unlabeled: dict = None,  # TODO: To discuss
+    type_k: bool = False,
+    title=''
 ) -> Matrix:
     """Generate scores input vector from labels scores dict."""
     input_mat = Matrix(
@@ -952,11 +953,11 @@ def format_input_vector_from_label_score_dict(
 
 
 def format_input_matrix_from_type_label_score_dict(
-        type_dict_labels_scores_dict: Union[Dict[str, Dict[str, int]], Dict[str, int]],
-        kernel,
-        missing_value: int = -1,
-        rows_unlabeled=None,  # TODO: To discuss
-        title=''
+    type_dict_labels_scores_dict: Union[Dict[str, Dict[str, int]], Dict[str, int]],
+    kernel,
+    missing_value: int = -1,
+    rows_unlabeled=None,  # TODO: To discuss
+    title=''
 ) -> Matrix:
     """Generate input matrix from labels scores dict and/or handle type classification by columns."""
     if _type_dict_label_scores_dict_data_struct_check(type_dict_labels_scores_dict):
