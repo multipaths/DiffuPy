@@ -11,8 +11,8 @@ import pybel
 from diffupy.matrix import Matrix, MatrixFromDataFrame, MatrixFromDict, MatrixFromNumpyArray
 from diffupy.utils import from_dataframe_file, format_checker, from_pickle, get_label_node, from_json
 from networkx import DiGraph, Graph, read_graphml, read_gml, node_link_graph, read_edgelist, nx
-
 from pybel.struct.mutation.induction.annotations import get_subgraph_by_annotation_value
+
 from .constants import *
 from .constants import CSV, TSV, GRAPHML, GML, BEL, PICKLE, EMOJI, GRAPH_FORMATS
 from .kernels import regularised_laplacian_kernel
@@ -72,18 +72,16 @@ def get_kernel_from_network_path(path: str,
                                  normalized: bool = False,
                                  filter_network_database: Optional[List[str]] = None,
                                  filter_network_omic: Optional[List[str]] = None,
-                                 kernel_method: Optional[Callable] = regularised_laplacian_kernel
+                                 kernel_method: Optional[Callable] = regularised_laplacian_kernel,
                                  ) -> Matrix:
     """Load network provided in cli (as a graph or as a kernel) retrieving a kernel."""
-    if path.endswith(KERNEL_FORMATS):
-        if filter_network_omic or filter_network_database:
-            raise ValueError(
-                "The provided network can not be filtered, since has been provided as a kernel. "
-                "For filtering, please provide the network formated as a graph.")
-
+    if path.endswith(KERNEL_FORMATS) and filter_network_omic is None and filter_network_database is None:
         try:
             graph = process_graph_from_file(path)
-
+            if filter_network_omic or filter_network_database:
+                raise ValueError(
+                    "The provided network can not be filtered, since has been provided as a kernel. "
+                    "For filtering, please provide the network formated as a graph.")
         except TypeError:
             return process_kernel_from_file(path)
 
@@ -108,6 +106,27 @@ def get_kernel_from_network_path(path: str,
             f'{GRAPH_FORMATS}'
         )
 
+    return get_kernel_from_graph(graph, kernel_method, normalized)
+
+
+def filter_graph(graph: nx.Graph, filter_network_database=None, filter_network_omic=None) -> nx.Graph:
+    """Filter graph by database or/and by omic."""
+    if filter_network_database:
+        graph = get_subgraph_by_annotation_value(graph,
+                                                 'database',
+                                                 filter_network_database
+                                                 )
+
+    if filter_network_omic:
+        graph = get_subgraph_by_annotation_value(graph,
+                                                 'enity_type',
+                                                 filter_network_omic
+                                                 )
+    return graph
+
+
+def get_kernel_from_graph(graph, kernel_method, normalized=False):
+    """Get kernel from graph given a kernel method."""
     if 'normalized' in inspect.getfullargspec(kernel_method).args:
         return kernel_method(graph, normalized=normalized)
     else:

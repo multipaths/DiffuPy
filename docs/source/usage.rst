@@ -313,31 +313,31 @@ Running diffusion will report the mapping as follows:
    Mapping descriptive statistics
 
    wikipathways:
-   gene_nodes  (474, 0.1538961038961039)
-   mirna_nodes  (2, 0.046511627906976744)
-   metabolite_nodes  (12, 0.75)
-   bp_nodes  (1, 0.004464285714285714)
-   total  (489, 0.14540588760035683)
+   gene_nodes  (474 mapped entities, 15.38% input coverage)
+   mirna_nodes  (2 mapped entities, 4.65% input coverage)
+   metabolite_nodes  (12 mapped entities, 75.0% input coverage)
+   bp_nodes  (1 mapped entities, 0.45% input coverage)
+   total  (489 mapped entities, 14.54% input coverage)
 
    kegg:
-   gene_nodes  (1041, 0.337987012987013)
-   mirna_nodes  (3, 0.06976744186046512)
-   metabolite_nodes  (6, 0.375)
-   bp_nodes  (12, 0.05357142857142857)
-   total  (1062, 0.3157894736842105)
+   gene_nodes  (1041 mapped entities, 33.80% input coverage)
+   mirna_nodes  (3 mapped entities, 6.98% input coverage)
+   metabolite_nodes  (6 mapped entities, 0.375% input coverage)
+   bp_nodes  (12 mapped entities, 5.36% input coverage)
+   total  (1062 mapped entities, 31.58% input coverage)
 
    reactome:
-   gene_nodes  (709, 0.2301948051948052)
-   mirna_nodes  (1, 0.023255813953488372)
-   metabolite_nodes  (6, 0.375)
-   total  (716, 0.22809812042051608)
+   gene_nodes  (709 mapped entities, 23.02% input coverage)
+   mirna_nodes  (1 mapped entities, 2.33% input coverage)
+   metabolite_nodes  (6 mapped entities, 37.5% input coverage)
+   total  (716 mapped entities, 22.8% input coverage)
 
    total:
-   gene_nodes  (1461, 0.4344335414808207)
-   mirna_nodes  (4, 0.0011894142134998512)
-   metabolite_nodes  (13, 0.003865596193874517)
-   bp_nodes  (13, 0.003865596193874517)
-   total  (1491, 0.4433541480820696)
+   gene_nodes  (1461 mapped entities, 43.44% input coverage)
+   mirna_nodes  (4 mapped entities, 0.12% input coverage)
+   metabolite_nodes  (13 mapped entities, 0.38% input coverage)
+   bp_nodes  (13 mapped entities, 0.39% input coverage)
+   total  (1491 mapped entities, 44.34% input coverage)
 
 To graphically see the mapping coverage, you can also plot a `heatmap view of the mapping (see views)
 <https://github.com/multipaths/DiffuPath/blob/master/docs/source/views.rst>`_. To see how the mapping is performed over
