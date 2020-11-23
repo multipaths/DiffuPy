@@ -14,9 +14,7 @@ import numpy as np
 import openpyxl as opxl
 import pandas as pd
 import pybel
-
 from networkx import Graph
-from numpy.core.defchararray import upper
 
 from .constants import *
 from .constants import CSV, TSV, GRAPH_FORMATS
@@ -144,13 +142,13 @@ def print_dict_dimensions(entities_db, title='Title', message=''):
         if isinstance(v1, dict):
             for k2, v2 in v1.items():
                 if isinstance(v2, tuple):
-                    m += f'{k2}  {v2[0]} mapped entities, {v2[1]*100}% input {k2} coverage.\n'
+                    m += f'{k2}  {v2[0]} mapped entities, {v2[1] * 100}% input {k2} coverage.\n'
                 else:
                     print()
                     m += f'{k2}  {v2}\n'
         else:
             if isinstance(v1, tuple):
-                m += f'{v1[0]} mapped entities, {v1[1]*100}% input coverage\n'
+                m += f'{v1[0]} mapped entities, {v1[1] * 100}% input coverage\n'
             else:
                 m += f'{v1}'
 
@@ -268,6 +266,7 @@ def munge_label(label: Union[str, int, float]) -> str:
 
     return label
 
+
 def munge_label_list(labels: list) -> List[str]:
     """Munge labels list."""
     return list(set([munge_label(label) for label in labels]))
@@ -307,7 +306,7 @@ def parse_xls_sheet_to_df(sheet: opxl.workbook,
         col_label = col[0].value
 
         if ((relevant_cols is not None and col_label in relevant_cols) or (
-                irrelevant_cols is not None and col_label not in irrelevant_cols)):
+            irrelevant_cols is not None and col_label not in irrelevant_cols)):
             parsed_sheet_dict[col_label] = [munge_cell(cell.value) for cell in col[1:]]
 
     return pd.DataFrame.from_dict(parsed_sheet_dict)
@@ -328,7 +327,8 @@ def parse_xls_to_df(path: str,
     if len(sheets) > 1:
         return {sheets[ix].lower(): parse_xls_sheet_to_df(sheet, min_row, relevant_cols, irrelevant_cols)
                 for ix, sheet in enumerate(wb)
-                if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or (irrelevant_sheets is not None and sheets[ix] not in irrelevant_sheets)
+                if (relevant_sheets is not None and sheets[ix] in relevant_sheets) or (
+                        irrelevant_sheets is not None and sheets[ix] not in irrelevant_sheets)
                 }
 
     else:
