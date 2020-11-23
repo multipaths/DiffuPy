@@ -516,7 +516,7 @@ def map_labels_input(
 
     # If type dict _map_labels_to_background for each classified input_labels.
     elif _type_dict_label_list_data_struct_check(background_labels) or _type_dict_label_scores_dict_data_struct_check(
-        background_labels):
+            background_labels):
         mapped_labels = {node_type: _map_labels_to_background(munge_labels(input_labels),
                                                               node_set,
                                                               background_labels_type=node_type
@@ -531,7 +531,7 @@ def map_labels_input(
 
     # If two-dimensional type dict call recursively map_labels_input.
     elif _two_dimensional_type_dict_label_list_data_struct_check(
-        background_labels) or _two_dimensional_type_dict_label_scores_dict_data_struct_check(background_labels):
+            background_labels) or _two_dimensional_type_dict_label_scores_dict_data_struct_check(background_labels):
         mapped_labels = {node_type: map_labels_input(input_labels,
                                                      node_set,
                                                      show_descriptive_stat=False
@@ -576,11 +576,11 @@ def mapping_statistics(
             statistics_dict['total'] = (len(total_mapping), len(total_mapping) / len(total_input))
 
     elif _type_dict_label_list_data_struct_check(mapped_labels) or _type_dict_label_scores_dict_data_struct_check(
-        mapped_labels):
+            mapped_labels):
         for mapping_type, mapping in mapped_labels.items():
 
             if (_type_dict_label_list_data_struct_check(input_labels) or _type_dict_label_scores_dict_data_struct_check(
-                input_labels)) and mapping_type in input_labels.keys():
+                    input_labels)) and mapping_type in input_labels.keys():
                 if len(input_labels[mapping_type]) != 0:
                     statistics_dict[mapping_type] = (len(mapping), len(mapping) / len(input_labels[mapping_type]))
                 else:
@@ -611,7 +611,7 @@ def mapping_statistics(
             statistics_dict['total'] = (len(total_mapping), len(total_mapping) / len(total_input))
 
     elif _two_dimensional_type_dict_label_scores_dict_data_struct_check(
-        mapped_labels) or _two_dimensional_type_dict_label_list_data_struct_check(mapped_labels):
+            mapped_labels) or _two_dimensional_type_dict_label_list_data_struct_check(mapped_labels):
 
         subtotals_dict = defaultdict(set)
 
@@ -687,7 +687,7 @@ def _map_labels_to_background(
 ) -> Union[Dict[str, Dict[str, int]], Dict[str, int]]:
     """Map labels from preprocessed input to background_labels to get a set of matched labels."""
     if _type_dict_label_scores_dict_data_struct_check(input_labels) or \
-        _type_dict_label_list_data_struct_check(input_labels):
+            _type_dict_label_list_data_struct_check(input_labels):
 
         if background_labels_type and background_labels_type in input_labels.keys():
             return _map_labels(input_labels[background_labels_type], background_labels)

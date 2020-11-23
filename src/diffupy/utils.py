@@ -306,7 +306,7 @@ def parse_xls_sheet_to_df(sheet: opxl.workbook,
         col_label = col[0].value
 
         if ((relevant_cols is not None and col_label in relevant_cols) or (
-            irrelevant_cols is not None and col_label not in irrelevant_cols)):
+                irrelevant_cols is not None and col_label not in irrelevant_cols)):
             parsed_sheet_dict[col_label] = [munge_cell(cell.value) for cell in col[1:]]
 
     return pd.DataFrame.from_dict(parsed_sheet_dict)
