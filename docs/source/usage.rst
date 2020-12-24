@@ -345,7 +345,7 @@ The diffusion running will report the mapping as follows:
    total  (1491 mapped entities, 44.34% input coverage)
 
 To graphically see the mapping coverage, you can also plot a `heatmap view of the mapping (see views) <https://github.com/multipaths/DiffuPath/blob/master/docs/source/views.rst>`_.
-To see how the mapping is performed over a input pipeline preprocessing, take a look at this `Jupyter Notebook <https://nbviewer.jupyter.org/github/multipaths/Results/blob/master/notebooks/processing_datasets/dataset_1.ipynb>`_
+To see how the mapping is performed over a input pipeline preprocessing, take a look at this `JupyterNotebook <https://nbviewer.jupyter.org/github/multipaths/Results/blob/master/notebooks/processing_datasets/dataset_1.ipynb>`_
 or `see process_input docs <https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_ in DiffuPy.
 
 Output format
