@@ -30,7 +30,7 @@ For its usability, you can either use:
    :members:
 
 Methods
-~~~~~~~
+=======
 The diffusion method by default is *z*, which statistical normalization has previously shown outperformance  [1].
 Further parameters to adapt the propagation procedure can be provided, such as choosing among the available diffusion methods
 or providing a custom method function. See the `diffusion Methods and/or Method modularity <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
@@ -67,7 +67,7 @@ The input is preprocessed and further mapped before the diffusion. See input map
 Here are exposed the covered input formats for its preprocessing.
 
 Scores
---------
+-------
 You can submit your dataset in any of the following formats:
 
 - CSV (*.csv*)
@@ -152,9 +152,6 @@ Kernel
 --------
 If you dispose of a precalculated kernel, you can provide directly the kernel object without needing to also provide a graph object.
 As mentioned above, if you wish to use your kernel method function you can provide it as *kernel_method* argument on the previous descrived functions:
-
-.. automodule:: diffupy.diffuse_raw
-   :members:
 
 
 Input dataset examples
