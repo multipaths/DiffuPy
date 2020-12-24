@@ -1,11 +1,9 @@
-
 .. image:: https://github.com/multipaths/diffupy/blob/master/docs/source/meta/diffupy_logo.png
    :align: center
    :target: https://diffupy.readthedocs.io/en/latest/
 
 Introduction |build| |docs| |zenodo|
 ====================================
-
 DiffuPy is a generalizable Python implementation of the numerous label propagation algorithms. DiffuPy supports generic
 graph formats such as `JSON, CSV, GraphML, or GML <https://github.com/multipaths/DiffuPy/tree/master/examples>`_. Check
 out `DiffuPy's documentation here <https://diffupy.readthedocs.io/en/latest/>`_.
@@ -33,8 +31,8 @@ editable mode with:
    $ cd diffupy
    $ python3 -m pip install -e .
 
-BASIC USAGE
-===========
+Basic Usage
+-----------
 The two required input elements to run diffusion using DiffuPy are:
  1) A **network/graph**. (see Network-Input Formatting below)
  2) A **dataset of scores/ponderations**. (see Scores-Input Formatting below)
@@ -58,17 +56,12 @@ For its usability, you can either:
   # DATA INPUT and GRAPH as Python OBJECTS -> exported *as_csv*
   diffusion_scores = run_diffusion(input_scores, network).as_csv('~/output/diffusion_results.csv')
 
-.. automodule:: diffupy.diffuse
-   :members:
-
-.. automodule:: diffupy.diffuse_raw
-   :members:
-
 Methods
-~~~~~~~
-The diffusion method by default is *z*, which statistical normalization has previously shown outperformance  [1].
-Further parameters to adapt the propagation procedure can be provided, such as choosing among the available diffusion methods
-or providing a custom method function. See the `diffusion Methods and/or Method modularity <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
+-------
+The diffusion method by default is *z*, which statistical normalization has previously shown outperformance.
+Further parameters to adapt the propagation procedure can be provided, such as choosing among the available diffusion
+methods or providing a custom method function. See the `diffusion Methods and/or Method modularity
+<https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
 
 .. code-block:: python3
 
@@ -78,8 +71,8 @@ or providing a custom method function. See the `diffusion Methods and/or Method 
 
   diffusion_scores_custom_method = run_diffusion(input_scores, method = page_rank)
 
-You can also provide your own kernel method or select among other provided in *kernels.py* function you can provide it as *kernel_method* argument.
-By default *regularised_laplacian_kernel* is used.
+You can also provide your own kernel method or select among other provided in *kernels.py* function you can provide it
+as *kernel_method* argument. By default *regularised_laplacian_kernel* is used.
 
 .. code-block:: python3
 
@@ -89,9 +82,8 @@ By default *regularised_laplacian_kernel* is used.
 
 So *method* stands for the **diffusion process** method, and *kernel_method* for the **kernel calculation** method.
 
-
 Command Line Interface
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 The following commands can be used directly from your terminal:
 
 1. **Run a diffusion analysis**
@@ -102,7 +94,6 @@ The following command will run a diffusion method on a given network with the gi
 
     $ python3 -m diffupy diffuse --network=<path-to-network-file> --data=<path-to-data-file> --method=<method>
 
-
 2. **Generate a kernel with one of the seven methods implemented**
 Generates the regularised Laplacian kernel of a given graph. More information in the `documentation
 <https://diffupy.readthedocs.io/en/latest/kernels.html>`_.
@@ -111,21 +102,20 @@ Generates the regularised Laplacian kernel of a given graph. More information in
 
     $ python3 -m diffupy kernel --network=<path-to-network-file>
 
-FORMATTING
-==========
-
+Formatting
+----------
 Before running diffusion algorithms on your network using DiffuPy, take into account the **graph and
 input data/scores formats**. You can find specified here samples of supported input scores and networks.
 
 Input format
 ~~~~~~~~~~~~~
 
-The input is preprocessed and further mapped before the diffusion. See input mapping or or `see process_input docs <https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_  for further details.
-Here are exposed the covered input formats for its preprocessing.
-
+The input is preprocessed and further mapped before the diffusion. See input mapping or or `see process_input docs
+<https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_  for further details. Here are
+exposed the covered input formats for its preprocessing.
 
 Scores
---------
+~~~~~~
 You can submit your dataset in any of the following formats:
 
 - CSV (*.csv*)
@@ -156,8 +146,6 @@ or **Pythonicaly** as a data structure as the *input_scores* parameter:
 
   diffusion_scores_from_dict = run_diffusion(df, network)
 
-
-
 Please ensure that the dataset minimally has a column 'Node' containing node IDs. You can also optionally add the
 following columns to your dataset:
 
@@ -170,8 +158,7 @@ following columns to your dataset:
 .. |Log| replace:: Log\ :sub:`2`
 
 Networks
---------
-
+~~~~~~~~
 If you would like to submit your own networks, please ensure they are in one of the following formats:
 
 - BEL_ (.bel)
@@ -191,6 +178,7 @@ If you would like to submit your own networks, please ensure they are in one of 
 - TXT (.txt)
 
 .. _Edge: https://networkx.github.io/documentation/stable/reference/readwrite/edgelist.html
+
 __ Edge_
 .. _GraphML: http://graphml.graphdrawing.org
 .. _BEL: https://language.bel.bio/
@@ -209,7 +197,8 @@ assigned as the **Source** or **Target**.
 
 Kernel
 --------
-If you dispose of a precalculated **kernel**, you can provide it directly as the *network* parameter without needing to also provide a graph object.
+If you dispose of a precalculated **kernel**, you can provide it directly as the *network* parameter without needing to
+also provide a graph object.
 
 Input dataset examples
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -248,10 +237,8 @@ Also as a list of nodes:
 
   diffusion_scores = run_diffusion(['A', 'B', 'C', 'D'], network)
 
-
-**2.** You can also provide a dataset with a column 'Node' containing node IDs as well as a column 'NodeType', indicating
-
-the entity type of the node to run diffusion by entity type.
+**2.** You can also provide a dataset with a column 'Node' containing node IDs as well as a column 'NodeType',
+indicating the entity type of the node to run diffusion by entity type.
 
 +------------+--------------+
 |     Node   |   NodeType   |
@@ -276,9 +263,8 @@ Also as a dictionary of type:list of nodes :
   diffusion_scores = run_diffusion({'Genes': ['A', 'B', 'D'], 'Metabolites': ['C']}, network)
 
 
-**3.** You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC' with
-
-their logFC. You may also add a 'NodeType' column to run diffusion by entity type.
+**3.** You can also choose to provide a dataset with a column 'Node' containing node IDs as well as a column 'logFC'
+with their logFC. You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+
 | Node         |   LogFC    |
@@ -325,9 +311,8 @@ Also as a dictionary of type:node:score_value :
   diffusion_scores = run_diffusion({Gene: {A:-1, B:-1, D:4}, Metabolite: {C:1.5}}, network)
 
 
-**4.** Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their logFC and a
-
-column 'p-value' with adjusted p-values. You may also add a 'NodeType' column to run diffusion by entity type.
+**4.** Finally, you can provide a dataset with a column 'Node' containing node IDs, a column 'logFC' with their logFC
+and a column 'p-value' with adjusted p-values. You may also add a 'NodeType' column to run diffusion by entity type.
 
 +--------------+------------+---------+
 | Node         |   LogFC    | p-value |
@@ -366,10 +351,10 @@ folder for some examples.
 
 Input Mapping/Coverage
 ~~~~~~~~~~~~~~~~~~~~~~
-Eventhough it is not relevant for the input user usage, it is relevant for the diffusion process assessment taking into account
-the input mapped entities over the background network, since the coverage of the input implies the actual entities-scores
-that are being diffused. In other words, only will be further processed for diffusion, the entities which label matches
-an entity in the network.
+Even though it is not relevant for the input user usage, it is relevant for the diffusion process assessment taking into
+account the input mapped entities over the background network, since the coverage of the input implies the actual
+entities-scores that are being diffused. In other words, only will be further processed for diffusion, the entities
+which label matches an entity in the network.
 
 The diffusion running will report the mapping as follows:
 
@@ -404,9 +389,12 @@ The diffusion running will report the mapping as follows:
    bp_nodes  (13 mapped entities, 0.39% input coverage)
    total  (1491 mapped entities, 44.34% input coverage)
 
-To graphically see the mapping coverage, you can also plot a `heatmap view of the mapping (see views) <https://github.com/multipaths/DiffuPath/blob/master/docs/source/views.rst>`_.
-To see how the mapping is performed over a input pipeline preprocessing, take a look at this `Jupyter Notebook <https://nbviewer.jupyter.org/github/multipaths/Results/blob/master/notebooks/processing_datasets/dataset_1.ipynb>`_
-or `see process_input docs <https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_ in DiffuPy.
+To graphically see the mapping coverage, you can also plot a `heatmap view of the mapping (see views)
+<https://github.com/multipaths/DiffuPath/blob/master/docs/source/views.rst>`_. To see how the mapping is performed over
+a input pipeline preprocessing, take a look at this `Jupyter Notebook
+<https://nbviewer.jupyter.org/github/multipaths/Results/blob/master/notebooks/processing_datasets/dataset_1.ipynb>`_
+or `see process_input docs <https://github.com/multipaths/DiffuPy/blob/master/docs/source/preprocessing.rst>`_ in
+DiffuPy.
 
 
 Output format
@@ -448,7 +436,5 @@ guarantee of maintenance, support, or back-up of data.
 .. |pypi_license| image:: https://img.shields.io/pypi/l/diffupy.svg
     :alt: Apache-2.0
 
-
 ..  |zenodo| image:: https://zenodo.org/badge/195810310.svg
    :target: https://zenodo.org/badge/latestdoi/195810310
-
