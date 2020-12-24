@@ -3,6 +3,8 @@
 """Miscellaneous utils of the package."""
 import inspect
 import logging
+import pickle
+import pickle5
 from typing import Tuple, Union, List, Optional, Callable
 
 import numpy as np
@@ -34,8 +36,7 @@ def get_kernel_and_graph_from_network_path(path: str,
     if path.endswith(KERNEL_FORMATS):
         try:
             graph = process_graph_from_file(path)
-
-        except TypeError:
+        except (pickle5.UnpicklingError, pickle.UnpicklingError, TypeError) as e:
             kernel = process_kernel_from_file(path)
 
     elif path.endswith(GRAPH_FORMATS):
@@ -75,14 +76,14 @@ def get_kernel_from_network_path(path: str,
                                  kernel_method: Optional[Callable] = regularised_laplacian_kernel,
                                  ) -> Matrix:
     """Load network provided in cli (as a graph or as a kernel) retrieving a kernel."""
-    if path.endswith(KERNEL_FORMATS) and filter_network_omic is None and filter_network_database is None:
+    if path.endswith(KERNEL_FORMATS) and filter_network_omic is None:
         try:
             graph = process_graph_from_file(path)
-            if filter_network_omic or filter_network_database:
+            if filter_network_omic:
                 raise ValueError(
                     "The provided network can not be filtered, since has been provided as a kernel. "
                     "For filtering, please provide the network formated as a graph.")
-        except TypeError:
+        except (pickle5.UnpicklingError, pickle.UnpicklingError, TypeError) as e:
             return process_kernel_from_file(path)
 
     elif path.endswith(GRAPH_FORMATS):

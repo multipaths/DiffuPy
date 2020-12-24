@@ -11,12 +11,12 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from .kernels import regularised_laplacian_kernel
-from .process_input import process_map_and_format_input_data_for_diff
-from .process_network import get_kernel_from_network_path, get_graph_from_network_path
 from .constants import *
 from .diffuse_raw import diffuse_raw
+from .kernels import regularised_laplacian_kernel
 from .matrix import Matrix
+from .process_input import process_map_and_format_input_data_for_diff
+from .process_network import get_kernel_from_network_path, get_graph_from_network_path
 from .utils import get_label_list_graph
 from .validate_input import _validate_scores
 
@@ -30,14 +30,14 @@ __all__ = [
 
 
 def run_diffusion(
-        input_labels: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
-        network: Union[str, nx.Graph, Matrix],
-        method: Union[str, Callable] = Z,
-        binarize: Optional[bool] = False,
-        threshold: Optional[float] = None,
-        absolute_value: Optional[bool] = False,
-        p_value: Optional[float] = 0.05,
-        kernel_method: Optional[Callable] = regularised_laplacian_kernel
+    input_labels: Union[str, pd.DataFrame, list, dict, np.ndarray, Matrix],
+    network: Union[str, nx.Graph, Matrix],
+    method: Union[str, Callable] = Z,
+    binarize: Optional[bool] = False,
+    threshold: Optional[float] = None,
+    absolute_value: Optional[bool] = False,
+    p_value: Optional[float] = 0.05,
+    kernel_method: Optional[Callable] = regularised_laplacian_kernel
 ) -> Matrix:
     """Process and format miscellaneous data input and run diffusion over a provided graph network.
 
@@ -91,10 +91,10 @@ def run_diffusion(
 
 
 def diffuse(
-        input_scores: Matrix,
-        method: Union[str, Callable] = RAW,
-        graph: nx.Graph = None,
-        **kwargs
+    input_scores: Matrix,
+    method: Union[str, Callable] = RAW,
+    graph: nx.Graph = None,
+    **kwargs
 ) -> Matrix:
     """Run diffusion on a network given a formated input (matched with kernel Matrix) and a diffusion method.
 

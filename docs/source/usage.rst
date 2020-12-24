@@ -24,7 +24,7 @@ For its usability, you can either:
   diffusion_scores = run_diffusion(input_scores, network).as_csv('~/output/diffusion_results.csv')
 
 Methods
-~~~~~~~
+-------
 The diffusion method by default is *z*, which statistical normalization has previously shown to outperform.
 Further parameters to adapt the propagation procedure are also provided, such as choosing from the available diffusion
 methods or providing a custom method function. See `diffusion Methods and/or Method modularity
@@ -63,7 +63,7 @@ The input is preprocessed and further mapped before the diffusion. See input map
 outline the input formats covered for its preprocessing.
 
 Scores
---------
+------
 You can submit your dataset in any of the following formats:
 
 - CSV (*.csv*)
@@ -146,9 +146,10 @@ assigned as the **Source** or **Target**.
 
 Kernel
 --------
+
 If you dispose of a precalculated kernel, you can provide directly the kernel object without needing to also provide a
 graph object. As mentioned above, if you wish to use your kernel method function you can provide it as *kernel_method*
-argument on the previous described functions:
+argument on the previous described function.
 
 Input dataset examples
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -338,6 +339,7 @@ Running diffusion will report the mapping as follows:
    metabolite_nodes  (13 mapped entities, 0.38% input coverage)
    bp_nodes  (13 mapped entities, 0.39% input coverage)
    total  (1491 mapped entities, 44.34% input coverage)
+
 
 To graphically see the mapping coverage, you can also plot a `heatmap view of the mapping (see views)
 <https://github.com/multipaths/DiffuPath/blob/master/docs/source/views.rst>`_. To see how the mapping is performed over

@@ -27,11 +27,6 @@ The provided methods can be elected for the diffusion computation through the pa
 
   diffusion_scores = run_diffusion(input_scores, network, method = 'raw')
 
-.. automodule:: diffupy.diffuse
-   :members:
-
-.. automodule:: diffupy.diffuse_raw
-   :members:
 
 Methods without statistical normalisation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
