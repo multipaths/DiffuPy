@@ -30,7 +30,7 @@ For its usability, you can either use:
    :members:
 
 Methods
--------
+=======
 The diffusion method by default is *z*, which statistical normalization has previously shown outperformance  [1].
 Further parameters to adapt the propagation procedure can be provided, such as choosing among the available diffusion methods
 or providing a custom method function. See the `diffusion Methods and/or Method modularity <https://github.com/multipaths/DiffuPy/blob/master/docs/source/diffusion.rst>`_.
@@ -67,7 +67,7 @@ The input is preprocessed and further mapped before the diffusion. See input map
 Here are exposed the covered input formats for its preprocessing.
 
 Scores
--------
+------
 You can submit your dataset in any of the following formats:
 
 - CSV (*.csv*)
