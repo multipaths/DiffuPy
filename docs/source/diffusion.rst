@@ -102,12 +102,6 @@ Through the parameter *method* can also be provided a callable function as a cus
   diffusion_scores = run_diffusion(input_scores, network, method = pagerank)
 
 
-.. automodule:: diffupy.diffuse
-   :members:
-
-.. automodule:: diffupy.diffuse_raw
-   :members:
-
 References
 ----------
 .. [1] Vandin, F., *et al.* (2010). Algorithms for detecting significantly mutated pathways in cancer. Lecture Notes in
