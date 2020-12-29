@@ -8,6 +8,13 @@ DiffuPy is a generalizable Python implementation of the numerous label propagati
 graph formats such as `JSON, CSV, GraphML, or GML <https://github.com/multipaths/DiffuPy/tree/master/examples>`_. Check
 out `DiffuPy's documentation here <https://diffupy.readthedocs.io/en/latest/>`_.
 
+Citation
+--------
+If you use DiffuPy in your work, please consider citing:
+
+Marín-Llaó, J., *et al.* (2020). `MultiPaths: a python framework for analyzing multi-layer biological networks using
+diffusion algorithms <https://doi.org/10.1093/bioinformatics/btaa1069>`_. *Bioinformatics*, btaa1069.
+
 Installation |pypi_version| |python_versions| |pypi_license|
 ------------------------------------------------------------
 The latest stable code can be installed from `PyPI <https://pypi.python.org/pypi/diffupy>`_ with:
