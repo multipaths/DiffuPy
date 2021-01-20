@@ -25,14 +25,14 @@ class Matrix:
     """Matrix class."""
 
     def __init__(
-            self,
-            mat=None,
-            rows_labels=None,
-            cols_labels=None,
-            graph=None,
-            quadratic=False,
-            name='',
-            init_value=None,
+        self,
+        mat=None,
+        rows_labels=None,
+        cols_labels=None,
+        graph=None,
+        quadratic=False,
+        name='',
+        init_value=None,
     ):
         """Initialize matrix.
 
