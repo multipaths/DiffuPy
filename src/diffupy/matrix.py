@@ -88,7 +88,7 @@ class Matrix:
         return f"\nmatrix {self.name} \n  {s} \n "
 
     def __iter__(self, **attr):
-        """Helper method for the iteration of the Matrix."""
+        """Iterate Matrix."""
         self.i = -1
         self.j = 0
 
@@ -100,7 +100,7 @@ class Matrix:
         return self
 
     def __next__(self):
-        """Helper method for the iteration of the Matrix."""
+        """Iterate Matrix helper."""
         if self.i >= len(self.rows_labels) - 1 and self.j >= len(self.cols_labels) - 1:
             self.get_labels = True
             self.get_indices = False
