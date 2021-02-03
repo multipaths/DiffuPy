@@ -148,7 +148,7 @@ def diffuse(
             return diffuse_raw(graph, scores, **kwargs)
 
         elif method == GM:
-            for score, i, j in scores.__iter__(get_labels=False, get_indices=True):
+            for score in scores.__iter__(get_labels=False, get_indices=False):
                 if score not in [0, 1]:
                     raise ValueError("Input scores must be binary.")
                     # Have to match rownames with background

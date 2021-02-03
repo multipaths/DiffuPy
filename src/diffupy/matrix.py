@@ -88,7 +88,7 @@ class Matrix:
         return f"\nmatrix {self.name} \n  {s} \n "
 
     def __iter__(self, **attr):
-        """Help method for the iteration of the Matrix."""
+        """Helper method for the iteration of the Matrix."""
         self.i = -1
         self.j = 0
 
@@ -100,7 +100,7 @@ class Matrix:
         return self
 
     def __next__(self):
-        """Help method for the iteration of the Matrix."""
+        """Helper method for the iteration of the Matrix."""
         if self.i >= len(self.rows_labels) - 1 and self.j >= len(self.cols_labels) - 1:
             self.get_labels = True
             self.get_indices = False
@@ -126,7 +126,10 @@ class Matrix:
         if self.get_labels:
             nxt += (self.rows_labels[self.i], self.cols_labels[self.j])
 
-        return nxt
+        if len(nxt) == 1:
+            return nxt[0]
+        else:
+            return nxt
 
     def __copy__(self):
         """Return a copy of a Matrix object."""
@@ -481,10 +484,25 @@ class Matrix:
         cnt = 0
 
         for x in self.__iter__(get_labels=False, get_indices=False):
-            if x != 0:
+            if x != -1 and x != 0:
                 cnt += 1
 
         return cnt
+
+    def binarize(self, null_value=-1, threshold=0, positive_value=1):
+        """Get count of n cells not 0 in matrix."""
+        binarize = False
+        for score, i, j in self.__iter__(get_labels=False, get_indices=True):
+            if score not in [null_value, positive_value]:
+                binarize = True
+                if score > threshold:
+                    self.mat[i, j] = positive_value
+                else:
+                    self.mat[i, j] = null_value
+
+        if binarize:
+            log.warning(
+                f"The input scores must be binary. The array {self.cols_labels} has been automatically binarized.")
 
     """Export"""
 

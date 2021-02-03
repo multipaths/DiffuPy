@@ -4,7 +4,7 @@
 import inspect
 import logging
 import pickle
-import pickle5
+
 from typing import Tuple, Union, List, Optional, Callable
 
 import numpy as np
@@ -36,7 +36,7 @@ def get_kernel_and_graph_from_network_path(path: str,
     if path.endswith(KERNEL_FORMATS):
         try:
             graph = process_graph_from_file(path)
-        except (pickle5.UnpicklingError, pickle.UnpicklingError, TypeError) as e:
+        except (pickle.UnpicklingError, TypeError) as e:
             kernel = process_kernel_from_file(path)
 
     elif path.endswith(GRAPH_FORMATS):
