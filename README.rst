@@ -13,7 +13,7 @@ Citation
 If you use DiffuPy in your work, please consider citing:
 
 Marín-Llaó, J., *et al.* (2020). `MultiPaths: a python framework for analyzing multi-layer biological networks using
-diffusion algorithms <https://doi.org/10.1093/bioinformatics/btaa1069>`_. *Bioinformatics*, btaa1069.
+diffusion algorithms <https://doi.org/10.1093/bioinformatics/btaa1069>`_. *Bioinformatics*, 37(1), 137-139.
 
 Installation |pypi_version| |python_versions| |pypi_license|
 ------------------------------------------------------------
